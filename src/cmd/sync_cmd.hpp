@@ -1,5 +1,7 @@
 #pragma once
 
+#include <span>
+
 #include "cmd.hpp"
 
 namespace leafsync {
