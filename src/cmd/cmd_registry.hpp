@@ -15,8 +15,6 @@ public:
 
     int run(std::span<const char*> args) const;
 
-    const cmd* find_by_name(const char* name) const;
-
 private:
     std::unordered_map<std::string, const cmd*> _names;
     static const cmd* const _list[];

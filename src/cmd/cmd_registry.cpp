@@ -32,11 +32,6 @@ std::string cmd_registry::usage() const {
     return result;
 }
 
-const cmd* cmd_registry::find_by_name(const char* name) const {
-    const auto it = _names.find(name);
-    return it != _names.cend() ? it->second : nullptr;
-}
-
 int cmd_registry::run(std::span<const char*> args) const {
     if (args.empty()) {
         fmt::print("{}\n", usage());
@@ -44,12 +39,12 @@ int cmd_registry::run(std::span<const char*> args) const {
     }
 
     const char* cmd_name = args[0];
-    const auto cmd = find_by_name(cmd_name);
-    if (cmd == nullptr) {
+    const auto it = _names.find(cmd_name);
+    if (it == _names.end()) {
         fmt::print("Unknown command: {}\n\n{}\n", cmd_name, usage());
         return 1;
     }
-    return cmd->run(args.subspan(1));
+    return it->second->run(args.subspan(1));
 }
 
 
