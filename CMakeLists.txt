@@ -18,9 +18,9 @@ add_executable(leafsync
 target_link_libraries(leafsync PRIVATE fmt::fmt nlohmann_json::nlohmann_json)
 
 if(MSVC)
-  target_compile_options(leafsync PRIVATE /W4 /WX)
+  target_compile_options(leafsync PRIVATE /W4)
 else()
-  target_compile_options(leafsync PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  target_compile_options(leafsync PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 # install(TARGETS leafsync

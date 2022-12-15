@@ -1,21 +1,19 @@
 #pragma once
 
 #include <span>
-#include <string>
+
+#include "cmd_desc.hpp"
 
 namespace leafsync {
 
 class cmd {
 public:
-    cmd(const std::span<const char*>& names, const char* description);
+    cmd(const cmd_desc& desc);
     
     virtual ~cmd() = default;
     virtual int run(const std::span<const char*>& args) const = 0;
 
-    std::span<const char*> names;
-    const char* description;
-    
-    std::string usage() const;
+    const cmd_desc desc;
 
 };
 
