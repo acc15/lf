@@ -1,4 +1,3 @@
-
 #include "cmd/cmd_registry.hpp"
 
 int main(const int argc, const char *argv[]) {

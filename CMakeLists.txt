@@ -5,10 +5,19 @@ project(leafsync LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(fmt REQUIRED)
+if(MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-add_executable(leafsync 
-    src/main.cpp 
+find_package(fmt REQUIRED)
+find_package(Catch2 REQUIRED)
+link_libraries(fmt::fmt)
+
+set(src
+    src/util/bitset.hpp
+    src/util/bitset.cpp
     src/fs/util.hpp 
     src/fs/util.cpp
     src/cmd/cmd_desc.hpp
@@ -19,13 +28,15 @@ add_executable(leafsync
     src/cmd/cmd_registry.hpp 
     src/cmd/cmd_registry.cpp
 )
-target_link_libraries(leafsync PRIVATE fmt::fmt)
 
-if(MSVC)
-  target_compile_options(leafsync PRIVATE /W4)
-else()
-  target_compile_options(leafsync PRIVATE -Wall -Wextra -Wpedantic)
-endif()
+set (test
+    test/util/bitset.cpp
+)
+
+add_executable(leafsync ${src} src/main.cpp)
+add_executable(leafsync_test ${src} ${test} test/main.cpp)
+target_include_directories(leafsync_test PRIVATE src)
+target_link_libraries(leafsync_test PRIVATE Catch2::Catch2)
 
 # install(TARGETS leafsync
 #     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
