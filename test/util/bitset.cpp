@@ -6,9 +6,8 @@ using leafsync::bitset;
 
 TEST_CASE( "default_constructor", "[bitset]" ) {
     bitset b;
-    REQUIRE( b.buf() == nullptr );
+    REQUIRE( b.blocks().empty() );
     REQUIRE( b.size() == 0 );
-    REQUIRE( b.blocks() == 0 );
 }
 
 TEST_CASE( "copy_constructor", "[bitset]" ) {
@@ -19,8 +18,7 @@ TEST_CASE( "copy_constructor", "[bitset]" ) {
     bitset b2(b1);
     REQUIRE( b1.size() == 5 );
     REQUIRE( b2.size() == 5 );
-    REQUIRE( b2.buf() != nullptr );
-    REQUIRE( b2.buf() != b1.buf() );
+    REQUIRE( b2.blocks() == b1.blocks() );
 }
 
 TEST_CASE( "move_constructor", "[bitset]" ) {
@@ -31,8 +29,8 @@ TEST_CASE( "move_constructor", "[bitset]" ) {
     bitset b2(std::move(b1));
     REQUIRE( b1.size() == 0 );
     REQUIRE( b2.size() == 5 );
-    REQUIRE( b1.buf() == nullptr );
-    REQUIRE( b2.buf() != nullptr );
+    REQUIRE( b1.blocks().empty() );
+    REQUIRE( b2.blocks().size() == 1 );
 }
 
 TEST_CASE( "copy_assign", "[bitset]" ) {
@@ -45,8 +43,8 @@ TEST_CASE( "copy_assign", "[bitset]" ) {
 
     REQUIRE( b1.size() == 5 );
     REQUIRE( b2.size() == 5 );
-    REQUIRE( b2.buf() != nullptr );
-    REQUIRE( b2.buf() != b1.buf() );
+    REQUIRE( b1.blocks().size() == 1 );
+    REQUIRE( b2.blocks().size() == 1 );
 }
 
 TEST_CASE( "move_assign", "[bitset]" ) {
@@ -60,8 +58,8 @@ TEST_CASE( "move_assign", "[bitset]" ) {
 
     REQUIRE( b1.size() == 0 );
     REQUIRE( b2.size() == 5 );
-    REQUIRE( b1.buf() == nullptr );
-    REQUIRE( b2.buf() != nullptr );
+    REQUIRE( b1.blocks().empty() );
+    REQUIRE( !b2.blocks().empty() );
 }
 
 TEST_CASE( "initial_values_is_false", "[bitset]" ) {
@@ -90,12 +88,12 @@ TEST_CASE( "set_get", "[bitset]" ) {
 TEST_CASE( "resize_must_initialize_buf", "[bitset]" ) {
     bitset b;
     b.resize(10);
-    REQUIRE( b.buf() != nullptr );
+    REQUIRE( !b.blocks().empty() );
     REQUIRE( b.size() == 10 );
-    REQUIRE( b.blocks() == 2 );
+    REQUIRE( b.blocks().size() == 2 );
 
-    REQUIRE( b.buf()[0] == 0 );
-    REQUIRE( b.buf()[1] == 0 );
+    REQUIRE( b.blocks()[0] == 0 );
+    REQUIRE( b.blocks()[1] == 0 );
 }
 
 TEST_CASE( "resize_should_keep_values", "[bitset]" ) {
