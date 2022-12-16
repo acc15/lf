@@ -14,20 +14,20 @@ Empty names are disallowed - so empty names - designates end of mirrors table
 
 ## Entry
 
-	(name) | \0 | flags | (mirror sync flags - size depends on used mirrors) | (children entries) | \0
+	(name) '\0' <sync flags> [mirror flags]* [children entries]* '\0'
 
-### Flags
+### Sync flags
 
-Flags contains next group bits:
+Flags contains next bit groups:
 
      87654   32   1
 	[00000] [00] [0] 
 
 * 1 bit - directory flag (0 - file, 1 - dir)
-* 2-3 bits - enables sync of entry (0 - not syncing, 1 - shallow dir/file sync, 2 - deep/recursive dir sync)
+* 2-3 bits - enables sync of entry (`00` - not syncing, `01` - shallow dir/file sync, `10` (decimal - 2) - deep/recursive dir sync)
 * other bits - unused
 
-### Mirror sync flags
+### Mirror flags
 
 Byte count is determined by used mirrors table and must be always equal to 
 
@@ -35,15 +35,15 @@ Byte count is determined by used mirrors table and must be always equal to
 
 Each bit designates whether current entry was synchronized to mirror or not.
 This information is required to determine how to resolve case when 
-left contains file "a", but remote doesn't - as there is 2 solutions possible:
+`left` contains file `"a"`, but `right` doesn't - as there is 2 solutions possible:
 
-* add file "a" to right
-* delete file "a" in left
+* add file `"a"` to `right`
+* delete file `"a"` from `left`
 
 ### Example
 
-	\b00000001\b00000000 <-- root flags and state
+	\b00000001\b00000000 <-- root flags and sync state
 	 a\0\b00000001\b00000000 <-- Directory "a"
 	  b.json\0\b00000010\b00000001\0 <-- Syncable file "b.json" - which already synced to first used mirror (`/mnt/sync`)
-	 \0 <-- Designated "a" listing
-	\0 <-- designates end of root listing, all trailing \0 also can be replaced with just <EOF>
+	 \0 <-- Designated end of "a" listing
+	\0 <-- Designates end of root listing, all trailing '\0' also can be replaced with <EOF>
