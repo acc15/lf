@@ -31,6 +31,7 @@ set(src
 
 set (test
     test/util/bitset.cpp
+    test/config/config.cpp
 )
 
 add_executable(leafsync ${src} src/main.cpp)

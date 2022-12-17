@@ -1,22 +1,31 @@
-# Used mirrors table
+# Index file format
 
-Table contains list of paths to which current directory was synchronized.
+Index files contains 2 sections as follows:
+
+* Used mirrors table
+* Entry tree
+
+## Used mirrors table
+
+Table contains list of paths to which tree was synchronized.
+
 Names are null-terminated string
-Empty names are disallowed - so empty names - designates end of mirrors table
 
-## Example
+Empty names are prohibited - so empty name just designates end of mirrors table
+
+### Example
 
 	/mnt/sync\0
 	/home/other\0
 	\0 - mirrors table ended
 
-# File tree with sync states
+## File tree with sync states
 
-## Entry
+### Entry
 
 	(name) '\0' <sync flags> [mirror flags]* [children entries]* '\0'
 
-### Sync flags
+#### Sync flags
 
 Flags contains next bit groups:
 
@@ -27,13 +36,14 @@ Flags contains next bit groups:
 * 2-3 bits - enables sync of entry (`00` - not syncing, `01` - shallow dir/file sync, `10` (decimal - 2) - deep/recursive dir sync)
 * other bits - unused
 
-### Mirror flags
+#### Mirror flags
 
-Byte count is determined by used mirrors table and must be always equal to 
+Byte count of mirror flags is determined by used mirrors table and must be always equal to 
 
 	(count of mirrors + 7) / 8
 
-Each bit designates whether current entry was synchronized to mirror or not.
+Each bit designates whether current entry was synchronized to mirror at specific index (in used mirror table) or not.
+
 This information is required to determine how to resolve case when 
 `left` contains file `"a"`, but `right` doesn't - as there is 2 solutions possible:
 

@@ -1,0 +1,4 @@
+home:/home/user/.config/leafsync/leafsync.index//w:/home/user//w:/mnt/sync
+pic:/home/user/.config/leafsync/pic.index//w:/home/user/Pictures//w:/mnt/images
+unicode:/home/user/тест/индекс.index//w:/home/user/тест//w:/mnt/Проверка
+unicode:/home/user/δοκιμή/δείκτης.index//w:/home/user/δοκιμή//w:/mnt/δοκιμή

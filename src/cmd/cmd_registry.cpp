@@ -35,7 +35,7 @@ std::string cmd_registry::usage() const {
 int cmd_registry::run(std::span<const char*> args) const {
     if (args.empty()) {
         fmt::print("{}\n", usage());
-        return 1;
+        return 0;
     }
 
     const char* cmd_name = args[0];
