@@ -34,9 +34,9 @@ set (test
 )
 
 add_executable(leafsync ${src} src/main.cpp)
-add_executable(leafsync_test ${src} ${test} test/main.cpp)
+add_executable(leafsync_test ${src} ${test} )
 target_include_directories(leafsync_test PRIVATE src)
-target_link_libraries(leafsync_test PRIVATE Catch2::Catch2)
+target_link_libraries(leafsync_test PRIVATE Catch2::Catch2WithMain)
 
 # install(TARGETS leafsync
 #     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
