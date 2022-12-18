@@ -1,7 +1,7 @@
 
 # VSCode config dir
 .vscode/
-build/ # VSCode output dir
+build/
 
 # Visual Studio settings file
 .vs/
