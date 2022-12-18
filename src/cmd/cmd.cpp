@@ -1,5 +1,3 @@
-#include <fmt/ranges.h>
-
 #include "cmd.hpp"
 
 namespace leafsync {

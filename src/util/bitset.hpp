@@ -1,14 +1,13 @@
 #pragma once
 
+#include <cstdint>
 #include <limits>
 #include <vector>
-
 namespace leafsync {
-
 class bitset {
 public:
-    typedef unsigned int size_type;
-    typedef unsigned char block_type;
+    typedef std::size_t size_type;
+    typedef std::uint8_t block_type;
 
     bitset();
     bitset(const bitset& copy);
@@ -33,7 +32,6 @@ public:
     inline const block_type& bit_block(size_type i) const;
 
 private:
-
     size_type _size = 0;
     std::vector<block_type> _blocks;
 

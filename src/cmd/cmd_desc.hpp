@@ -2,10 +2,8 @@
 
 #include <span>
 #include <fmt/format.h>
-
 namespace leafsync
 {
-
 struct cmd_desc
 {
     std::span<const char *> names;
@@ -13,7 +11,6 @@ struct cmd_desc
 };
 
 }
-
 template <>
 struct fmt::formatter<leafsync::cmd_desc> : fmt::formatter<string_view>
 {
