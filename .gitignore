@@ -1,3 +1,6 @@
+# KDevelop
+.kdev4/
+*.kdev4
 
 # VSCode config dir
 .vscode/
