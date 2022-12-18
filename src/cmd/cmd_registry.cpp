@@ -21,12 +21,12 @@ std::string cmd_registry::usage() const {
     std::string result;
 
     const size_t sz = std::size(_list);
-    if (sz == 0) {
+    if constexpr (sz == 0) {
         return result;
     }
 
     result.append(fmt::format("Usage: \n\n{}", _list[0]->desc));
-    for (size_t i = 1; i < std::size(_list); i++) {
+    for (size_t i = 1; i < sz; i++) {
         result.append(fmt::format("\n{}", _list[i]->desc));
     }
     return result;

@@ -1,4 +1,13 @@
-build/
+
+# VSCode config dir
 .vscode/
+build/ # VSCode output dir
+
+# Visual Studio settings file
+.vs/
+CMakeSettings.json
+out/
+
+# CMake
 CMakeLists.txt.user
 CMakeCache.txt
