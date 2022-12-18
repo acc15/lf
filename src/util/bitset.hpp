@@ -27,7 +27,7 @@ public:
 
     static constexpr size_type bits_per_block = std::numeric_limits<block_type>::digits;
     static constexpr size_type min_blocks(size_type n);
-    static constexpr size_type bit_mask(size_type i);
+    static constexpr block_type bit_mask(size_type i);
     inline block_type& bit_block(size_type i);
     inline const block_type& bit_block(size_type i) const;
 

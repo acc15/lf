@@ -6,9 +6,15 @@ project(leafsync LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(executable_src)
 if(MSVC)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS -DUNICODE -D_UNICODE)
-    add_compile_options(/utf-8 /W4)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_compile_options(/utf-8 /W4 /Zc:__cplusplus)
+    
+    # See
+    # https://learn.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page
+    # https://habr.com/ru/company/ruvds/blog/645325/
+    list(APPEND executable_src msvc/utf8.manifest)
 else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -31,10 +37,15 @@ add_library(leafsync_core
     src/cmd/cmd_registry.cpp
 )
 
-add_executable(leafsync src/main.cpp)
+add_executable(leafsync 
+    ${executable_src}
+    src/main.cpp
+)
 target_link_libraries(leafsync PRIVATE leafsync_core)
 
-add_executable(leafsync_test
+add_executable(leafsync_test 
+    ${executable_src}
+    msvc/utf8.manifest 
     test/util/bitset.cpp
     test/config/config.cpp
     test/unicode/unicode.cpp

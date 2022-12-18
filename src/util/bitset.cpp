@@ -70,8 +70,8 @@ constexpr bitset::size_type bitset::min_blocks(bitset::size_type n) {
     return (n + bits_per_block - 1) / bits_per_block;
 }
 
-constexpr bitset::size_type bitset::bit_mask(bitset::size_type i) {
-    return 1 << (i % bits_per_block);
+constexpr bitset::block_type bitset::bit_mask(bitset::size_type i) {
+    return static_cast<block_type>(1 << (i % bits_per_block));
 }
 
 bitset::block_type& bitset::bit_block(bitset::size_type i) {
