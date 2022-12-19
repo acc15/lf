@@ -6,11 +6,11 @@
 
 int main(const int argc, const char *argv[]) {
 
-#ifdef WIN32
+#ifdef _WIN32
 	SetConsoleOutputCP(CP_UTF8);
 #endif
     
     std::span<const char*> args(argv, argc);
     return leafsync::cmds.run(args.subspan(1));
-    
+
 }
