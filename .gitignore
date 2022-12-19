@@ -4,6 +4,7 @@
 
 # VSCode config dir
 .vscode/
+!.vscode/launch.json
 build/
 
 # Visual Studio settings file
