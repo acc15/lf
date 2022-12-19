@@ -18,3 +18,15 @@ TEST_CASE("trim", "[string]") {
 	REQUIRE(leafsync::trim("  abc   ") == "abc");
 	REQUIRE(leafsync::trim("  юникод  ") == "юникод");
 }
+
+TEST_CASE("lower", "[string]") {
+	REQUIRE(leafsync::lower(" aBcюникод ") == " abcюникод ");
+	REQUIRE(leafsync::lower("  ЮНИКОД  ") == "  ЮНИКОД  ");
+	REQUIRE(leafsync::lower("ABCD") == "abcd");
+}
+
+TEST_CASE("upper", "[string]") {
+	REQUIRE(leafsync::upper(" aBcюникод ") == " ABCюникод ");
+	REQUIRE(leafsync::upper("  юникод  ") == "  юникод  ");
+	REQUIRE(leafsync::upper("abcD") == "ABCD");
+}

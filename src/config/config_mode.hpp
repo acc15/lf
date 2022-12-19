@@ -1,17 +1,14 @@
 #pragma once
 
-#include <istream>
+#include <string_view>
 
 namespace leafsync {
 
 	enum class config_mode {
-		UNKNOWN,
 		READ,
 		WRITE
 	};
 
-	config_mode parse_config_mode(const char ch);
+	bool parse_config_mode(std::string_view str, config_mode& result);
 
 }
-
-// std::istream& operator>>(std::istream& in, leafsync::config_mode& mode);

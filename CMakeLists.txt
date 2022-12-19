@@ -16,7 +16,7 @@ if(MSVC)
     # https://habr.com/ru/company/ruvds/blog/645325/
     list(APPEND executable_src msvc/utf8.manifest)
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic)
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror=return-type)
 endif()
 
 find_package(fmt REQUIRED)
@@ -26,8 +26,12 @@ link_libraries(fmt::fmt)
 add_library(leafsync_core     
     src/util/string.hpp
     src/util/string.cpp
+    src/util/tokenizer.hpp
+    src/util/tokenizer.cpp
     src/util/bitset.hpp
     src/util/bitset.cpp
+    src/err/error_handler.hpp
+    src/err/error_handler.cpp
     src/fs/util.hpp 
     src/fs/util.cpp
     src/cmd/cmd_desc.hpp
@@ -52,11 +56,14 @@ target_link_libraries(leafsync PRIVATE leafsync_core)
 add_executable(leafsync_test 
     ${executable_src}
     test/main.cpp
+    test/test_util.hpp
+    test/test_util.cpp
     test/util/bitset.cpp
+    test/util/string.cpp
     test/config/config.cpp
     test/unicode/unicode.cpp
     test/config/config_mode.cpp
- "test/util/string.cpp")
+)
 target_include_directories(leafsync_test PRIVATE src)
 target_link_libraries(leafsync_test PRIVATE leafsync_core Catch2::Catch2)
 

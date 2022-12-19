@@ -5,7 +5,10 @@
 using namespace leafsync;
 
 TEST_CASE("should parse", "[config_mode]") {
-	REQUIRE( parse_config_mode('r') == config_mode::READ );
-	REQUIRE( parse_config_mode('w') == config_mode::WRITE );
-	REQUIRE( parse_config_mode('x') == config_mode::UNKNOWN );
+	config_mode mode;
+	REQUIRE((parse_config_mode("r", mode) && mode == config_mode::READ));
+	REQUIRE((parse_config_mode("READ", mode) && mode == config_mode::READ));
+	REQUIRE((parse_config_mode("w", mode) && mode == config_mode::WRITE));
+	REQUIRE((parse_config_mode("WRITE", mode) && mode == config_mode::WRITE));
+	REQUIRE_FALSE( parse_config_mode("x", mode) );
 }

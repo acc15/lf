@@ -1,4 +1,10 @@
-home:/home/user/.config/leafsync/leafsync.index//w:/home/user//w:/mnt/sync
-pic:/home/user/.config/leafsync/pic.index//w:/home/user/Pictures//w:/mnt/images
-unicode:/home/user/тест/индекс.index//w:/home/user/тест//w:/mnt/Проверка
-unicode:/home/user/δοκιμή/δείκτης.index//w:/home/user/δοκιμή//w:/mnt/δοκιμή
+
+    # Comments allowed, blank lines are ignored
+    home:/home/user/.config/leafsync/leafsync.index//w:/home/user//w:/mnt/sync   
+
+pic:/home/user/.config/leafsync/pic.index//r:/home/user/Pictures//w:/mnt/images 
+rus:/home/user/тест/индекс.index//w:/home/user/тест//w:/mnt/Проверка  
+  greek:/home/user/δοκιμή/δείκτης.index//w:/home/user/δοκιμή//w:/mnt/δοκιμή   
+
+# This should be trimmed    
+    trim:/home/user/test.index//w:/home/user/test//r:/mnt/test      
