@@ -24,6 +24,8 @@ find_package(Catch2 REQUIRED)
 link_libraries(fmt::fmt)
 
 add_library(leafsync_core     
+    src/util/string.hpp
+    src/util/string.cpp
     src/util/bitset.hpp
     src/util/bitset.cpp
     src/fs/util.hpp 
@@ -35,6 +37,10 @@ add_library(leafsync_core
     src/cmd/sync_cmd.cpp
     src/cmd/cmd_registry.hpp 
     src/cmd/cmd_registry.cpp
+    src/config/config_mode.hpp
+    src/config/config_mode.cpp
+    src/config/config.hpp
+    src/config/config.cpp
 )
 
 add_executable(leafsync 
@@ -45,13 +51,14 @@ target_link_libraries(leafsync PRIVATE leafsync_core)
 
 add_executable(leafsync_test 
     ${executable_src}
-    msvc/utf8.manifest 
+    test/main.cpp
     test/util/bitset.cpp
     test/config/config.cpp
     test/unicode/unicode.cpp
-)
+    test/config/config_mode.cpp
+ "test/util/string.cpp")
 target_include_directories(leafsync_test PRIVATE src)
-target_link_libraries(leafsync_test PRIVATE leafsync_core Catch2::Catch2WithMain)
+target_link_libraries(leafsync_test PRIVATE leafsync_core Catch2::Catch2)
 
 # install(TARGETS leafsync
 #     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
