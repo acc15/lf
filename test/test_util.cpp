@@ -4,9 +4,7 @@
 
 namespace leafsync {
 
-    const std::filesystem::path test_dir = std::filesystem::path(
-        std::source_location::current().file_name()
-    ).parent_path();
+    const std::filesystem::path test_dir = std::filesystem::path(__FILE__).parent_path();
 
     void test_error_handler::error(std::string_view msg) {
         messages.push_back(static_cast<std::string>(msg));
