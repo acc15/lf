@@ -4,9 +4,9 @@
 #include <string_view>
 #include <istream>
 #include <vector>
-#include <unordered_map>
 
 #include "config_sync.hpp"
+#include "../util/map.hpp"
 #include "../err/error_handler.hpp"
 
 namespace leafsync {
@@ -27,7 +27,7 @@ private:
 	bool parse_mirror(error_handler& err, token_array tokens, size_t token_offset, config_mirror& mirror);
 
 	std::vector<config_sync> _syncs;
-	std::unordered_map<std::string, std::size_t> _names;
+	unordered_string_map<std::size_t> _names;
 
 };
 

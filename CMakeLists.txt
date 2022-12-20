@@ -58,6 +58,7 @@ add_executable(leafsync_test
     test/main.cpp
     test/test_util.hpp
     test/test_util.cpp
+    test/util/map.cpp
     test/util/bitset.cpp
     test/util/string.cpp
     test/config/config.cpp

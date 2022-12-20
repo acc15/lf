@@ -94,8 +94,7 @@ TEST_CASE("load", "[config]") {
 bool test_has_errors(const std::string& text) {
 	test_error_handler err;
 	std::stringstream ss(text);
-	config cfg;
-	cfg.load(err, ss);
+	config().load(err, ss);
 	
 	UNSCOPED_INFO("text: " << text);
 	for (const auto& m: err.messages) {

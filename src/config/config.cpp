@@ -53,9 +53,8 @@ namespace leafsync {
 				continue;
 			}
 
-			std::string name = static_cast<std::string>(tokens[0]);
-			if (_names.contains(name)) {
-				err.error(fmt::format("duplicate sync: {}", name));
+			if (_names.contains(tokens[0])) {
+				err.error(fmt::format("duplicate sync: {}", tokens[0]));
 				continue;
 			}
 
@@ -67,7 +66,7 @@ namespace leafsync {
 				continue;
 			}
 
-			const auto ins = _names.emplace(std::move(name), index);
+			const auto ins = _names.emplace(tokens[0], index);
 			assert(ins.second);
 
 			sync.name = ins.first->first;
