@@ -4,9 +4,10 @@
 #include <cstring>
 #include <string>
 #include <fstream>
+#include <filesystem>
+#include <locale>
 
 #include <fmt/core.h>
-#include <filesystem>
 
 #include "../test_util.hpp"
 

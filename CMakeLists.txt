@@ -30,6 +30,8 @@ add_library(leafsync_core
     src/util/tokenizer.cpp
     src/util/bitset.hpp
     src/util/bitset.cpp
+    src/util/hash.hpp
+    src/util/hash.cpp
     src/err/error_handler.hpp
     src/err/error_handler.cpp
     src/fs/util.hpp 
@@ -58,7 +60,7 @@ add_executable(leafsync_test
     test/main.cpp
     test/test_util.hpp
     test/test_util.cpp
-    test/util/map.cpp
+    test/util/hash.cpp
     test/util/bitset.cpp
     test/util/string.cpp
     test/config/config.cpp
