@@ -32,6 +32,8 @@ add_library(leafsync_core
     src/util/bitset.cpp
     src/util/hash.hpp
     src/util/hash.cpp
+    src/util/console.hpp
+    src/util/console.cpp
     src/err/error_handler.hpp
     src/err/error_handler.cpp
     src/fs/util.hpp 

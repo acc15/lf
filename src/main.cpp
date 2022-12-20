@@ -1,16 +1,9 @@
 #include "cmd/cmd_registry.hpp"
-
-#ifdef _WIN32
-#include <Windows.h>
-#endif
+#include "util/console.hpp"
 
 int main(const int argc, const char *argv[]) {
+    leafsync::console_init();    
 
-#ifdef _WIN32
-	SetConsoleOutputCP(CP_UTF8);
-#endif
-    
     std::span<const char*> args(argv, argc);
     return leafsync::cmds.run(args.subspan(1));
-
 }
