@@ -23,7 +23,9 @@ find_package(fmt REQUIRED)
 find_package(Catch2 REQUIRED)
 link_libraries(fmt::fmt)
 
-add_library(leafsync_core     
+add_library(leafsync_core  
+    src/index/index.hpp
+    src/index/index.cpp
     src/util/string.hpp
     src/util/string.cpp
     src/util/tokenizer.hpp
@@ -69,6 +71,7 @@ add_executable(leafsync_test
     test/config/config.cpp
     test/unicode/unicode.cpp
     test/io/file.cpp
+    test/index/index.cpp
 )
 target_include_directories(leafsync_test PRIVATE src)
 target_link_libraries(leafsync_test PRIVATE leafsync_core Catch2::Catch2)

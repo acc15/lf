@@ -4,6 +4,7 @@
 #include <fstream>
 #include <filesystem>
 #include <locale>
+#include <set>
 
 #include <fmt/core.h>
 
@@ -23,12 +24,12 @@ TEST_CASE("unicode env", "[unicode]") {
 }
 
 TEST_CASE("list_dir", "[unicode]") {
-    std::vector<std::string> actual_names;
+    std::set<std::string> actual_names;
     for (const auto& e : std::filesystem::directory_iterator(unicode_dir)) {
-        actual_names.push_back(e.path().filename().string());
+        actual_names.insert(e.path().filename().string());
     }
 
-    std::vector<std::string> expect_names = {"Ελληνικά.txt", "Русский.txt"};
+    std::set<std::string> expect_names = {"Ελληνικά.txt", "Русский.txt"};
     REQUIRE( actual_names == expect_names );
 }
 

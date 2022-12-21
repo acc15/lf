@@ -1,59 +1,47 @@
 # Index file format
 
-Index files contains 2 sections as follows:
-
-* Used mirrors table
-* Entry tree
-
-## Used mirrors table
-
-Table contains list of paths to which tree was synchronized.
-
-Names are null-terminated string
-
-Empty names are prohibited - so empty name just designates end of mirrors table
-
-### Example
-
-	/mnt/sync\0
-	/home/other\0
-	\0 - mirrors table ended
+Index file is binary file which contains directory tree and current synchronization state
 
 ## File tree with sync states
 
 ### Entry
 
-	(name) '\0' <sync flags> [mirror flags]* [children entries]* '\0'
-
-#### Sync flags
-
-Flags contains next bit groups:
-
-     87654   32   1
-	[00000] [00] [0] 
-
-* 1 bit - directory flag (0 - file, 1 - dir)
-* 2-3 bits - enables sync of entry (`00` - not syncing, `01` - shallow dir/file sync, `10` (decimal - 2) - deep/recursive dir sync)
-* other bits - unused
-
-#### Mirror flags
-
-Byte count of mirror flags is determined by used mirrors table and must be always equal to 
-
-	(count of mirrors + 7) / 8
-
-Each bit designates whether current entry was synchronized to mirror at specific index (in used mirror table) or not.
-
-This information is required to determine how to resolve case when 
-`left` contains file `"a"`, but `right` doesn't - as there is 2 solutions possible:
-
-* add file `"a"` to `right`
-* delete file `"a"` from `left`
+```plantuml
+@startebnf
+title leafsync entry grammar
+index = "LF" (* Signature *), "0-255" (* File format version, single byte *), root_entry;
+root = flags, entries;
+entries = { entry, "\0" };
+entry = entry_name, "\0", flags, entries (* Child entries *), "\0";
+entry_name = { "<any utf-8 char, except / and \0>" }-;
+flags (* single byte, binary format *) = "00000" (* Unused bits *), ("0" (* Entry isn't synchronized *) | "1" (* Entry is synchronized *)), ("00" (* Sync disabled *) | "01" (* Shallow sync enabled *) | "10" (* Deep sync enabled *));
+@endebnf
+```
 
 ### Example
 
-	\b00000001\b00000000 <-- root flags and sync state
-	 a\0\b00000001\b00000000 <-- Directory "a"
-	  b.json\0\b00000010\b00000001\0 <-- Syncable file "b.json" - which already synced to first used mirror (`/mnt/sync`)
-	 \0 <-- Designated end of "a" listing
-	\0 <-- Designates end of root listing, all trailing '\0' also can be replaced with <EOF>
+```plantuml
+@startyaml
+signature: LF
+version: 0
+flags: 00000001
+entries:
+  - name: dir_a
+    flags: 00000001
+    entries:
+      - name: a.json
+        flags: 00001000
+      - name: b.json
+        flags: 00001010
+      - name: c.json
+        flags: 00000010
+  - name: dir_b
+    flags: 00001101
+    entries:
+      - name: d.json
+        flags: 00001010
+      - name: e.json
+        flags: 00001010
+
+@endyaml
+```
