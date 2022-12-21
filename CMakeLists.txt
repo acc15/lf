@@ -65,10 +65,9 @@ add_executable(leafsync_test
     test/util/hash.cpp
     test/util/bitset.cpp
     test/util/string.cpp
+    test/config/config_mode.cpp
     test/config/config.cpp
     test/unicode/unicode.cpp
-    test/config/config_mode.cpp
-    test/io/file.cpp
 )
 target_include_directories(leafsync_test PRIVATE src)
 target_link_libraries(leafsync_test PRIVATE leafsync_core Catch2::Catch2)

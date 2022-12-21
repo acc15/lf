@@ -4,6 +4,33 @@ Configuration file format are plain text
 
 Each line means separate synchronization process
 
+## Grammar
+
+```plantuml
+@startebnf
+title leafsync config grammar
+
+file = [line, {eol, line}];
+
+(* Blank lines and comments are ignored *)
+line = ws, [(comment | sync), ws];
+sync = sync_name, ":", index_path, "//", mirror, "//", mirror;
+
+mirror = mode, ":", absolute_path;
+
+(* Read/Write mirror mode *)
+mode = "r" | "w";
+comment = "#", {"<any char, except eol>"};
+
+(* Zero or more whitespaces *)
+ws = {"\t" | " "};
+
+(* End of line - depends on OS *) 
+eol = "\n" | "\r" | "\r\n"; 
+
+@endebnf
+```
+
 ## Format
 
     <name>:<path-to-index>//<left-mode>:<left-path>//<right-mode>:<right-path>
