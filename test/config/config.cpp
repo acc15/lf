@@ -10,6 +10,7 @@
 #include <fmt/ranges.h>
 
 #include <config/config.hpp>
+#include <string_view>
 
 #include "../test_util.hpp"
 
@@ -41,47 +42,62 @@ void cmp_syncs(const std::vector<config_sync>& l, const std::vector<config_sync>
 	}
 }
 
+
 TEST_CASE("load", "[config]") {
 	
+	const std::string content = 
+		"\n"
+        "    # Comments allowed, blank lines are ignored   \n"
+    	"    home:" + test_pstr("home/user/.config/leafsync/leafsync.index") + "//w:" + test_pstr("home/user") + "//w:" + test_pstr("mnt/sync") + "   \n"
+		"\n"
+		"pic:" + test_pstr("home/user/.config/leafsync/pic.index") + "//r:" + test_pstr("home/user/Pictures") + "//w:" + test_pstr("mnt/images") + " \n"
+		"rus:" + test_pstr("home/user/тест/индекс.index") + "//w:" + test_pstr("home/user/тест") + "//w:" + test_pstr("mnt/Проверка") + "  \n"
+  		"greek:" + test_pstr("home/user/δοκιμή/δείκτης.index") + "//w:" + test_pstr("home/user/δοκιμή") + "//w:" + test_pstr("mnt/δοκιμή") + "\n"
+		"\n"
+		"# This should be trimmed    \n"
+    	"trim:" + test_pstr("home/user/test.index") + "//w:" + test_pstr("home/user/test") + "//r:" + test_pstr("mnt/test") + "      ";
+
 	config cfg;
 
-	const auto config_path = leafsync::test_dir / "config" / "config.txt";
+	const auto config_path = test_dir / "config" / "config.txt";
 
-	leafsync::error_handler err(config_path.string());
-	std::ifstream f(config_path);
+	leafsync::error_handler err("config.txt");
+	std::stringstream f;
+	f << content;
+
 	cfg.load(err, f);
 
 	const std::vector<config_sync>& actual_syncs = cfg.syncs();
 	const std::vector<config_sync> expected_syncs = {
 		config_sync {
 			.name = "home", 
-			.index = "/home/user/.config/leafsync/leafsync.index",
-			.left = config_mirror { .mode = config_mode::WRITE, .path = "/home/user" },
-			.right = config_mirror { .mode = config_mode::WRITE, .path = "/mnt/sync" }
+			.index = test_path("home/user/.config/leafsync/leafsync.index"),
+			.left = config_mirror { .mode = config_mode::WRITE, .path = test_path("home/user") },
+			.right = config_mirror { .mode = config_mode::WRITE, .path = test_path("mnt/sync") }
 		},
 		config_sync {
 			.name = "pic", 
-			.index = "/home/user/.config/leafsync/pic.index",
-			.left = config_mirror { .mode = config_mode::READ, .path = "/home/user/Pictures" },
-			.right = config_mirror { .mode = config_mode::WRITE, .path = "/mnt/images" }
+			.index = test_path("home/user/.config/leafsync/pic.index"),
+			.left = config_mirror { .mode = config_mode::READ, .path = test_path("home/user/Pictures") },
+			.right = config_mirror { .mode = config_mode::WRITE, .path = test_path("mnt/images") }
 		},
 		config_sync {
 			.name = "rus", 
-			.index = "/home/user/тест/индекс.index",
-			.left = config_mirror { .mode = config_mode::WRITE, .path = "/home/user/тест" },
-			.right = config_mirror { .mode = config_mode::WRITE, .path = "/mnt/Проверка" }
+			.index = test_path("home/user/тест/индекс.index"),
+			.left = config_mirror { .mode = config_mode::WRITE, .path = test_path("home/user/тест") },
+			.right = config_mirror { .mode = config_mode::WRITE, .path = test_path("mnt/Проверка") }
 		},
 		config_sync {
 			.name = "greek", 
-			.index = "/home/user/δοκιμή/δείκτης.index",
-			.left = config_mirror { .mode = config_mode::WRITE, .path = "/home/user/δοκιμή" },
-			.right = config_mirror { .mode = config_mode::WRITE, .path = "/mnt/δοκιμή" }
+			.index = test_path("home/user/δοκιμή/δείκτης.index"),
+			.left = config_mirror { .mode = config_mode::WRITE, .path = test_path("home/user/δοκιμή") },
+			.right = config_mirror { .mode = config_mode::WRITE, .path = test_path("mnt/δοκιμή") }
 		},
 		config_sync {
 			.name = "trim", 
-			.index = "/home/user/test.index",
-			.left = config_mirror { .mode = config_mode::WRITE, .path = "/home/user/test" },
-			.right = config_mirror { .mode = config_mode::READ, .path = "/mnt/test" }
+			.index = test_path("home/user/test.index"),
+			.left = config_mirror { .mode = config_mode::WRITE, .path = test_path("home/user/test") },
+			.right = config_mirror { .mode = config_mode::READ, .path = test_path("mnt/test") }
 		}
 	};
 
@@ -92,17 +108,13 @@ TEST_CASE("load", "[config]") {
 
 }
 
-bool test_has_errors(std::string text) {
+bool test_has_errors(const std::string& text) {
 	test_error_handler err;
 
-	const std::string p1 = (test_dir / "a").string();
-	const std::string p2 = (test_dir / "b").string();
-	const std::string formatted = fmt::format(fmt::runtime(text), p1, p2);
-
-	std::stringstream ss(formatted);
+	std::stringstream ss(text);
 	config().load(err, ss);
 	
-	UNSCOPED_INFO("text: " << formatted);
+	UNSCOPED_INFO("text: " << text);
 	for (const auto& m: err.messages) {
 		UNSCOPED_INFO("error: " << m);
 	}
@@ -110,25 +122,29 @@ bool test_has_errors(std::string text) {
 	return err.has_errors;
 }
 
+
 TEST_CASE("errors", "[config]") {
+	
+	const std::string p1 = (test_dir / "a").string();
+	const std::string p2 = (test_dir / "b").string();
 
 	// valid case 
-	CHECK_FALSE( test_has_errors("a:b//r:{}//w:{}") );
+	CHECK_FALSE( test_has_errors("a:b//r:" + p1 + "//w:" + p2) );
 	
 	// empty component
-	CHECK( test_has_errors(":b//r:{}//w:{}") );
-	CHECK( test_has_errors("a://r:{}//w:{}") );
-	CHECK( test_has_errors("a:b//:{}//w:{}") );
-	CHECK( test_has_errors("a:b//r://w:{}") );
-	CHECK( test_has_errors("a:b//r:{}//:{}") );
-	CHECK( test_has_errors("a:b//r:{}//w:") );
+	CHECK( test_has_errors(":b//r:" + p1 + "//w:" + p2) );
+	CHECK( test_has_errors("a://r:" + p1 + "//w:" + p2) );
+	CHECK( test_has_errors("a:b//:" + p1 + "//w:" + p2) );
+	CHECK( test_has_errors("a:b//r://w:" + p2) );
+	CHECK( test_has_errors("a:b//r:" + p1 + "//:" + p2) );
+	CHECK( test_has_errors("a:b//r:" + p1 + "//w:") );
 	
 	// illegal mode
-	CHECK( test_has_errors("a:b//x:{}//w:{}") );
-	CHECK( test_has_errors("a:b//r:{}//z:{}") );
+	CHECK( test_has_errors("a:b//x:" + p1 + "//w:" + p2) );
+	CHECK( test_has_errors("a:b//r:" + p1 + "//z:" + p2) );
 
 	// non absolute paths
-	CHECK( test_has_errors("a:b//r:c//w:{}") );
-	CHECK( test_has_errors("a:b//r:{}//w:d") );
+	CHECK( test_has_errors("a:b//r:c//w:" + p2) );
+	CHECK( test_has_errors("a:b//r:" + p1 + "//w:d") );
 
 }

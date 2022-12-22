@@ -9,6 +9,10 @@
 namespace leafsync {
 
     extern const std::filesystem::path test_dir;
+    extern const std::filesystem::path test_root;
+
+    std::filesystem::path test_path(std::string_view p); 
+    std::string test_pstr(std::string_view p); 
 
     class test_error_handler: public error_handler {
     public:
