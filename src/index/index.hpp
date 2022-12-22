@@ -1,11 +1,14 @@
 #pragma once
 
+#include <cstdint>
 #include <istream>
 #include <ostream>
 #include <string>
 #include <vector>
 
 namespace leafsync {
+
+    extern const char index_signature[];
 
     enum class index_sync_mode: std::uint8_t {
         NONE,
@@ -26,9 +29,15 @@ namespace leafsync {
         std::vector<index_entry> entries;
     };
 
-    struct index_entry: index {
+    struct index_entry {
         std::string name;
+        index_flags flags;
+        std::vector<index_entry> entries = {};
     };
+
+
+    std::ostream& write_index_fields(std::ostream& s, const leafsync::index_flags& flags, const std::vector<index_entry>& entries);
+    std::istream& read_index_fields(std::istream& s, leafsync::index_flags& flags, std::vector<index_entry>& entries);
 
 }
 

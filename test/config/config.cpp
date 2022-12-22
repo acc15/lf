@@ -42,7 +42,6 @@ void cmp_syncs(const std::vector<config_sync>& l, const std::vector<config_sync>
 	}
 }
 
-
 TEST_CASE("load", "[config]") {
 	
 	const std::string content = 
