@@ -88,13 +88,9 @@ namespace leafsync {
 
 	bool config::parse_sync(error_handler& err, token_array tokens, config_sync& sync) {
 		sync.index = tokens[1];
-		if (!parse_mirror(err, tokens, 2, sync.left)) {
-			return false;
-		}
-		if (!parse_mirror(err, tokens, 4, sync.right)) {
-			return false;
-		}
-		return true;
+		bool pl = parse_mirror(err, tokens, 2, sync.left);
+		bool pr = parse_mirror(err, tokens, 4, sync.right);
+		return pl && pr;
 	}
 
 	bool config::parse_mirror(error_handler& err, token_array tokens, size_t token_offset, config_mirror& mirror) {

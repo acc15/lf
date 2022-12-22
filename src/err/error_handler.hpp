@@ -9,7 +9,7 @@ namespace leafsync {
 
         error_handler(std::string_view source = "", size_t line = 0);
 
-        std::string_view source;
+        std::string source;
         size_t line;
         bool has_errors;
 
