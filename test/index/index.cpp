@@ -19,13 +19,8 @@ TEST_CASE("set", "[index_flags]") {
     REQUIRE( byte == 0b110 );
 }
 
-TEST_CASE("size", "[index_flags]") {
-    REQUIRE( sizeof(index_flags) == 1 );
-}
-
 TEST_CASE("serialization", "[index_flags]") {
     std::stringstream ss;
-    std::ofstream
 
     index_flags s = { 
         .mode = GENERATE( index_sync_mode::NONE, index_sync_mode::SHALLOW, index_sync_mode::RECURSIVE ), 

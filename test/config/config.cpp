@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
-
+#include <string>
 #include <sstream>
 #include <filesystem>
 #include <fstream>
@@ -91,12 +92,17 @@ TEST_CASE("load", "[config]") {
 
 }
 
-bool test_has_errors(const std::string& text) {
+bool test_has_errors(std::string text) {
 	test_error_handler err;
-	std::stringstream ss(text);
+
+	const std::string p1 = (test_dir / "a").string();
+	const std::string p2 = (test_dir / "b").string();
+	const std::string formatted = fmt::format(fmt::runtime(text), p1, p2);
+
+	std::stringstream ss(formatted);
 	config().load(err, ss);
 	
-	UNSCOPED_INFO("text: " << text);
+	UNSCOPED_INFO("text: " << formatted);
 	for (const auto& m: err.messages) {
 		UNSCOPED_INFO("error: " << m);
 	}
@@ -105,24 +111,24 @@ bool test_has_errors(const std::string& text) {
 }
 
 TEST_CASE("errors", "[config]") {
-	
+
 	// valid case 
-	CHECK_FALSE( test_has_errors("a:b//r:/c//w:/d") );
+	CHECK_FALSE( test_has_errors("a:b//r:{}//w:{}") );
 	
 	// empty component
-	CHECK( test_has_errors(":b//r:/c//w:/d") );
-	CHECK( test_has_errors("a://r:/c//w:/d") );
-	CHECK( test_has_errors("a:b//:/c//w:/d") );
-	CHECK( test_has_errors("a:b//r://w:/d") );
-	CHECK( test_has_errors("a:b//r:/c//:/d") );
-	CHECK( test_has_errors("a:b//r:/c//w:") );
+	CHECK( test_has_errors(":b//r:{}//w:{}") );
+	CHECK( test_has_errors("a://r:{}//w:{}") );
+	CHECK( test_has_errors("a:b//:{}//w:{}") );
+	CHECK( test_has_errors("a:b//r://w:{}") );
+	CHECK( test_has_errors("a:b//r:{}//:{}") );
+	CHECK( test_has_errors("a:b//r:{}//w:") );
 	
 	// illegal mode
-	CHECK( test_has_errors("a:b//x:c//w:/d") );
-	CHECK( test_has_errors("a:b//r:/c//z:/d") );
+	CHECK( test_has_errors("a:b//x:{}//w:{}") );
+	CHECK( test_has_errors("a:b//r:{}//z:{}") );
 
 	// non absolute paths
-	CHECK( test_has_errors("a:b//r:c//w:/d") );
-	CHECK( test_has_errors("a:b//r:/c//w:d") );
+	CHECK( test_has_errors("a:b//r:c//w:{}") );
+	CHECK( test_has_errors("a:b//r:{}//w:d") );
 
 }

@@ -70,9 +70,13 @@ add_executable(leafsync_test
     test/config/config_mode.cpp
     test/config/config.cpp
     test/unicode/unicode.cpp
-    test/io/file.cpp
     test/index/index.cpp
 )
+
+if(UNIX)
+    target_sources(leafsync_test PRIVATE test/io/file.cpp)
+endif()
+
 target_include_directories(leafsync_test PRIVATE src)
 target_link_libraries(leafsync_test PRIVATE leafsync_core Catch2::Catch2)
 

@@ -9,9 +9,10 @@
 namespace leafsync {
 
     void console_init() {
-        std::locale::global(std::locale("C.UTF-8"));
 #ifdef WIN32
         SetConsoleOutputCP(CP_UTF8);
+#else
+        std::locale::global(std::locale("C.UTF-8"));
 #endif
     }
 
