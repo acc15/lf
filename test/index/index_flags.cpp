@@ -9,7 +9,7 @@
 using namespace leafsync;
 
 void cmp_index_flags_byte(index_flags flags, std::uint8_t expected) {
-    INFO("mode=" << flags.mode << ",sync=" << flags.sync);
+    // TODO fix INFO("mode=" << flags.mode << ",sync=" << flags.sync);
     std::uint8_t& actual = reinterpret_cast<std::uint8_t&>(flags);
     REQUIRE( actual == expected );
 }

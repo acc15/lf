@@ -8,3 +8,7 @@ namespace leafsync {
         "(invalid value)" 
     };
 }
+
+std::ostream& operator<<(std::ostream& s, const leafsync::index_sync_mode& mode) {
+    return s << leafsync::pick_indexed_with_last_default(mode, leafsync::index_sync_mode_names);
+}

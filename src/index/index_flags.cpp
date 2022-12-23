@@ -25,6 +25,5 @@ std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const inde
 }
 
 std::istream& operator>>(std::istream& s, with_format<format::BINARY, index_flags&> flags) {
-    char& char_ref = reinterpret_cast<char&>(flags.value);
-    return s >> char_ref;
+    return s >> reinterpret_cast<char&>(flags.value);
 }

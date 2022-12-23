@@ -86,7 +86,6 @@ add_executable(leafsync_test
     
     test/index/index_cmp.hpp
     test/index/index_cmp.cpp
-
     test/index/index_flags.cpp
     test/index/index_root.cpp
 
