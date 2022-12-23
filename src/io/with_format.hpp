@@ -12,11 +12,16 @@ namespace leafsync {
 
 	template <auto Format, typename T>
 	struct with_format {
-		T& value;
+		T value;
 
-		template <typename T>
-		with_format<Format, T> with(T& new_ref) const {
-			return with_format<Format, T> { new_ref };
+		template <typename V>
+		with_format<Format, V&> with_ref(V& new_ref) const {
+			return with_format<Format, V&> { new_ref };
+		}
+
+		template <typename V>
+		with_format<Format, V> with_value(V new_value) const {
+			return with_format<Format, V> { new_value };
 		}
 	};
 
@@ -24,20 +29,20 @@ namespace leafsync {
 	struct with_format_and_errors: with_format<Format, T> {
 		errors& err;
 
-		template <typename T>
-		with_format_and_errors<Format, T> with(T& new_ref) const {
-			return with_format_and_errors<Format, T> { new_ref, err };
+		template <typename V>
+		with_format_and_errors<Format, V&> with_ref(V& new_ref) const {
+			return with_format_and_errors<Format, V&> { new_ref, err };
 		}
 	};
 
 	template <auto Format, typename T>
-	with_format<Format, T> formatted_as(T& ref) {
-		return with_format<Format, T> { ref };
+	with_format<Format, T&> with_ref_format(T& ref) {
+		return with_format<Format, T&> { ref };
 	}
 
 	template <auto Format, typename T>
-	with_format_and_errors<Format, T> formatted_as(T& ref, errors& e) {
-		return with_format_and_errors<Format, T> { ref, e };
+	with_format_and_errors<Format, T&> with_ref_format(T& ref, errors& e) {
+		return with_format_and_errors<Format, T&> { ref, e };
 	}
 
 }

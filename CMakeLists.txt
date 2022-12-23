@@ -24,10 +24,19 @@ find_package(Catch2 REQUIRED)
 link_libraries(fmt::fmt)
 
 add_library(leafsync_core  
-    src/index/index.hpp
-    src/index/index_print.cpp
-    src/index/index_binary.cpp
-    src/index/index.cpp
+
+    src/util/util.hpp
+
+    # index files
+    src/index/index_sync_mode.hpp
+    src/index/index_sync_mode.cpp
+    src/index/index_flags.hpp
+    src/index/index_flags.cpp
+    src/index/index_entry.hpp
+    src/index/index_root.hpp
+    src/index/index_root_print.cpp
+    src/index/index_root_binary.cpp
+
     src/util/string.hpp
     src/util/string.cpp
     src/util/tokenizer.hpp
@@ -74,7 +83,13 @@ add_executable(leafsync_test
     test/config/config_mode.cpp
     test/config/config.cpp
     test/unicode/unicode.cpp
-    test/index/index.cpp
+    
+    test/index/index_cmp.hpp
+    test/index/index_cmp.cpp
+
+    test/index/index_flags.cpp
+    test/index/index_root.cpp
+
  )
 
 if(UNIX)
