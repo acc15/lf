@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <source_location>
 
-#include <err/error_handler.hpp>
+#include <io/errors.hpp>
 
 namespace leafsync {
 
@@ -14,10 +14,12 @@ namespace leafsync {
     std::filesystem::path test_path(std::string_view p); 
     std::string test_pstr(std::string_view p); 
 
-    class test_error_handler: public error_handler {
-    public:
-        void error(std::string_view msg) override;
+    class test_errors: public errors {
+    protected:
+        void on_error(std::string_view msg) override;
 
+    public:
+        test_errors(const data_location& loc);
         std::vector<std::string> messages;
     };
 

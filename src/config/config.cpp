@@ -21,7 +21,7 @@ namespace leafsync {
 		return it == _names.end() ? nullptr : &_syncs[it->second];
 	}
 
-	void config::load(error_handler& err, std::istream& in) {
+	void config::load(errors& err, std::istream& in) {
 
 		_names.clear();
 		_syncs.clear();
@@ -33,9 +33,9 @@ namespace leafsync {
 
 		tokenizer tok;
 
-		err.line = 0;
+		err.loc.line = 0;
 		while (std::getline(in, line)) {
-			++err.line;
+			++err.loc.line;
 
 			std::string_view trimmed = trim(line);
 			if (trimmed.empty() || trimmed.starts_with("#")) {
@@ -45,7 +45,7 @@ namespace leafsync {
 			tok.chunk = trimmed;
 
 			if (!tok.parse(tokens, separators)) {
-				err.error(fmt::format("illegal configuration line format: {}", trimmed));
+				err(fmt::format("illegal configuration line format: {}", trimmed));
 				continue;
 			}
 
@@ -54,7 +54,7 @@ namespace leafsync {
 			}
 
 			if (_names.contains(tokens[0])) {
-				err.error(fmt::format("duplicate sync: {}", tokens[0]));
+				err(fmt::format("duplicate sync: {}", tokens[0]));
 				continue;
 			}
 
@@ -75,33 +75,33 @@ namespace leafsync {
 
 	}
 
-	bool config::validate_tokens(error_handler& err, token_array tokens) {
+	bool config::validate_tokens(errors& err, token_array tokens) {
 		bool valid = true;
 		for (size_t i = 0; i < std::size(TOKENS); i++) {
 			if (tokens[i].empty()) {
-				err.error(fmt::format("{} can't be empty", TOKENS[i]));
+				err(fmt::format("{} can't be empty", TOKENS[i]));
 				valid = false;
 			}
 		}
 		return valid;
 	}
 
-	bool config::parse_sync(error_handler& err, token_array tokens, config_sync& sync) {
+	bool config::parse_sync(errors& err, token_array tokens, config_sync& sync) {
 		sync.index = tokens[1];
 		bool pl = parse_mirror(err, tokens, 2, sync.left);
 		bool pr = parse_mirror(err, tokens, 4, sync.right);
 		return pl && pr;
 	}
 
-	bool config::parse_mirror(error_handler& err, token_array tokens, size_t token_offset, config_mirror& mirror) {
+	bool config::parse_mirror(errors& err, token_array tokens, size_t token_offset, config_mirror& mirror) {
 		if (!parse_config_mode(tokens[token_offset], mirror.mode)) {
-			err.error(fmt::format("illegal {}: {}", TOKENS[token_offset], tokens[token_offset]));
+			err(fmt::format("illegal {}: {}", TOKENS[token_offset], tokens[token_offset]));
 			return false;
 		}
 		
 		mirror.path = tokens[token_offset + 1];
 		if (!mirror.path.is_absolute()) {
-			err.error(fmt::format("{} must be absolute: {}", TOKENS[token_offset + 1], tokens[token_offset + 1]));
+			err(fmt::format("{} must be absolute: {}", TOKENS[token_offset + 1], tokens[token_offset + 1]));
 			return false;
 		}
 		return true;

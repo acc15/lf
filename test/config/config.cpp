@@ -60,9 +60,9 @@ TEST_CASE("load", "[config]") {
 
 	const auto config_path = test_dir / "config" / "config.txt";
 
-	leafsync::error_handler err("config.txt");
+	leafsync::errors err(data_location {.source = "config.txt", .line = 0 });
 	std::stringstream f;
-	f << content;
+	REQUIRE( f << content );
 
 	cfg.load(err, f);
 
@@ -108,7 +108,7 @@ TEST_CASE("load", "[config]") {
 }
 
 bool test_has_errors(const std::string& text) {
-	test_error_handler err;
+	test_errors err({ .source = "test" });
 
 	std::stringstream ss(text);
 	config().load(err, ss);
@@ -118,7 +118,7 @@ bool test_has_errors(const std::string& text) {
 		UNSCOPED_INFO("error: " << m);
 	}
 
-	return err.has_errors;
+	return err.has_errors();
 }
 
 

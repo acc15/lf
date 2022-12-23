@@ -9,13 +9,13 @@
 
 #include "config_sync.hpp"
 #include "../util/hash.hpp"
-#include "../err/error_handler.hpp"
+#include "../io/errors.hpp"
 
 namespace leafsync {
 
 class config {
 public:
-	void load(error_handler& err, std::istream& in);
+	void load(errors& err, std::istream& in);
 	
 	const std::vector<config_sync>& syncs() const;
 	const config_sync* find(const std::string& name) const;
@@ -24,9 +24,9 @@ private:
 	static const char* TOKENS[6];
 	typedef const std::string_view token_array[std::size(TOKENS)];
 
-	bool validate_tokens(error_handler& err, token_array tokens);
-	bool parse_sync(error_handler& err, token_array tokens, config_sync& sync);
-	bool parse_mirror(error_handler& err, token_array tokens, size_t token_offset, config_mirror& mirror);
+	bool validate_tokens(errors& err, token_array tokens);
+	bool parse_sync(errors& err, token_array tokens, config_sync& sync);
+	bool parse_mirror(errors& err, token_array tokens, size_t token_offset, config_mirror& mirror);
 
 	std::vector<config_sync> _syncs;
 	std::unordered_map<std::string, std::size_t, str_hash, str_hash::eq> _names;

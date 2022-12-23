@@ -25,6 +25,8 @@ link_libraries(fmt::fmt)
 
 add_library(leafsync_core  
     src/index/index.hpp
+    src/index/index_print.cpp
+    src/index/index_binary.cpp
     src/index/index.cpp
     src/util/string.hpp
     src/util/string.cpp
@@ -36,8 +38,10 @@ add_library(leafsync_core
     src/util/hash.cpp
     src/util/console.hpp
     src/util/console.cpp
-    src/err/error_handler.hpp
-    src/err/error_handler.cpp
+    src/io/data_location.hpp
+    src/io/errors.hpp
+    src/io/errors.cpp
+    src/io/with_format.hpp
     src/fs/util.hpp 
     src/fs/util.cpp
     src/cmd/cmd_desc.hpp
@@ -51,7 +55,7 @@ add_library(leafsync_core
     src/config/config_mode.cpp
     src/config/config.hpp
     src/config/config.cpp
-)
+ )
 
 add_executable(leafsync 
     ${executable_src}
@@ -71,7 +75,7 @@ add_executable(leafsync_test
     test/config/config.cpp
     test/unicode/unicode.cpp
     test/index/index.cpp
-)
+ )
 
 if(UNIX)
     target_sources(leafsync_test PRIVATE test/io/file.cpp)
