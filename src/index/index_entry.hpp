@@ -1,16 +1,37 @@
 #pragma once
 
+#include <cstdint>
+
 #include <string>
-#include <vector>
+#include <filesystem>
+#include <unordered_map>
+#include <optional>
+
+#include "../io/with_format.hpp"
 
 #include "index_flags.hpp"
 
 namespace lf {
 
+    extern const char index_signature[];
+    extern const std::uint8_t index_version;
+
     struct index_entry {
-        std::string name;
+        
+        using entry_map = std::unordered_map<std::string, index_entry>;
+
         index_flags flags;
-        std::vector<index_entry> entries = {};
+        entry_map entries = {};
+
+        index_flags get(const std::filesystem::path& path) const;
+        void set(const std::filesystem::path& path, index_flags flags);
+
     };
 
+    std::ostream& operator<<(std::ostream& s, const index_entry& index);
+    std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const index_entry&> index);
+    std::istream& operator>>(std::istream& s, with_format_and_errors<format::BINARY, index_entry&> index);
+
 }
+
+

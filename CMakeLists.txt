@@ -14,7 +14,7 @@ if(MSVC)
     # See
     # https://learn.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page
     # https://habr.com/ru/company/ruvds/blog/645325/
-    list(APPEND executable_src msvc/utf8.manifest)
+    list(APPEND executable_src src/utf8.manifest)
 else()
     add_compile_options(-Wall -Wextra -Wpedantic -Werror=return-type)
 endif()
@@ -31,9 +31,9 @@ add_library(lf_core
     src/index/index_flags.hpp
     src/index/index_flags.cpp
     src/index/index_entry.hpp
-    src/index/index_root.hpp
-    src/index/index_root_print.cpp
-    src/index/index_root_binary.cpp
+    src/index/index_entry.cpp
+    src/index/index_entry_print.cpp
+    src/index/index_entry_binary.cpp
 
     src/util/pick.hpp
     src/util/string.hpp
@@ -86,7 +86,7 @@ add_executable(lf_test
     test/index/index_cmp.hpp
     test/index/index_cmp.cpp
     test/index/index_flags.cpp
-    test/index/index_root.cpp
+    test/index/index_entry.cpp
  )
 
 if(UNIX)

@@ -10,8 +10,8 @@
 namespace lf {
 
     struct index_flags {
-        index_sync_mode mode: 2;
-        bool sync: 1;
+        index_sync_mode mode: 2 = index_sync_mode::NONE;
+        bool sync: 1 = false;
         std::uint8_t: 5;
     };
 

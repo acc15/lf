@@ -1,29 +1,31 @@
+#include <iterator>
+#include <vector>
 #include <algorithm>
 #include <fmt/core.h>
-#include <string>
 
-#include "index_root.hpp"
+#include "index_entry.hpp"
 
 using namespace std;
 
 namespace lf {
 
     const char index_signature[] = "LF";
+    const uint8_t index_version = 0;
 
-    void rev_add(const vector<index_entry>& entries, vector<const index_entry*>& queue) {
-        for_each(entries.rbegin(), entries.rend(), [&queue](const index_entry& e) { queue.push_back(&e); });
+    void queue_entries(const index_entry::entry_map& entries, vector<index_entry::entry_map::const_pointer>& queue) {
+        for_each(entries.begin(), entries.end(), [&queue](index_entry::entry_map::const_reference e) { queue.push_back(&e); });
     }
 
-    ostream& operator<<(ostream& s, with_format<format::BINARY, const index_root&> index) {
-        s << index_signature << static_cast<uint8_t>(0);
+    ostream& operator<<(ostream& s, with_format<format::BINARY, const index_entry&> index) {
+        s << index_signature << index_version;
         if (!s.good()) {
             return s;
         }
 
         s << with_ref_format<format::BINARY>(index.value.flags);
 
-        vector<const index_entry*> queue;
-        rev_add(index.value.entries, queue);
+        vector<index_entry::entry_map::const_pointer> queue;
+        queue_entries(index.value.entries, queue);
         while (!queue.empty()) {
             const auto e = queue.back();
             queue.pop_back();
@@ -32,23 +34,24 @@ namespace lf {
                 s << '\0';
                 continue;
             }
-            s << e->name << '\0' << with_ref_format<format::BINARY>(e->flags);
-            if (e->entries.empty()) {
+
+            s << e->first << '\0' << with_ref_format<format::BINARY>(e->second.flags);
+            if (e->second.entries.empty()) {
                 if (std::all_of(queue.begin(), queue.end(), [](auto p) { return p == nullptr; })) {
-                break;
+                    break;
                 }
                 s << '\0';
                 continue;
             }
 
             queue.push_back(nullptr);
-            rev_add(e->entries, queue);
+            queue_entries(e->second.entries, queue);
 
         }
         return s;
     }
 
-    istream& operator>>(istream& s, with_format_and_errors<format::BINARY, index_root&> index) {
+    istream& operator>>(istream& s, with_format_and_errors<format::BINARY, index_entry&> index) {
         char signature[sizeof(index_signature)];
         uint8_t version;
 
@@ -72,7 +75,7 @@ namespace lf {
             return s;
         }
 
-        vector<vector<index_entry>*> stack;
+        vector<index_entry::entry_map*> stack;
         stack.push_back(&index.value.entries);
 
         do {
@@ -88,11 +91,12 @@ namespace lf {
                 continue;
             }
             
-            index_entry& entry = stack.back()->emplace_back();
-            if (!getline(s, entry.name, '\0')) {
+            std::string name;
+            if (!getline(s, name, '\0')) {
                 break;
             }
 
+            index_entry& entry = (*stack.back())[name];
             if (!(s >> with_ref_format<format::BINARY>(entry.flags))) {
                 break;
             }
