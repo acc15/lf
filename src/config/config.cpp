@@ -8,7 +8,7 @@
 #include "config.hpp"
 #include "../util/string.hpp"
 #include "../util/tokenizer.hpp"
-namespace leafsync {
+namespace lf {
 
 	const char* config::TOKENS[] = { "sync name", "index path", "left mode", "left path", "right mode", "right path" };
 

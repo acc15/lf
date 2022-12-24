@@ -2,7 +2,7 @@
 
 #include "test_util.hpp"
 
-namespace leafsync {
+namespace lf {
 
     const std::filesystem::path test_dir = std::filesystem::path(__FILE__).parent_path();
     

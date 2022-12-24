@@ -5,7 +5,7 @@
 
 #include "cmd.hpp"
 
-namespace leafsync
+namespace lf
 {
     
 class cmd_registry {

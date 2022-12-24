@@ -1,6 +1,6 @@
 #include "sync_cmd.hpp"
 
-namespace leafsync {
+namespace lf {
 
 const char* names[] = { "s", "sync" };
 const char* description = "synchronizes all mirrors";

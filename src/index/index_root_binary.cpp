@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace leafsync {
+namespace lf {
 
     const char index_signature[] = "LF";
 

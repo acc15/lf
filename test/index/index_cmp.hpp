@@ -4,7 +4,7 @@
 
 #include <index/index_root.hpp>
 
-namespace leafsync {
+namespace lf {
 
     void cmp_index_flags(index_flags l, index_flags r);
     void cmp_index_entry(const index_entry& l, const index_entry& r);

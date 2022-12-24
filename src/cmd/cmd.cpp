@@ -1,6 +1,6 @@
 #include "cmd.hpp"
 
-namespace leafsync {
+namespace lf {
 
 cmd::cmd(const cmd_desc& desc): desc(desc) {
 }

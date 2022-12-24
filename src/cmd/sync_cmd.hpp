@@ -3,7 +3,7 @@
 #include <span>
 #include "cmd.hpp"
 
-namespace leafsync {
+namespace lf {
 
 class sync_cmd: public cmd {
 public:

@@ -2,7 +2,7 @@
 
 #include <util/bitset.hpp>
 
-using leafsync::bitset;
+using namespace lf;
 
 TEST_CASE( "default_constructor", "[bitset]" ) {
     bitset b;

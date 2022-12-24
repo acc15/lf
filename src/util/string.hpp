@@ -4,7 +4,7 @@
 #include <locale>
 #include <string_view>
 
-namespace leafsync {
+namespace lf {
 
 	bool is_ascii(char c);
 

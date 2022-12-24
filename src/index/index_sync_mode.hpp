@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <ostream>
 
-namespace leafsync {
+namespace lf {
     
     enum class index_sync_mode: std::uint8_t {
         NONE,

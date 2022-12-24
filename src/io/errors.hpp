@@ -2,7 +2,7 @@
 
 #include "data_location.hpp"
 
-namespace leafsync {
+namespace lf {
     class errors {
     public:
 

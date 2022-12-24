@@ -1,7 +1,7 @@
 #include "index_sync_mode.hpp"
 #include "../util/pick.hpp"
 
-namespace leafsync {
+namespace lf {
     const char* index_sync_mode_names[4] = { 
         "NONE", 
         "SHALLOW", 

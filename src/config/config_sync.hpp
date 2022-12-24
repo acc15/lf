@@ -4,7 +4,7 @@
 
 #include "config_mirror.hpp"
 
-namespace leafsync {
+namespace lf {
 
 	struct config_sync {
 		std::string_view name;

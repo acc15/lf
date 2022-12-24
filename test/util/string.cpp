@@ -2,31 +2,33 @@
 
 #include <util/string.hpp>
 
+using namespace lf;
+
 TEST_CASE("rtrim", "[string]") {
-	REQUIRE(leafsync::rtrim("  abc   ") == "  abc");
-	REQUIRE(leafsync::rtrim("abc") == "abc");
-	REQUIRE(leafsync::rtrim("  юникод  ") == "  юникод");
+	REQUIRE(rtrim("  abc   ") == "  abc");
+	REQUIRE(rtrim("abc") == "abc");
+	REQUIRE(rtrim("  юникод  ") == "  юникод");
 }
 
 TEST_CASE("ltrim", "[string]") {
-	REQUIRE(leafsync::ltrim("  abc   ") == "abc   ");
-	REQUIRE(leafsync::ltrim("abc ") == "abc ");
-	REQUIRE(leafsync::ltrim("  юникод") == "юникод");
+	REQUIRE(ltrim("  abc   ") == "abc   ");
+	REQUIRE(ltrim("abc ") == "abc ");
+	REQUIRE(ltrim("  юникод") == "юникод");
 }
 
 TEST_CASE("trim", "[string]") {
-	REQUIRE(leafsync::trim("  abc   ") == "abc");
-	REQUIRE(leafsync::trim("  юникод  ") == "юникод");
+	REQUIRE(trim("  abc   ") == "abc");
+	REQUIRE(trim("  юникод  ") == "юникод");
 }
 
 TEST_CASE("lower", "[string]") {
-	REQUIRE(leafsync::lower(" aBcюникод ") == " abcюникод ");
-	REQUIRE(leafsync::lower("  ЮНИКОД  ") == "  ЮНИКОД  ");
-	REQUIRE(leafsync::lower("ABCD") == "abcd");
+	REQUIRE(lower(" aBcюникод ") == " abcюникод ");
+	REQUIRE(lower("  ЮНИКОД  ") == "  ЮНИКОД  ");
+	REQUIRE(lower("ABCD") == "abcd");
 }
 
 TEST_CASE("upper", "[string]") {
-	REQUIRE(leafsync::upper(" aBcюникод ") == " ABCюникод ");
-	REQUIRE(leafsync::upper("  юникод  ") == "  юникод  ");
-	REQUIRE(leafsync::upper("abcD") == "ABCD");
+	REQUIRE(upper(" aBcюникод ") == " ABCюникод ");
+	REQUIRE(upper("  юникод  ") == "  юникод  ");
+	REQUIRE(upper("abcD") == "ABCD");
 }

@@ -4,7 +4,7 @@
 
 #include "errors.hpp"
 
-namespace leafsync {
+namespace lf {
 
 	enum class format: size_t {
 		BINARY

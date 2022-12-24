@@ -4,7 +4,7 @@
 #include <string_view>
 #include <unordered_map>
 
-namespace leafsync {
+namespace lf {
     
     struct str_hash {
         using is_transparent = void;

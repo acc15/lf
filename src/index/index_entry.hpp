@@ -5,7 +5,7 @@
 
 #include "index_flags.hpp"
 
-namespace leafsync {
+namespace lf {
 
     struct index_entry {
         std::string name;

@@ -3,7 +3,7 @@
 #include "index_flags.hpp"
 #include "../util/pick.hpp"
 
-namespace leafsync {
+namespace lf {
 
     const char mode_chars[] = { '-', '.', '*', '!' };
     const char sync_chars[] = { '-', '+'  };

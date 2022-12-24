@@ -7,7 +7,7 @@
 #include "index_sync_mode.hpp"
 #include "../io/with_format.hpp"
 
-namespace leafsync {
+namespace lf {
 
     struct index_flags {
         index_sync_mode mode: 2;

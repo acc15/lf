@@ -9,7 +9,7 @@
 #include "index/index_sync_mode.hpp"
 #include "index_cmp.hpp"
 
-using namespace leafsync;
+using namespace lf;
 
 void cmp_index_flags_byte(index_flags flags, std::uint8_t expected) {
     INFO("mode=" << flags.mode << ",sync=" << flags.sync);

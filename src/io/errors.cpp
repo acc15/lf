@@ -2,7 +2,7 @@
 
 #include "errors.hpp"
 
-namespace leafsync {
+namespace lf {
 
     errors::errors(const data_location& loc) : loc(loc) {
     }

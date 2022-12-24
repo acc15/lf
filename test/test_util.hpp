@@ -6,7 +6,7 @@
 
 #include <io/errors.hpp>
 
-namespace leafsync {
+namespace lf {
 
     extern const std::filesystem::path test_dir;
     extern const std::filesystem::path test_root;

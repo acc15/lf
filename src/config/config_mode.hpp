@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace leafsync {
+namespace lf {
 
 	enum class config_mode {
 		READ,

@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace leafsync {
+namespace lf {
 
 	struct data_location {
 		std::string source = "";

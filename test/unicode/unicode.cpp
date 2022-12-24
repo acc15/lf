@@ -10,7 +10,9 @@
 
 #include "../test_util.hpp"
 
-const std::filesystem::path unicode_dir = leafsync::test_dir / "unicode" / "testdir";
+using namespace lf;
+
+const std::filesystem::path unicode_dir = test_dir / "unicode" / "testdir";
 
 TEST_CASE("unicode env", "[unicode]") {   
     const char* expect_env = "русский текст";

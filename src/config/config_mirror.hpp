@@ -5,7 +5,7 @@
 
 #include "config_mode.hpp"
 
-namespace leafsync {
+namespace lf {
 
 struct config_mirror {
 	config_mode mode;

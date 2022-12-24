@@ -4,7 +4,7 @@
 
 #include "cmd_desc.hpp"
 
-namespace leafsync {
+namespace lf {
 
 class cmd {
 public:

@@ -3,7 +3,7 @@
 #include "cmd_registry.hpp"
 #include "sync_cmd.hpp"
 
-namespace leafsync {
+namespace lf {
 
 const sync_cmd _sync;
 

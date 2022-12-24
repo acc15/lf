@@ -3,7 +3,7 @@
 
 #include "tokenizer.hpp"
 
-namespace leafsync {
+namespace lf {
 
 
     bool tokenizer::next(std::string_view& result, std::string_view separator) {

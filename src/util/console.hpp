@@ -1,5 +1,5 @@
 #pragma once
-namespace leafsync {
+namespace lf {
 
     void console_init();
 

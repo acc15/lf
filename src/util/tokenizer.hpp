@@ -3,7 +3,7 @@
 #include <span>
 #include <string_view>
 
-namespace leafsync {
+namespace lf {
 
     class tokenizer {
     public:

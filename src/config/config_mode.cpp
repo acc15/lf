@@ -5,7 +5,7 @@
 #include "config_mode.hpp"
 #include "../util/string.hpp"
 
-namespace leafsync {
+namespace lf {
 
 	const std::unordered_map<std::string_view, config_mode> mode_names = {
 		{"r", config_mode::READ},

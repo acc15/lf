@@ -9,7 +9,7 @@
 
 #include "index_cmp.hpp"
 
-using namespace leafsync;
+using namespace lf;
 using namespace std;
 
 TEST_CASE("serialization", "[index_root]") {

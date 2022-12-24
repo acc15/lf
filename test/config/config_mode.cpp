@@ -2,7 +2,7 @@
 
 #include <config/config_mode.hpp>
 
-using namespace leafsync;
+using namespace lf;
 
 TEST_CASE("should parse", "[config_mode]") {
 	config_mode mode;

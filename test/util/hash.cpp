@@ -4,7 +4,7 @@
 #include <util/hash.hpp>
 
 using namespace std::literals;
-using namespace leafsync;
+using namespace lf;
 
 void init_hash(size_t v[3], const char* variant, const str_hash& h) {
     v[0] = h(variant);

@@ -1,6 +1,6 @@
 #include "string.hpp"
 
-namespace leafsync {
+namespace lf {
 
 	bool is_ascii(char c) {
 		return c >= 0;

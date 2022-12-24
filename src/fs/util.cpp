@@ -1,6 +1,6 @@
 #include "util.hpp"
 
-namespace leafsync {
+namespace lf {
 
 std::chrono::system_clock::time_point ft_to_sys(const std::chrono::file_clock::time_point& v) {
 // TODO: std::chrono::clock_cast not implemented in GNU C++ library (however it provides file_clock::to_sys)

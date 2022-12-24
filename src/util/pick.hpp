@@ -3,7 +3,7 @@
 #include <array>
 #include <algorithm>
 
-namespace leafsync {
+namespace lf {
 
     template <typename T, size_t N>
     const T& pick_indexed_bool(bool flag, const T (&values_with_last_default)[N]) {

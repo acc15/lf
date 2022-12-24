@@ -6,7 +6,7 @@
 #include <Windows.h>
 #endif
 
-namespace leafsync {
+namespace lf {
 
     void console_init() {
 #ifdef WIN32

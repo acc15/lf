@@ -1,6 +1,6 @@
 #include "hash.hpp"
 
-namespace leafsync {
+namespace lf {
 
     size_t str_hash::operator()(std::string_view txt) const { 
         return impl{}(txt); 

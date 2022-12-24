@@ -2,7 +2,7 @@
 
 using namespace std;
 
-namespace leafsync {
+namespace lf {
 
     struct tree_print_data {
         const index_entry* entry;

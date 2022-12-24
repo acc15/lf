@@ -14,7 +14,7 @@
 
 #include "../test_util.hpp"
 
-using namespace leafsync;
+using namespace lf;
 
 void cmp_mirror(const config_mirror& l, const config_mirror& r) {
 	CHECK( l.mode == r.mode );
@@ -60,7 +60,7 @@ TEST_CASE("load", "[config]") {
 
 	const auto config_path = test_dir / "config" / "config.txt";
 
-	leafsync::errors err(data_location {.source = "config.txt", .line = 0 });
+	errors err(data_location {.source = "config.txt", .line = 0 });
 	std::stringstream f;
 	REQUIRE( f << content );
 

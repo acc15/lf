@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0092 NEW) # Disable /W3 flag for MSVC by default
 
-project(leafsync LANGUAGES CXX)
+project(lf LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,7 +23,7 @@ find_package(fmt REQUIRED)
 find_package(Catch2 REQUIRED)
 link_libraries(fmt::fmt)
 
-add_library(leafsync_core  
+add_library(lf_core  
 
     # index files
     src/index/index_sync_mode.hpp
@@ -65,13 +65,13 @@ add_library(leafsync_core
     src/config/config.cpp
  )
 
-add_executable(leafsync 
+add_executable(lf 
     ${executable_src}
     src/main.cpp
 )
-target_link_libraries(leafsync PRIVATE leafsync_core)
+target_link_libraries(lf PRIVATE lf_core)
 
-add_executable(leafsync_test 
+add_executable(lf_test 
     ${executable_src}
     test/main.cpp
     test/test_util.hpp
@@ -90,11 +90,11 @@ add_executable(leafsync_test
  )
 
 if(UNIX)
-    target_sources(leafsync_test PRIVATE test/io/file.cpp)
+    target_sources(lf_test PRIVATE test/io/file.cpp)
 endif()
 
-target_include_directories(leafsync_test PRIVATE src)
-target_link_libraries(leafsync_test PRIVATE leafsync_core Catch2::Catch2)
+target_include_directories(lf_test PRIVATE src)
+target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
 
-# install(TARGETS leafsync
+# install(TARGETS lf
 #     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

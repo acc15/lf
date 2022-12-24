@@ -11,7 +11,7 @@
 #include "../util/hash.hpp"
 #include "../io/errors.hpp"
 
-namespace leafsync {
+namespace lf {
 
 class config {
 public:

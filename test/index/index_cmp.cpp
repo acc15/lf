@@ -2,7 +2,7 @@
 
 #include "index_cmp.hpp"
 
-namespace leafsync {
+namespace lf {
 
     void cmp_index_flags(index_flags l, index_flags r) {
         CHECK( (l.mode == r.mode) );
@@ -24,7 +24,7 @@ namespace leafsync {
         cmp_index_entries(l.entries, r.entries);
     }
 
-    void cmp_index(const leafsync::index_root& l, const leafsync::index_root& r) {
+    void cmp_index(const index_root& l, const index_root& r) {
         cmp_index_flags(l.flags, r.flags);
         cmp_index_entries(l.entries, r.entries);
     }
