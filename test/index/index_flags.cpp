@@ -1,5 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/catch_message.hpp>
+
+#include <sstream>
 
 #include <index/index_flags.hpp>
 
@@ -9,7 +12,7 @@
 using namespace leafsync;
 
 void cmp_index_flags_byte(index_flags flags, std::uint8_t expected) {
-    // TODO fix INFO("mode=" << flags.mode << ",sync=" << flags.sync);
+    INFO("mode=" << flags.mode << ",sync=" << flags.sync);
     std::uint8_t& actual = reinterpret_cast<std::uint8_t&>(flags);
     REQUIRE( actual == expected );
 }

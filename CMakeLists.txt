@@ -25,8 +25,6 @@ link_libraries(fmt::fmt)
 
 add_library(leafsync_core  
 
-    src/util/util.hpp
-
     # index files
     src/index/index_sync_mode.hpp
     src/index/index_sync_mode.cpp
@@ -37,6 +35,7 @@ add_library(leafsync_core
     src/index/index_root_print.cpp
     src/index/index_root_binary.cpp
 
+    src/util/pick.hpp
     src/util/string.hpp
     src/util/string.cpp
     src/util/tokenizer.hpp
@@ -88,7 +87,6 @@ add_executable(leafsync_test
     test/index/index_cmp.cpp
     test/index/index_flags.cpp
     test/index/index_root.cpp
-
  )
 
 if(UNIX)

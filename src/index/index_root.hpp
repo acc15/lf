@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 #include "../io/with_format.hpp"
 
 #include "index_flags.hpp"
@@ -12,12 +14,17 @@ namespace leafsync {
     struct index_root {
         index_flags flags;
         std::vector<index_entry> entries;
+
+        // index_flags get(std::filesystem::path path);
+        // void set(std::filesystem::path path, index_flags flags);
+        // void remove(std::filesystem::path path);
+
     };
+
+    std::ostream& operator<<(std::ostream& s, const index_root& index);
+    std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const index_root&> index);
+    std::istream& operator>>(std::istream& s, with_format_and_errors<format::BINARY, index_root&> index);
 
 }
 
-std::ostream& operator<<(std::ostream& s, const leafsync::index_root& index);
-
-std::ostream& operator<<(std::ostream& s, leafsync::with_format<leafsync::format::BINARY, const leafsync::index_root&> index);
-std::istream& operator>>(std::istream& s, leafsync::with_format_and_errors<leafsync::format::BINARY, leafsync::index_root&> index);
 
