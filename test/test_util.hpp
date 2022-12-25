@@ -19,6 +19,7 @@ namespace lf {
         void on_error(std::string_view msg) override;
 
     public:
+        test_errors();
         test_errors(const data_location& loc);
         std::vector<std::string> messages;
     };

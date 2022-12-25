@@ -1,22 +1,19 @@
-#include <iterator>
+#include <cstring>
 #include <vector>
 #include <algorithm>
-#include <fmt/core.h>
 
 #include "index_entry.hpp"
-
-using namespace std;
 
 namespace lf {
 
     const char index_signature[] = "LF";
     const uint8_t index_version = 0;
 
-    void queue_entries(const index_entry::entry_map& entries, vector<index_entry::entry_map::const_pointer>& queue) {
-        for_each(entries.begin(), entries.end(), [&queue](index_entry::entry_map::const_reference e) { queue.push_back(&e); });
+    void queue_entries(const index_entry::entry_map& entries, std::vector<index_entry::entry_map::const_pointer>& queue) {
+        std::for_each(entries.begin(), entries.end(), [&queue](index_entry::entry_map::const_reference e) { queue.push_back(&e); });
     }
 
-    ostream& operator<<(ostream& s, with_format<format::BINARY, const index_entry&> index) {
+    std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const index_entry&> index) {
         s << index_signature << index_version;
         if (!s.good()) {
             return s;
@@ -24,7 +21,7 @@ namespace lf {
 
         s << with_ref_format<format::BINARY>(index.value.flags);
 
-        vector<index_entry::entry_map::const_pointer> queue;
+        std::vector<index_entry::entry_map::const_pointer> queue;
         queue_entries(index.value.entries, queue);
         while (!queue.empty()) {
             const auto e = queue.back();
@@ -51,7 +48,7 @@ namespace lf {
         return s;
     }
 
-    istream& operator>>(istream& s, with_format_and_errors<format::BINARY, index_entry&> index) {
+    std::istream& operator>>(std::istream& s, with_format_and_errors<format::BINARY, index_entry&> index) {
         char signature[sizeof(index_signature)];
         uint8_t version;
 
@@ -59,15 +56,15 @@ namespace lf {
             return s;
         }
 
-        if (strcmp(signature, index_signature) != 0) {
-            index.err(fmt::format("invalid file signature: {}", signature));
-            s.clear(ios_base::failbit);
+        if (std::strcmp(signature, index_signature) != 0) {
+            index.err << "invalid file signature: " << signature << errors::end;
+            s.clear(std::ios_base::failbit);
             return s;
         }
 
         if (version != 0) {
-            index.err(fmt::format("invalid file version: {}", static_cast<unsigned int>(version)));
-            s.clear(ios_base::failbit);
+            index.err << "invalid file version: " << static_cast<unsigned int>(version) << errors::end;
+            s.clear(std::ios_base::failbit);
             return s;
         }
 
@@ -75,13 +72,13 @@ namespace lf {
             return s;
         }
 
-        vector<index_entry::entry_map*> stack;
+        std::vector<index_entry::entry_map*> stack;
         stack.push_back(&index.value.entries);
 
         do {
 
-            istream::int_type next = s.peek();
-            if (next == istream::traits_type::eof()) {
+            std::istream::int_type next = s.peek();
+            if (next == std::istream::traits_type::eof()) {
                 break;
             }
 

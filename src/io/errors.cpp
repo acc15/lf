@@ -1,26 +1,23 @@
-#include <fmt/core.h>
+#include <iostream>
 
 #include "errors.hpp"
 
 namespace lf {
 
-    errors::errors(const data_location& loc) : loc(loc), _count(0) {
-    }
+    const errors::end_t errors::end = {};
 
-    void errors::operator()(std::string_view msg) {
-        on_error(msg);
-        ++_count;
+    errors::errors(const data_location& loc) : loc(loc), _count(0) {
     }
 
     void errors::on_error(std::string_view msg) {
         if (!has_errors()) {
-            fmt::print("There are errors: {}\n\n", loc.source);
+            std::cerr << "There are errors in " << loc.source << std::endl << std::endl;
         }
-        fmt::print(" - ");
+        std::cerr << " - ";
         if (loc.line > 0) {
-            fmt::print("Line {}, ", loc.line);
+            std::cerr << "Line " << loc.line << ", ";
         }
-        fmt::print("{}\n", msg);
+        std::cerr << msg << std::endl;
     }
 
     size_t errors::error_count() const {
@@ -29,6 +26,14 @@ namespace lf {
 
     bool errors::has_errors() const {
         return _count > 0;
+    }
+
+    template <>
+    errors& errors::operator<<(const end_t&) {
+        on_error(_stream.view());
+        _stream.clear();
+        ++_count;
+        return *this;
     }
 
 }

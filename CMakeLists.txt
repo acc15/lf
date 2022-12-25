@@ -19,10 +19,9 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic -Werror=return-type)
 endif()
 
-find_package(fmt REQUIRED)
 find_package(Catch2 REQUIRED)
 find_package(yaml-cpp REQUIRED)
-link_libraries(fmt::fmt yaml-cpp)
+link_libraries(yaml-cpp)
 
 add_library(lf_core  
 
@@ -86,6 +85,7 @@ add_executable(lf_test
     test/index/index_entry.cpp
 
     test/cmd/cmd_desc.cpp
+    test/io/errors.cpp
  )
 
 target_include_directories(lf_test PRIVATE src)

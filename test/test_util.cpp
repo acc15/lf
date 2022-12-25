@@ -1,4 +1,5 @@
 #include "test_util.hpp"
+#include "io/data_location.hpp"
 
 namespace lf {
 
@@ -16,6 +17,9 @@ namespace lf {
 
     std::string test_pstr(std::string_view p) {
         return test_path(p).string();
+    }
+
+    test_errors::test_errors() : errors(data_location { .source = "test" }) {
     }
 
     test_errors::test_errors(const data_location& loc) : errors(loc) {
