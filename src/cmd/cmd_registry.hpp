@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <unordered_map>
 #include <string_view>
 
@@ -11,7 +12,7 @@ namespace lf
 class cmd_registry {
 public:
     cmd_registry();
-    std::string usage() const;
+    std::ostream& usage(std::ostream&) const;
 
     int run(std::span<const char*> args) const;
 

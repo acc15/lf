@@ -8,10 +8,10 @@ using namespace lf;
 
 TEST_CASE("print", "[cmd_desc]") {
     const char* names[] = {"a", "b", "c"};
-    cmd_desc desc = {.names = names, .description = "test"};
+    cmd_desc desc = {names, "params", "description"};
 
     std::stringstream ss;
     ss << desc;
 
-    REQUIRE(ss.str() == "a, b, c - test");
+    REQUIRE(ss.str() == "(a|b|c) params - description");
 }

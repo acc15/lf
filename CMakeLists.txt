@@ -38,14 +38,7 @@ add_library(lf_core
     # config files
     src/config/config.hpp
     src/config/config.cpp
-
     src/util/pick.hpp
-    src/util/string.hpp
-    src/util/string.cpp
-    src/util/tokenizer.hpp
-    src/util/tokenizer.cpp
-    src/util/str_hash.hpp
-    src/util/str_hash.cpp
     src/util/console.hpp
     src/util/console.cpp
     src/io/data_location.hpp
@@ -61,6 +54,8 @@ add_library(lf_core
     src/cmd/cmd.cpp
     src/cmd/sync_cmd.hpp 
     src/cmd/sync_cmd.cpp
+    src/cmd/add_cmd.hpp 
+    src/cmd/add_cmd.cpp 
     src/cmd/cmd_registry.hpp 
     src/cmd/cmd_registry.cpp
  )
@@ -76,8 +71,6 @@ add_executable(lf_test
     test/main.cpp
     test/test_util.hpp
     test/test_util.cpp
-    test/util/str_hash.cpp
-    test/util/string.cpp
     test/unicode/unicode.cpp
     
     test/index/index_cmp.hpp

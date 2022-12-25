@@ -13,7 +13,7 @@ public:
     virtual ~cmd() = default;
     virtual int run(const std::span<const char*>& args) const = 0;
 
-    const cmd_desc desc;
+    const cmd_desc& desc;
 
 };
 

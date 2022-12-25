@@ -5,8 +5,9 @@
 
 #include "config.hpp"
 
-namespace lf {
+namespace fs = std::filesystem;
 
+namespace lf {
 
     std::istream& operator>>(std::istream& s, with_format_and_errors<format::YAML, config&> dest) {
         dest.value.clear();
@@ -18,9 +19,9 @@ namespace lf {
                 std::string sync_name = pair.first.as<std::string>();
                 
                 const auto& sync_node = pair.second;
-                std::filesystem::path index = sync_node["index"].as<std::string>();
-                std::filesystem::path local = sync_node["local"].as<std::string>();
-                std::filesystem::path remote = sync_node["remote"].as<std::string>();
+                fs::path index = sync_node["index"].as<std::string>();
+                fs::path local = sync_node["local"].as<std::string>();
+                fs::path remote = sync_node["remote"].as<std::string>();
                 if (local.is_relative()) {
                     dest.err << sync_name << ".local must be absolute path" << errors::end;
                     continue;
@@ -49,40 +50,40 @@ namespace lf {
         return s;
     }
     
-    std::filesystem::path get_config_path() {
+    fs::path get_config_path() {
         const char* config_path = std::getenv("LF_CONFIG");
         if (config_path != nullptr) {
             return config_path;
         }
 
-        std::filesystem::path rel_path = std::filesystem::path("lf") / "lf.yaml";
+        const fs::path rel_path = fs::path("lf") / "lf.yaml";
 
 #if __linux__
         const char* home = std::getenv("HOME");
         if (home != nullptr) {
-            return std::filesystem::path(home) / ".config" / rel_path;
+            return fs::path(home) / ".config" / rel_path;
         }
-        return std::filesystem::path("/etc") / rel_path;
+        return fs::path("/etc") / rel_path;
 #elif _WIN32
         const char* local_app_data = std::getenv("LOCALAPPDATA");
         if (local_app_data != nullptr) {
-            return std::filesystem::path(local_app_data) / rel_path;
+            return fs::path(local_app_data) / rel_path;
         }
         const char* program_data = std::getenv("PROGRAMDATA")
         if (program_data != nullptr) {
-            return std::filesystem::path(program_data) / rel_path;
+            return fs::path(program_data) / rel_path;
         }
-        return std::filesystem::path("C:\\ProgramData") / rel_path;
+        return fs::path("C:\\ProgramData") / rel_path;
 #elif __APPLE__
         const char* home = std::getenv("HOME");
-        return std::filesystem::path(home != nullptr ? home : "/") / "Library" / "Preferences" / rel_path;
+        return fs::path(home != nullptr ? home : "/") / "Library" / "Preferences" / rel_path;
 #endif
     }
 
     config load_config(errors& err) {
         config result;
         
-        const std::filesystem::path path = get_config_path();
+        const fs::path path = get_config_path();
         err.loc.source = path.string();
 
         std::ifstream file(path);  
