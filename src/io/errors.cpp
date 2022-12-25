@@ -9,6 +9,12 @@ namespace lf {
     errors::errors(const data_location& loc) : loc(loc), _count(0) {
     }
 
+    errors::errors(const errors& copy): loc(copy.loc), _count(copy._count), _stream(copy._stream.str()) {
+    }
+    
+    errors::errors(errors&& move): loc(move.loc), _count(move._count), _stream(std::move(move._stream)) {
+    }
+
     void errors::on_error(std::string_view msg) {
         if (!has_errors()) {
             std::cerr << "There are errors in " << loc.source << std::endl << std::endl;

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <index/index_entry.hpp>
+#include "index/index_entry.hpp"
 
 namespace lf {
 

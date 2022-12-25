@@ -13,6 +13,8 @@ namespace lf {
         data_location loc;
 
         errors(const data_location& loc);
+        errors(const errors& copy);
+        errors(errors&& move);
         virtual ~errors() = default;
 
         size_t error_count() const;

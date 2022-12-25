@@ -6,8 +6,9 @@
 
 namespace lf {
 
-	enum class format: size_t {
-		BINARY
+	enum class format {
+		BINARY,
+		YAML
 	};
 
 	template <auto Format, typename T>

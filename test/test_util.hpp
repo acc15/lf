@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <source_location>
 
-#include <io/errors.hpp>
+#include "io/errors.hpp"
 
 namespace lf {
 
@@ -21,6 +21,8 @@ namespace lf {
     public:
         test_errors();
         test_errors(const data_location& loc);
+        test_errors(const test_errors& copy);
+        test_errors(test_errors&& move);
         std::vector<std::string> messages;
     };
 

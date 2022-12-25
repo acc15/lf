@@ -4,8 +4,7 @@
 
 #include <sstream>
 
-#include <index/index_flags.hpp>
-
+#include "index/index_flags.hpp"
 #include "index/index_sync_mode.hpp"
 #include "index_cmp.hpp"
 

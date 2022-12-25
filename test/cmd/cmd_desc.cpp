@@ -1,7 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <cmd/cmd_desc.hpp>
 #include <sstream>
+
+#include "cmd/cmd_desc.hpp"
 
 using namespace lf;
 

@@ -35,6 +35,10 @@ add_library(lf_core
     src/index/index_entry_print.cpp
     src/index/index_entry_binary.cpp
 
+    # config files
+    src/config/config.hpp
+    src/config/config.cpp
+
     src/util/pick.hpp
     src/util/string.hpp
     src/util/string.cpp
@@ -83,6 +87,8 @@ add_executable(lf_test
 
     test/cmd/cmd_desc.cpp
     test/io/errors.cpp
+
+    test/config/config.cpp
  )
 
 target_include_directories(lf_test PRIVATE src)
