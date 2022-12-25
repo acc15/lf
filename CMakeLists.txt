@@ -43,8 +43,8 @@ add_library(lf_core
     src/util/tokenizer.cpp
     src/util/bitset.hpp
     src/util/bitset.cpp
-    src/util/hash.hpp
-    src/util/hash.cpp
+    src/util/str_hash.hpp
+    src/util/str_hash.cpp
     src/util/console.hpp
     src/util/console.cpp
     src/io/data_location.hpp
@@ -79,7 +79,7 @@ add_executable(lf_test
     test/main.cpp
     test/test_util.hpp
     test/test_util.cpp
-    test/util/hash.cpp
+    test/util/str_hash.cpp
     test/util/bitset.cpp
     test/util/string.cpp
     test/config/config_mode.cpp

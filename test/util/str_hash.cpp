@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <unordered_map>
-#include <util/hash.hpp>
+#include <util/str_hash.hpp>
 
 using namespace std::literals;
 using namespace lf;

@@ -1,4 +1,4 @@
-#include "hash.hpp"
+#include "str_hash.hpp"
 
 namespace lf {
 

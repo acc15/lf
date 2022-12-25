@@ -8,7 +8,7 @@
 #include <unordered_map>
 
 #include "config_sync.hpp"
-#include "../util/hash.hpp"
+#include "../util/str_hash.hpp"
 #include "../io/errors.hpp"
 
 namespace lf {
