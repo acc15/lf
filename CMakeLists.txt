@@ -62,10 +62,6 @@ add_library(lf_core
     src/cmd/sync_cmd.cpp
     src/cmd/cmd_registry.hpp 
     src/cmd/cmd_registry.cpp
-    src/config/config_mode.hpp
-    src/config/config_mode.cpp
-    src/config/config.hpp
-    src/config/config.cpp
  )
 
 add_executable(lf 
@@ -82,8 +78,6 @@ add_executable(lf_test
     test/util/str_hash.cpp
     test/util/bitset.cpp
     test/util/string.cpp
-    test/config/config_mode.cpp
-    test/config/config.cpp
     test/unicode/unicode.cpp
     
     test/index/index_cmp.hpp
