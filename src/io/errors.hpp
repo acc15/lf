@@ -21,7 +21,7 @@ namespace lf {
         virtual void on_error(std::string_view msg);
 
     private:
-        size_t _count = 0;
+        size_t _count;
 
     };
 } 

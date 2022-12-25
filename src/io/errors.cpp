@@ -4,7 +4,7 @@
 
 namespace lf {
 
-    errors::errors(const data_location& loc) : loc(loc) {
+    errors::errors(const data_location& loc) : loc(loc), _count(0) {
     }
 
     void errors::operator()(std::string_view msg) {
@@ -14,9 +14,13 @@ namespace lf {
 
     void errors::on_error(std::string_view msg) {
         if (!has_errors()) {
-            fmt::print("There are errors in file: {}\n\n", loc.source);
+            fmt::print("There are errors: {}\n\n", loc.source);
         }
-        fmt::print(" - Line {}, {}\n", loc.line, msg);
+        fmt::print(" - ");
+        if (loc.line > 0) {
+            fmt::print("Line {}, ", loc.line);
+        }
+        fmt::print("{}\n", msg);
     }
 
     size_t errors::error_count() const {
