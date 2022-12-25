@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "index_flags.hpp"
 #include "../util/pick.hpp"
 #include "index_sync_mode.hpp"

@@ -1,7 +1,4 @@
 #include <filesystem>
-#include <iostream>
-#include <optional>
-#include <utility>
 
 #include "index_entry.hpp"
 #include "index_sync_mode.hpp"
@@ -51,7 +48,10 @@ namespace lf {
     std::pair<index_entry*, const std::string*> index_entry::compute_removal_pair(const std::filesystem::path& path, index_flags flags) {
         
         index_entry* e = this;
-        std::pair<index_entry*, const std::string*> removal_pair(e, nullptr);
+        std::pair<index_entry*, const std::string*> removal_pair(flags.is_default() ? e : nullptr, nullptr);
+        if (removal_pair.first == nullptr) {
+            return removal_pair;
+        }
 
         bool in_recursive = false;
         bool in_shallow = false;
@@ -74,7 +74,7 @@ namespace lf {
             e = &eit->second;
         }
         
-        if (in_recursive || in_shallow || !flags.is_default()) {
+        if (in_recursive || in_shallow) {
             removal_pair.first = nullptr;
         }
 

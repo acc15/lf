@@ -188,3 +188,16 @@ TEST_CASE("set must add default flags in recursive directory", "[index_entry]") 
     REQUIRE( e != nullptr );
     cmp_index_flags(e->flags, none_flags);
 }
+
+TEST_CASE("set must remove whole tree", "[index_entry]") {
+    const path recursive_dir = "a/b";
+    const path recursive_file = recursive_dir / "c/test.yaml";
+
+    index_entry index;
+    index.set(recursive_dir, recursive_flags);
+    index.set(recursive_file, shallow_flags);
+    REQUIRE(index.entry(recursive_file) != nullptr);
+
+    index.set(recursive_dir, none_flags);
+    REQUIRE(index.entries.empty());
+}
