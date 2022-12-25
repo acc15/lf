@@ -1,4 +1,5 @@
-#include <fmt/core.h>
+#include <sstream>
+#include <iostream>
 
 #include "cmd_registry.hpp"
 #include "sync_cmd.hpp"
@@ -18,30 +19,30 @@ cmd_registry::cmd_registry() {
 }
 
 std::string cmd_registry::usage() const {
-    std::string result;
+    std::stringstream s;
 
     const size_t sz = std::size(_list);
     if constexpr (sz == 0) {
-        return result;
+        return s.str();
     }
 
-    result.append(fmt::format("Usage: \n\n{}", _list[0]->desc));
+    s << "Usage: " << std::endl << std::endl << _list[0]->desc;
     for (size_t i = 1; i < sz; i++) {
-        result.append(fmt::format("\n{}", _list[i]->desc));
+        s << std::endl << _list[i]->desc;
     }
-    return result;
+    return s.str();
 }
 
 int cmd_registry::run(std::span<const char*> args) const {
     if (args.empty()) {
-        fmt::print("{}\n", usage());
+        std::cout << usage() << std::endl;
         return 0;
     }
 
     const char* cmd_name = args[0];
     const auto it = _names.find(cmd_name);
     if (it == _names.end()) {
-        fmt::print("Unknown command: {}\n\n{}\n", cmd_name, usage());
+        std::cout << "Unknown command: " << cmd_name << std::endl << std::endl << usage() << std::endl;
         return 1;
     }
     return it->second->run(args.subspan(1));

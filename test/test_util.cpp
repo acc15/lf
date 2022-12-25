@@ -1,5 +1,3 @@
-#include <fmt/core.h>
-
 #include "test_util.hpp"
 
 namespace lf {

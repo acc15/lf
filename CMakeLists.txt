@@ -21,7 +21,8 @@ endif()
 
 find_package(fmt REQUIRED)
 find_package(Catch2 REQUIRED)
-link_libraries(fmt::fmt)
+find_package(yaml-cpp REQUIRED)
+link_libraries(fmt::fmt yaml-cpp)
 
 add_library(lf_core  
 
@@ -49,10 +50,12 @@ add_library(lf_core
     src/io/data_location.hpp
     src/io/errors.hpp
     src/io/errors.cpp
+    src/io/joiner.hpp
     src/io/with_format.hpp
     src/fs/util.hpp 
     src/fs/util.cpp
     src/cmd/cmd_desc.hpp
+    src/cmd/cmd_desc.cpp
     src/cmd/cmd.hpp 
     src/cmd/cmd.cpp
     src/cmd/sync_cmd.hpp 
@@ -87,6 +90,8 @@ add_executable(lf_test
     test/index/index_cmp.cpp
     test/index/index_flags.cpp
     test/index/index_entry.cpp
+
+    test/cmd/cmd_desc.cpp
  )
 
 if(UNIX)

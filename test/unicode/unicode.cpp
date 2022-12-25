@@ -1,12 +1,11 @@
 ﻿#include <catch2/catch_test_macros.hpp>
 
+#include <cstring>
 #include <string>
 #include <fstream>
 #include <filesystem>
 #include <locale>
 #include <set>
-
-#include <fmt/core.h>
 
 #include "../test_util.hpp"
 

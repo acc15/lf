@@ -42,7 +42,7 @@ namespace lf {
 
 	template <auto Format, typename T>
 	with_format_and_errors<Format, T&> with_ref_format(T& ref, errors& e) {
-		return with_format_and_errors<Format, T&> { ref, e };
+		return with_format_and_errors<Format, T&> { { ref }, e };
 	}
 
 }
