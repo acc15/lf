@@ -13,6 +13,7 @@
 
 using namespace lf;
 using namespace std;
+using namespace std::filesystem;
 
 const index_entry test_index = {
     .flags = { .mode = index_sync_mode::NONE, .sync = false },
@@ -81,8 +82,14 @@ const index_entry test_index = {
     }
 };
 
+const path test_index_path = path("a") / "c.yaml";
+
+const index_flags none_flags = { .mode = index_sync_mode::NONE };
+const index_flags shallow_flags = { .mode = index_sync_mode::SHALLOW };
+const index_flags recursive_flags = { .mode = index_sync_mode::RECURSIVE };
+
 TEST_CASE("serialization", "[index_root]") {
-    const auto path = filesystem::temp_directory_path() / "index_serialization_test.index";
+    const auto path = temp_directory_path() / "index_serialization_test.index";
     fstream file(path, ios_base::in | ios_base::out | ios_base::binary | ios_base::trunc );
     REQUIRE( file << with_ref_format<format::BINARY>(test_index) );
     REQUIRE( file.seekg(0).good() );
@@ -95,15 +102,89 @@ TEST_CASE("serialization", "[index_root]") {
     cmp_index_entry(test_index, d);
 }
 
-TEST_CASE("get", "[index_root]") {
-    const auto flags = test_index.get(std::filesystem::path("a") / "c.yaml");
-    cmp_index_flags(flags, index_flags {.mode = index_sync_mode::SHALLOW, .sync = true });
+TEST_CASE("get", "[index_entry]") {
+    cmp_index_flags(test_index.get(test_index_path), index_flags {.mode = index_sync_mode::SHALLOW, .sync = true });
+    cmp_index_flags(test_index.get(path("x")), none_flags);
 }
 
-TEST_CASE("set", "[index_root]") {
+TEST_CASE("set update flags", "[index_entry]") {
     index_entry index;
-    index_flags flags = { .mode = index_sync_mode::NONE, .sync = true };
+    index.set(test_index_path, shallow_flags);
+    cmp_index_flags(index.get(test_index_path), shallow_flags);
+}
 
-    index.set(std::filesystem::path("a") / "b" / "c" / "d.yaml", flags);
-    cmp_index_flags(index.entries["a"].entries["b"].entries["c"].entries["d.yaml"].flags, flags);
+TEST_CASE("set must avoid creating entries with default flags only", "[index_entry]") {
+    index_entry index;
+    REQUIRE( index.entries.empty() );
+
+    index.set(test_index_path, none_flags);
+    REQUIRE( index.entries.empty() );
+}
+
+TEST_CASE("set must remove redunant entries", "[index_entry]") {
+    index_entry index;
+
+    index.set(test_index_path, shallow_flags);
+    REQUIRE( !index.entries.empty() );
+    
+    index.set(test_index_path, none_flags);
+    REQUIRE( index.entries.empty() );
+}
+
+TEST_CASE("set must preserve adjanced entries when removing redunant entries", "[index_entry]") {
+    index_entry index;
+
+    const path adjanced_path = test_index_path.parent_path() / "x.jpg";
+
+    index.set(test_index_path, shallow_flags);
+    index.set(adjanced_path, shallow_flags);
+    REQUIRE( !index.entries.empty() );
+    
+    index.set(test_index_path, none_flags);
+    REQUIRE( index.entry(adjanced_path) != nullptr );
+
+}
+
+TEST_CASE("set must preserve intermediate shallow directory", "[index_entry]") {
+
+    path shallow_path = path("a") / "b";
+    path file_path = shallow_path / "c" / "file.txt";
+
+    index_entry index;
+    index.set(shallow_path, shallow_flags);
+    index.set(file_path, shallow_flags);
+    REQUIRE( index.entry(file_path) != nullptr );
+
+    index.set(file_path, none_flags);
+    REQUIRE( index.entry(file_path) == nullptr );
+
+    auto shallow_entry = index.entry(shallow_path);
+    REQUIRE(shallow_entry != nullptr);
+    REQUIRE(shallow_entry->entries.empty());
+
+}
+
+TEST_CASE("set must add default flags in shallow directory", "[index_entry]") {
+    index_entry index;
+    
+    index.set(test_index_path.parent_path(), shallow_flags);
+    index.set(test_index_path, none_flags);
+    
+    cmp_index_flags(index.get(test_index_path.parent_path()), shallow_flags);
+    REQUIRE( index.entry(test_index_path) != nullptr );
+}
+
+TEST_CASE("set must add default flags in recursive directory", "[index_entry]") {
+    index_entry index;
+
+    const path deep_path = test_index_path.parent_path() / "x" / "y" / "z.jpg";
+
+    index.set(test_index_path.parent_path(), recursive_flags);
+    index.set(deep_path, none_flags);
+    
+    cmp_index_flags(index.get(test_index_path.parent_path()), recursive_flags);
+    
+    const auto e = index.entry(deep_path); 
+    REQUIRE( e != nullptr );
+    cmp_index_flags(e->flags, none_flags);
 }

@@ -23,8 +23,15 @@ namespace lf {
         index_flags flags;
         entry_map entries = {};
 
+        index_entry* entry(const std::filesystem::path& path);
+        const index_entry* entry(const std::filesystem::path& path) const;
+
         index_flags get(const std::filesystem::path& path) const;
         void set(const std::filesystem::path& path, index_flags flags);
+
+    private:
+        index_entry& create_entry(const std::filesystem::path& path);
+        std::pair<index_entry*, const std::string*> compute_removal_pair(const std::filesystem::path& path, index_flags flags);
 
     };
 

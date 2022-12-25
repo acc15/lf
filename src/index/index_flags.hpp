@@ -13,6 +13,8 @@ namespace lf {
         index_sync_mode mode: 2 = index_sync_mode::NONE;
         bool sync: 1 = false;
         std::uint8_t: 5;
+
+        bool is_default() const;
     };
 
     static_assert(sizeof(index_flags) == 1, "sizeof(index_flags) must be exactly 1");
