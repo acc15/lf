@@ -94,10 +94,6 @@ add_executable(lf_test
     test/cmd/cmd_desc.cpp
  )
 
-if(UNIX)
-    target_sources(lf_test PRIVATE test/io/file.cpp)
-endif()
-
 target_include_directories(lf_test PRIVATE src)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
 
