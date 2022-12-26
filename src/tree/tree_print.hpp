@@ -35,7 +35,7 @@ namespace lf {
         }
 
         static std::ostream& print(std::ostream& s, const node_type& node) {
-            s << "<root> " << node.data << std::endl;
+            s << "<root> [" << node.data << "]" << std::endl;
 
             std::vector<bool> indents;
             queue_type queue;
@@ -56,7 +56,7 @@ namespace lf {
                 s << (p.last ? "└── " : "├── ");
 
                 const auto& e = *p.entry;
-                s << e.first << " " << e.second.flags << std::endl;
+                s << e.first << " [" << e.second.data << "]" << std::endl;
 
                 if (e.second.entries.empty()) {
                     continue;
