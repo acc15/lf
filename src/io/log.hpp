@@ -3,8 +3,7 @@
 
 namespace lf {
 
-    class log {
-    public:
+    struct log {
 
         enum level { TRACE, DEBUG, INFO, WARN, ERROR, MUTE };
 
@@ -20,15 +19,13 @@ namespace lf {
         level min_level = get_default_min_level();
         level reset_level = default_level;
         level next_level = reset_level;
-
-        std::function<std::ostream&(enum level)> stream_fn = std::bind(&log::default_stream_fn, this, std::placeholders::_1);
+        std::ostream* stream = nullptr;
 
         static const level default_level = INFO;
-        static level get_default_min_level();
         static const char* level_names[];
+        static level get_default_min_level();
 
-    private:
-        std::ostream& default_stream_fn(level level);
+        std::ostream& default_stream(level level);
 
     };
 

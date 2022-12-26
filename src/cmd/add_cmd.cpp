@@ -5,6 +5,7 @@
 #include "add_cmd.hpp"
 #include "../index/index_entry.hpp"
 #include "../fs/path.hpp"
+#include "../io/log.hpp"
 
 namespace fs = std::filesystem;
 
@@ -18,7 +19,7 @@ namespace lf {
 
     int add_cmd::run(const std::span<const char*>& args) const {
         if (args.empty()) {
-            std::cerr << desc;
+            log.error() && log() << desc;
             return 1;
         }
 
@@ -31,7 +32,7 @@ namespace lf {
             try {
                 process_path(cfg, path_str);
             } catch (const fs::filesystem_error& ex) {
-                std::cerr << "unable to add " << path_str << ", error: " << ex.what() << std::endl;
+                log.error() && log() << "unable to add " << path_str << ", error: " << ex.what() << std::endl;
             }
         }
         return 0;
@@ -51,11 +52,11 @@ namespace lf {
         fs::file_status status = fs::status(path);
         if (status.type() != fs::file_type::directory) {
             if (mode == sync_mode::RECURSIVE) {
-                std::cerr << "recursive mode must be set only for existing directory, but " << path << " doesn't denote a directory" << std::endl;
+                log.error() && log() << "recursive mode must be set only for existing directory, but " << path << " doesn't denote a directory" << std::endl;
                 return;
             }
             if (status.type() == fs::file_type::not_found) {
-                std::cerr << "path " << path << " doesn't exists" << std::endl;
+                log.error() && log() << "path " << path << " doesn't exists" << std::endl;
                 return;
             }
         }

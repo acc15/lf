@@ -14,7 +14,7 @@ namespace lf {
 
     const char* log::level_names[] = { "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "MUTE" };
 
-    std::ostream& log::default_stream_fn(enum log::level level) {
+    std::ostream& log::default_stream(log::level level) {
         return level < min_level ? nullout : level >= ERROR ? std::cerr : std::cout;
     }
 
@@ -47,7 +47,7 @@ namespace lf {
     }
 
     std::ostream& log::operator()() {
-        std::ostream& target = stream_fn(next_level);
+        std::ostream& target = stream != nullptr ? *stream : default_stream(next_level);
         next_level = reset_level;
         return target;
     }
@@ -70,6 +70,6 @@ namespace lf {
         return std::min(static_cast<level>(index), MUTE);
     }
 
-    class log log;
+    struct log log;
 
 }
