@@ -25,6 +25,11 @@ link_libraries(yaml-cpp)
 
 add_library(lf_core  
 
+    # tree
+    src/tree/tree.hpp
+    src/tree/tree_print.hpp
+    src/tree/tree_binary.hpp
+
     # index files
     src/index/sync_mode.hpp
     src/index/sync_mode.cpp
@@ -77,7 +82,9 @@ add_executable(lf_test
     test/test_util.hpp
     test/test_util.cpp
     test/unicode/unicode.cpp
-    
+
+    test/tree/tree.cpp
+
     test/index/index_cmp.hpp
     test/index/index_cmp.cpp
     test/index/index_flags.cpp
