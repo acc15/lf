@@ -8,6 +8,7 @@
 
 using namespace lf;
 
+
 TEST_CASE("log stream", "[log]") {
     log.min_level = log::INFO;
 
@@ -22,7 +23,12 @@ TEST_CASE("log stream", "[log]") {
 }
 
 TEST_CASE("stream override", "[log]") {
-    
+    std::stringstream test_stream;
+    log.stream = &test_stream;
+    log() << "abc" << std::endl;
+    log.stream = nullptr;
+
+    REQUIRE(test_stream.str() == "abc\n");
 }
 
 

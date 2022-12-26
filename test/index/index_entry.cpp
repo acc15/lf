@@ -93,7 +93,7 @@ TEST_CASE("serialization", "[index_root]") {
     REQUIRE( file.seekg(0).good() );
 
     index_entry d;
-    errors err(data_location { .source = path.string() });
+    errors err(path.string());
 
     REQUIRE( file >> with_ref_format<format::BINARY>(d, err) );
 

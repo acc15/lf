@@ -1,16 +1,18 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "../../src/io/errors.hpp"
-#include "../test_util.hpp"
+#include "io/errors.hpp"
+#include "log_tester.hpp"
 
 using namespace lf;
 
 TEST_CASE("error formatting", "[errors]") {
+    log_tester t(log::INFO);
 
-    test_errors err;
+    errors err("test");
     err << "test message" << errors::end;
 
-    REQUIRE(err.messages.size() == 1);
-    REQUIRE(err.messages[0] == "test message");
+    auto lines = t.lines();
+    REQUIRE(lines.size() == 3);
+    REQUIRE(lines[2] == " - test message");
 
 }

@@ -2,20 +2,16 @@
 
 #include <sstream>
 
-#include "data_location.hpp"
-
 namespace lf {
     class errors {
     public:
         struct end_t {};
         static const end_t end;
 
-        data_location loc;
-
-        errors(const data_location& loc);
-        errors(const errors& copy);
-        errors(errors&& move);
-        virtual ~errors() = default;
+        errors(const std::string& loc);
+        
+        errors(const errors& c);
+        errors(errors&& c);
 
         size_t error_count() const;
         bool has_errors() const;
@@ -23,12 +19,11 @@ namespace lf {
         template <typename T>
         errors& operator<<(const T& value);
 
-    protected:
-        virtual void on_error(std::string_view msg);
-
     private:
-        size_t _count;
+        void on_error(std::string_view msg);
         std::stringstream _stream;
+        std::string _loc;
+        size_t _count;
 
     };
 

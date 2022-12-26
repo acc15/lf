@@ -41,7 +41,6 @@ add_library(lf_core
     src/util/pick.hpp
     src/util/console.hpp
     src/util/console.cpp
-    src/io/data_location.hpp
     src/io/log.hpp
     src/io/log.cpp
     src/io/null_stream.hpp
@@ -85,6 +84,8 @@ add_executable(lf_test
     test/index/index_entry.cpp
 
     test/cmd/cmd_desc.cpp
+    test/io/log_tester.hpp
+    test/io/log_tester.cpp
     test/io/log.cpp
     test/io/errors.cpp
 

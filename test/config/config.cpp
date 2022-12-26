@@ -25,11 +25,11 @@ void cmp_sync(const config& cfg, const std::string& name, const config_sync& r) 
     CHECK( l.remote == r.remote );
 }
 
-std::pair<config, test_errors> test_parse(const std::string& yaml) {
+std::pair<config, errors> test_parse(const std::string& yaml) {
     std::stringstream ss(yaml);
 
     config cfg;
-    test_errors errors;
+    errors errors("test");
     REQUIRE( ss >> with_ref_format<format::YAML>(cfg, errors) );
     return std::make_pair(cfg, errors);
 }

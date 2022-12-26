@@ -1,29 +1,31 @@
 #include <iostream>
 
 #include "errors.hpp"
+#include "log.hpp"
 
 namespace lf {
 
     const errors::end_t errors::end = {};
 
-    errors::errors(const data_location& loc) : loc(loc), _count(0) {
+    errors::errors(const std::string& loc): _loc(loc), _count(0) {
     }
 
-    errors::errors(const errors& copy): loc(copy.loc), _count(copy._count), _stream(copy._stream.str()) {
+    errors::errors(const errors& c): _stream(c._stream.str()), _loc(c._loc), _count(c._count) {
     }
-    
-    errors::errors(errors&& move): loc(move.loc), _count(move._count), _stream(std::move(move._stream)) {
+
+    errors::errors(errors&& c): _stream(std::move(c._stream)), _loc(std::move(c._loc)), _count(c._count) {
     }
 
     void errors::on_error(std::string_view msg) {
+        if (!log.error()) {
+            return;
+        }
+        
+        std::ostream& out = log();
         if (!has_errors()) {
-            std::cerr << "There are errors in " << loc.source << std::endl << std::endl;
+            out << "There are errors in " << _loc << std::endl << std::endl;
         }
-        std::cerr << " - ";
-        if (loc.line > 0) {
-            std::cerr << "Line " << loc.line << ", ";
-        }
-        std::cerr << msg << std::endl;
+        out << " - " << msg << std::endl;
     }
 
     size_t errors::error_count() const {
@@ -37,6 +39,7 @@ namespace lf {
     template <>
     errors& errors::operator<<(const end_t&) {
         on_error(_stream.view());
+        _stream.str("");
         _stream.clear();
         ++_count;
         return *this;

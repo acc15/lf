@@ -4,6 +4,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "config.hpp"
+#include "../io/log.hpp"
 
 namespace fs = std::filesystem;
 
@@ -80,30 +81,26 @@ namespace lf {
 #endif
     }
 
-    config load_config(errors& err) {
+    config load_config() {
         config config;
         
         const fs::path path = get_config_path();
-        err.loc.source = path.string();
+        log.info() && log() << "loading config from " << path << "..." << std::endl;
 
         std::ifstream file(path);  
         if (!file) {
-            err << "config file doesn't exists" << errors::end;
+            log.error() && log() << "config file doesn't exists" << std::endl;
             return config;
         }
 
+        errors err(path.string());
         file >> with_ref_format<format::YAML>(config, err);
         if (config.empty()) {
-            err << "config doesn't have any declared sync" << errors::end;
+            log.error() && log() << "config doesn't have any declared sync" << std::endl;
             return config;
         }
 
         return config;
-    }
-
-    config load_config() {
-        errors err(data_location{});
-        return load_config(err);
     }
 
 }

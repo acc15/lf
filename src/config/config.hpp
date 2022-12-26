@@ -17,7 +17,6 @@ namespace lf {
     std::istream& operator>>(std::istream& s, with_format_and_errors<format::YAML, config&> dest);
 
     std::filesystem::path get_config_path();
-    config load_config(errors& err);
     config load_config();
 
 }
