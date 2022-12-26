@@ -20,29 +20,40 @@ namespace lf {
                 std::string sync_name = pair.first.as<std::string>();
                 
                 const auto& sync_node = pair.second;
-                fs::path index = sync_node["index"].as<std::string>();
                 fs::path local = sync_node["local"].as<std::string>();
+                fs::path state = sync_node["state"].as<std::string>();
                 fs::path remote = sync_node["remote"].as<std::string>();
+                fs::path index = sync_node["index"].as<std::string>();
+
                 if (local.is_relative()) {
                     dest.err << sync_name << ".local must be absolute path" << errors::end;
                     continue;
                 }
+
                 if (remote.is_relative()) {
                     dest.err << sync_name << ".remote must be absolute path" << errors::end;
                     continue;
                 }
+
                 if (index.is_relative()) {
-                    index = local / index;
+                    index = remote / index;
+                }
+                
+                if (state.is_relative()) {
+                    state = local / state;
                 }
 
                 const auto result = dest.value.emplace(sync_name, config_sync { 
-                    .index = std::move(index),
                     .local = std::move(local),
-                    .remote = std::move(remote)
+                    .remote = std::move(remote),
+                    .state = std::move(state),
+                    .index = std::move(index)
                 });
+
                 if (!result.second) {
                     dest.err << "duplicate sync \"" << sync_name << "\" entry" << errors::end;
                 }
+
             }
 
         } catch (const std::runtime_error& e) {

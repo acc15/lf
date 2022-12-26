@@ -8,9 +8,10 @@
 namespace lf {
 
     struct config_sync {
-        std::filesystem::path index;
         std::filesystem::path local;
         std::filesystem::path remote;
+        std::filesystem::path state;
+        std::filesystem::path index;
     };
 
     using config = std::unordered_map<std::string, config_sync>;

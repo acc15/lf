@@ -40,23 +40,27 @@ TEST_CASE("parse", "[config]") {
         "home: \n"
         "  local: " + test_pstr("local/home") + "\n"
         "  remote: " + test_pstr("remote/home") + "\n"
-        "  index: .config/lf/home.index\n"
+        "  state: .config/lf/home.state\n"
+        "  index: home.index\n"
         "pic: \n"
         "  local: " + test_pstr("local/pic") + "\n"
         "  remote: " + test_pstr("remote/pic") + "\n"
-        "  index: .config/lf/pic.index\n";
+        "  state: .config/lf/pic.state\n"
+        "  index: pic.index\n";
 
     auto p = test_parse(yaml);
     REQUIRE( !p.second.has_errors() );
     cmp_sync(p.first, "home", config_sync {
-        .index = test_root / "local/home/.config/lf/home.index", 
         .local = test_root / "local/home", 
-        .remote = test_root / "remote/home"
+        .remote = test_root / "remote/home",
+        .state = test_root / "local/home/.config/lf/home.state", 
+        .index = test_root / "remote/home/home.index"
     });
     cmp_sync(p.first, "pic", config_sync {
-        .index = test_root / "local/pic/.config/lf/pic.index", 
         .local = test_root / "local/pic", 
-        .remote = test_root / "remote/pic"
+        .remote = test_root / "remote/pic",
+        .state = test_root / "local/pic/.config/lf/pic.state", 
+        .index = test_root / "remote/pic/pic.index"
     });
 
 }
