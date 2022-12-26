@@ -1,7 +1,7 @@
 #include <filesystem>
 
 #include "index_entry.hpp"
-#include "index_sync_mode.hpp"
+#include "sync_mode.hpp"
 
 using namespace std::filesystem;
 
@@ -57,8 +57,8 @@ namespace lf {
         bool in_shallow = false;
 
         for (const auto& el: path) {
-            in_recursive |= e->flags.mode == index_sync_mode::RECURSIVE;
-            in_shallow = e->flags.mode == index_sync_mode::SHALLOW;
+            in_recursive |= e->flags.mode == sync_mode::RECURSIVE;
+            in_shallow = e->flags.mode == sync_mode::SHALLOW;
 
             std::string key = el.string();
             auto eit = e->entries.find(key);

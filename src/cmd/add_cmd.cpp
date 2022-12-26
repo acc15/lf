@@ -38,9 +38,9 @@ namespace lf {
     }
 
     void add_cmd::process_path(const config& cfg, std::string_view path_str) const {
-        index_sync_mode mode = index_sync_mode::SHALLOW;
+        sync_mode mode = sync_mode::SHALLOW;
         if (path_str.ends_with("**")) {
-            mode = index_sync_mode::RECURSIVE;
+            mode = sync_mode::RECURSIVE;
             path_str.remove_suffix(2);
         } else if (path_str.ends_with("*")) {
             path_str.remove_suffix(1);
@@ -50,7 +50,7 @@ namespace lf {
 
         fs::file_status status = fs::status(path);
         if (status.type() != fs::file_type::directory) {
-            if (mode == index_sync_mode::RECURSIVE) {
+            if (mode == sync_mode::RECURSIVE) {
                 std::cerr << "recursive mode must be set only for existing directory, but " << path << " doesn't denote a directory" << std::endl;
                 return;
             }
@@ -71,7 +71,7 @@ namespace lf {
 
     }
 
-    void add_cmd::add_path(const config_sync& sync, const std::filesystem::path& rel_path, index_sync_mode mode) const {
+    void add_cmd::add_path(const config_sync& sync, const std::filesystem::path& rel_path, sync_mode mode) const {
         // index_entry index;
         // std::fstream file(sync.index);
         // if (file.eof()) {

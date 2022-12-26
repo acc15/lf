@@ -5,7 +5,6 @@
 #include <sstream>
 
 #include "index/index_flags.hpp"
-#include "index/index_sync_mode.hpp"
 #include "index_cmp.hpp"
 
 using namespace lf;
@@ -17,16 +16,16 @@ void cmp_index_flags_byte(index_flags flags, std::uint8_t expected) {
 }
 
 TEST_CASE("set", "[index_flags]") {
-    cmp_index_flags_byte(index_flags { .mode = index_sync_mode::NONE, .sync = false }, 0);
-    cmp_index_flags_byte(index_flags { .mode = index_sync_mode::RECURSIVE, .sync = true }, 0b110);
-    cmp_index_flags_byte(index_flags { .mode = index_sync_mode::SHALLOW, .sync = false }, 1);
+    cmp_index_flags_byte(index_flags { .mode = sync_mode::NONE, .sync = false }, 0);
+    cmp_index_flags_byte(index_flags { .mode = sync_mode::RECURSIVE, .sync = true }, 0b110);
+    cmp_index_flags_byte(index_flags { .mode = sync_mode::SHALLOW, .sync = false }, 1);
 }
 
 TEST_CASE("serialization", "[index_flags]") {
     std::stringstream ss;
 
     const index_flags s = { 
-        .mode = GENERATE( index_sync_mode::NONE, index_sync_mode::SHALLOW, index_sync_mode::RECURSIVE ), 
+        .mode = GENERATE( sync_mode::NONE, sync_mode::SHALLOW, sync_mode::RECURSIVE ), 
         .sync = GENERATE( false, true ) 
     };
 

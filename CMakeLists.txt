@@ -26,8 +26,8 @@ link_libraries(yaml-cpp)
 add_library(lf_core  
 
     # index files
-    src/index/index_sync_mode.hpp
-    src/index/index_sync_mode.cpp
+    src/index/sync_mode.hpp
+    src/index/sync_mode.cpp
     src/index/index_flags.hpp
     src/index/index_flags.cpp
     src/index/index_entry.hpp
@@ -42,6 +42,10 @@ add_library(lf_core
     src/util/console.hpp
     src/util/console.cpp
     src/io/data_location.hpp
+    src/io/log.hpp
+    src/io/log.cpp
+    src/io/null_stream.hpp
+    src/io/null_stream.cpp
     src/io/errors.hpp
     src/io/errors.cpp
     src/io/joiner.hpp
@@ -81,6 +85,7 @@ add_executable(lf_test
     test/index/index_entry.cpp
 
     test/cmd/cmd_desc.cpp
+    test/io/log.cpp
     test/io/errors.cpp
 
     test/config/config.cpp

@@ -7,8 +7,6 @@
 #include <io/with_format.hpp>
 
 #include "index/index_entry.hpp"
-#include "index/index_flags.hpp"
-#include "index/index_sync_mode.hpp"
 #include "index_cmp.hpp"
 
 using namespace lf;
@@ -16,23 +14,23 @@ using namespace std;
 using namespace std::filesystem;
 
 const index_entry test_index = {
-    .flags = { .mode = index_sync_mode::NONE, .sync = false },
+    .flags = { .mode = sync_mode::NONE, .sync = false },
     .entries = {
         { 
             "a", 
             index_entry {
-                .flags = { .mode = index_sync_mode::NONE, .sync = false },
+                .flags = { .mode = sync_mode::NONE, .sync = false },
                 .entries = {
                     {
                         "b.json",
                         index_entry {
-                            .flags = { .mode = index_sync_mode::SHALLOW, .sync = false },
+                            .flags = { .mode = sync_mode::SHALLOW, .sync = false },
                         }
                     },
                     {
                         "c.yaml",
                         index_entry {
-                            .flags = { .mode = index_sync_mode::SHALLOW, .sync = true },
+                            .flags = { .mode = sync_mode::SHALLOW, .sync = true },
                         }
                     }
                 }
@@ -41,18 +39,18 @@ const index_entry test_index = {
         {
             "d",
             index_entry {
-                .flags = { .mode = index_sync_mode::RECURSIVE, .sync = false },
+                .flags = { .mode = sync_mode::RECURSIVE, .sync = false },
                 .entries = {
                     {
                         "e.sql",
                         index_entry {
-                            .flags = { .mode = index_sync_mode::RECURSIVE, .sync = false },
+                            .flags = { .mode = sync_mode::RECURSIVE, .sync = false },
                         }
                     },
                     {
                         "f.jpg",
                         index_entry {
-                            .flags = { .mode = index_sync_mode::RECURSIVE, .sync = true },
+                            .flags = { .mode = sync_mode::RECURSIVE, .sync = true },
                         }
                     }
                     
@@ -62,18 +60,18 @@ const index_entry test_index = {
         {
             "g",
             index_entry {
-                .flags = { .mode = index_sync_mode::SHALLOW, .sync = true },
+                .flags = { .mode = sync_mode::SHALLOW, .sync = true },
                 .entries = {
                     {
                         "h.mp3",
                         index_entry {
-                            .flags = { .mode = index_sync_mode::SHALLOW, .sync = true },
+                            .flags = { .mode = sync_mode::SHALLOW, .sync = true },
                         }
                     },
                     {
                         "i.mp4",
                         index_entry {
-                            .flags = { .mode = index_sync_mode::SHALLOW, .sync = true },
+                            .flags = { .mode = sync_mode::SHALLOW, .sync = true },
                         }
                     }
                 }
@@ -84,9 +82,9 @@ const index_entry test_index = {
 
 const path test_index_path = path("a") / "c.yaml";
 
-const index_flags none_flags = { .mode = index_sync_mode::NONE };
-const index_flags shallow_flags = { .mode = index_sync_mode::SHALLOW };
-const index_flags recursive_flags = { .mode = index_sync_mode::RECURSIVE };
+const index_flags none_flags = { .mode = sync_mode::NONE };
+const index_flags shallow_flags = { .mode = sync_mode::SHALLOW };
+const index_flags recursive_flags = { .mode = sync_mode::RECURSIVE };
 
 TEST_CASE("serialization", "[index_root]") {
     const auto path = temp_directory_path() / "index_serialization_test.index";
@@ -103,7 +101,7 @@ TEST_CASE("serialization", "[index_root]") {
 }
 
 TEST_CASE("get", "[index_entry]") {
-    cmp_index_flags(test_index.get(test_index_path), index_flags {.mode = index_sync_mode::SHALLOW, .sync = true });
+    cmp_index_flags(test_index.get(test_index_path), index_flags {.mode = sync_mode::SHALLOW, .sync = true });
     cmp_index_flags(test_index.get(path("x")), none_flags);
 }
 

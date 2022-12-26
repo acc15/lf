@@ -41,6 +41,8 @@ namespace lf {
 		return with_format<Format, T&> { ref };
 	}
 
+
+	// TODO refactor to data_location (with_ref_format and data_location)
 	template <auto Format, typename T>
 	with_format_and_errors<Format, T&> with_ref_format(T& ref, errors& e) {
 		return with_format_and_errors<Format, T&> { { ref }, e };

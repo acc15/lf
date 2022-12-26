@@ -1,6 +1,6 @@
 #include "index_flags.hpp"
 #include "../util/pick.hpp"
-#include "index_sync_mode.hpp"
+#include "sync_mode.hpp"
 
 namespace lf {
 
@@ -8,7 +8,7 @@ namespace lf {
     const char sync_chars[] = { '-', '+'  };
 
     bool index_flags::is_default() const {
-        return mode == index_sync_mode::NONE && sync == false;
+        return mode == sync_mode::NONE && sync == false;
     }
 
     std::ostream& operator<<(std::ostream& s, const index_flags& flags) {

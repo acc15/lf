@@ -5,7 +5,7 @@
 
 namespace lf {
     
-    enum class index_sync_mode: std::uint8_t {
+    enum class sync_mode: std::uint8_t {
         NONE,
         SHALLOW,
         RECURSIVE
@@ -13,7 +13,7 @@ namespace lf {
 
     extern const char* index_sync_mode_names[4];
     
-    std::ostream& operator<<(std::ostream& s, const index_sync_mode& mode);
+    std::ostream& operator<<(std::ostream& s, const sync_mode& mode);
 
 }
 

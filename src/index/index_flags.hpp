@@ -4,13 +4,13 @@
 #include <istream>
 #include <ostream>
 
-#include "index_sync_mode.hpp"
+#include "sync_mode.hpp"
 #include "../io/with_format.hpp"
 
 namespace lf {
 
     struct index_flags {
-        index_sync_mode mode: 2 = index_sync_mode::NONE;
+        sync_mode mode: 2 = sync_mode::NONE;
         bool sync: 1 = false;
         std::uint8_t: 5;
 
