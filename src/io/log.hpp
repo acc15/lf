@@ -29,6 +29,6 @@ namespace lf {
 
     };
 
-    extern class log log;
+    extern struct log log;
 
 }
