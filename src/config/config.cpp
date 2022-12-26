@@ -81,7 +81,7 @@ namespace lf {
     }
 
     config load_config(errors& err) {
-        config result;
+        config config;
         
         const fs::path path = get_config_path();
         err.loc.source = path.string();
@@ -89,11 +89,16 @@ namespace lf {
         std::ifstream file(path);  
         if (!file) {
             err << "config file doesn't exists" << errors::end;
-            return result;
+            return config;
         }
 
-        file >> with_ref_format<format::YAML>(result, err);
-        return result;
+        file >> with_ref_format<format::YAML>(config, err);
+        if (config.empty()) {
+            err << "config doesn't have any declared sync" << errors::end;
+            return config;
+        }
+
+        return config;
     }
 
     config load_config() {

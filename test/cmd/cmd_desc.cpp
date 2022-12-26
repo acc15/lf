@@ -13,5 +13,5 @@ TEST_CASE("print", "[cmd_desc]") {
     std::stringstream ss;
     ss << desc;
 
-    REQUIRE(ss.str() == "(a|b|c) params - description");
+    REQUIRE(ss.str() == "(a|b|c) params - description\n");
 }

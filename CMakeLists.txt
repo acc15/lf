@@ -46,6 +46,8 @@ add_library(lf_core
     src/io/errors.cpp
     src/io/joiner.hpp
     src/io/with_format.hpp
+    src/fs/path.hpp 
+    src/fs/path.cpp
     src/fs/util.hpp 
     src/fs/util.cpp
     src/cmd/cmd_desc.hpp
@@ -82,6 +84,7 @@ add_executable(lf_test
     test/io/errors.cpp
 
     test/config/config.cpp
+    test/fs/path.cpp
  )
 
 target_include_directories(lf_test PRIVATE src)
