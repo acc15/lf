@@ -29,6 +29,7 @@ add_library(lf_core
     src/tree/tree.hpp
     src/tree/tree_print.hpp
     src/tree/tree_binary.hpp
+    src/tree/tree_binary.cpp
 
     # index files
     src/index/sync_mode.hpp

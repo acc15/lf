@@ -11,8 +11,8 @@ namespace lf {
     template <typename T>
     struct tree_print {
 
-        using node_type = tree<T>;
-        using entry_map = typename node_type::entry_map;
+        using tree_type = tree<T>;
+        using entry_map = typename tree_type::entry_map;
         using queue_type = std::vector<tree_print>;
 
         typename entry_map::const_pointer entry;
@@ -34,7 +34,7 @@ namespace lf {
             }
         }
 
-        static std::ostream& print(std::ostream& s, const node_type& node) {
+        static std::ostream& print(std::ostream& s, const tree_type& node) {
             s << "<root> [" << node.data << "]" << std::endl;
 
             std::vector<bool> indents;
