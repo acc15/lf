@@ -30,12 +30,21 @@ namespace lf {
         }
 
         static std::ostream& write(std::ostream& s, const tree_type& tree) {
-            s << tree_signature << tree_version;
-            if (!s.good()) {
+            
+            if (!(s << tree_signature)) {
+                log.error() && log() << "unable to write file signature: " << strerror(errno) << std::endl;
                 return s;
             }
 
-            s << with_ref_format<format::BINARY>(tree.data);
+            if (!(s << tree_version)) {
+                log.error() && log() << "unable to write file version: " << strerror(errno) << std::endl;
+                return s;
+            }
+
+            if (!(s << with_ref_format<format::BINARY>(tree.data))) {
+                log.error() && log() << "unable to write root data: " << strerror(errno) << std::endl;
+                return s;
+            }
 
             std::vector<entry_map_ptr> queue;
             add_entries(tree.entries, queue);
@@ -45,16 +54,35 @@ namespace lf {
                 queue.pop_back();
 
                 if (e == nullptr) {
+                    log.trace() && log() << "entry ended, writing zero char" << std::endl;
                     s << '\0';
                     continue;
                 }
 
-                s << e->first << '\0' << with_ref_format<format::BINARY>(e->second.data);
+                log.trace() && log() << "writing entry " << e->first << "..." << std::endl;
+                if (!(s << e->first << '\0')) {
+                    log.error() && log() << "unable to write entry " << e->first << " name: " << strerror(errno) << std::endl;
+                    break;
+                }
+
+                if (!(s << with_ref_format<format::BINARY>(e->second.data))) {
+                    log.error() && log() << "unable to write entry " << e->first << " data: " << strerror(errno) << std::endl;
+                    break;
+                }
+
                 if (e->second.entries.empty()) {
+                    
                     if (std::all_of(queue.begin(), queue.end(), [](auto p) { return p == nullptr; })) {
+                        log.trace() && log() << "all other entries are zeroes... ending tree file" << std::endl;
                         break;
                     }
-                    s << '\0';
+
+                    log.trace() && log() << "entry " << e->first << " is empty, writing zero char" << std::endl;
+                    if (!(s << '\0')) {
+                        log.error() && log() << "unable to write entry " << e->first << " finising zero char: " << strerror(errno) << std::endl;
+                        break;
+                    }
+
                     continue;
                 }
 
@@ -71,6 +99,7 @@ namespace lf {
             uint8_t version;
 
             if (!(s >> signature)) {
+                log.error() && log() << "unable to read file signature: " << strerror(errno) << std::endl;
                 return s;
             }
             
@@ -81,6 +110,7 @@ namespace lf {
             }
 
             if (!(s >> version)) {
+                log.error() && log() << "unable to read file version: " << strerror(errno) << std::endl;
                 return s;
             }
 
@@ -91,6 +121,7 @@ namespace lf {
             }
 
             if (!(s >> with_ref_format<format::BINARY>(tree.data))) {
+                log.error() && log() << "unable to read root data: " << strerror(errno) << std::endl;
                 return s;
             }
 
@@ -112,11 +143,13 @@ namespace lf {
                 
                 std::string name;
                 if (!getline(s, name, '\0')) {
+                    log.error() && log() << "unable to read entry name: " << strerror(errno) << std::endl;
                     break;
                 }
 
                 tree_type& entry = (*stack.back())[name];
                 if (!(s >> with_ref_format<format::BINARY>(entry.data))) {
+                    log.error() && log() << "unable to read entry " << name << " data: " << strerror(errno) << std::endl;
                     break;
                 }
 
