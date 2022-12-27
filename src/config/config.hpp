@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <istream>
+#include <concepts>
 
 #include "../io/format.hpp"
 
@@ -17,14 +18,15 @@ namespace lf {
     };
 
     using config = std::unordered_map<std::string, config_sync>;
-    std::istream& operator>>(std::istream& s, with_format<format::YAML, config&> dest);
-
-    std::filesystem::path get_config_path();
 
     struct config_desc {
         using type = config;
         static const lf::format format = lf::format::YAML;
         static const char* const name;
     };
+
+    std::istream& operator>>(std::istream& s, with_format<format::YAML, config&> dest);
+
+    std::filesystem::path get_config_path();
 
 }
