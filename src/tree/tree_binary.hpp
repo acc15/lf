@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "../io/with_format.hpp"
+#include "../io/log.hpp"
 
 namespace lf {
 
@@ -64,29 +65,27 @@ namespace lf {
             return s;
         }
 
-        static std::istream& read(std::istream& s, tree_type& tree, errors& err) {
+        static std::istream& read(std::istream& s, tree_type& tree) {
             
             char signature[std::size(tree_signature)];
             uint8_t version;
 
             if (!(s >> signature)) {
-                err << "unable to read file signature: " << errors::end;
                 return s;
             }
             
             if (std::strcmp(signature, tree_signature) != 0) {
-                err << "invalid file signature: " << signature << errors::end;
+                log.error() && log() << "invalid file signature: " << signature << std::endl;
                 s.setstate(std::istream::failbit);
                 return s;
             }
 
             if (!(s >> version)) {
-                err << "unable to read tree version" << errors::end;
                 return s;
             }
 
             if (version != 0) {
-                err << "invalid file version: " << static_cast<unsigned int>(version) << errors::end;
+                log.error() && log() << "invalid file version: " << static_cast<unsigned int>(version) << std::endl;
                 s.setstate(std::istream::failbit);
                 return s;
             }
@@ -136,8 +135,8 @@ namespace lf {
     }
     
     template <tree_data T>
-    std::istream& operator>>(std::istream& s, with_format_and_errors<format::BINARY, tree<T>&> tree) {
-        return tree_binary<T>::read(s, tree.value, tree.err);
+    std::istream& operator>>(std::istream& s, with_format<format::BINARY, tree<T>&> tree) {
+        return tree_binary<T>::read(s, tree.value);
     }
 
 }

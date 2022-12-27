@@ -8,7 +8,7 @@
 #include "../index/index_tree.hpp"
 #include "../fs/path.hpp"
 #include "../io/log.hpp"
-
+#include "../io/serialization.hpp"
 
 namespace fs = std::filesystem;
 
@@ -29,8 +29,8 @@ namespace lf {
             return 1;
         }
 
-        config cfg = load_config();
-        if (cfg.empty()) {
+        config cfg;
+        if (!load_file<format::YAML>(get_config_path(), "config", cfg)) {
             return 1;
         }
         

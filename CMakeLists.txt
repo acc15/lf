@@ -46,10 +46,9 @@ add_library(lf_core
     src/io/log.cpp
     src/io/null_stream.hpp
     src/io/null_stream.cpp
-    src/io/errors.hpp
-    src/io/errors.cpp
     src/io/joiner.hpp
     src/io/with_format.hpp
+    src/io/serialization.hpp
     src/fs/path.hpp 
     src/fs/path.cpp
     src/fs/util.hpp 
@@ -85,7 +84,6 @@ add_executable(lf_test
     test/io/log_tester.hpp
     test/io/log_tester.cpp
     test/io/log.cpp
-    test/io/errors.cpp
 
     test/config/config.cpp
     test/fs/path.cpp

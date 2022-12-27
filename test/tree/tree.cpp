@@ -144,8 +144,7 @@ TEST_CASE("serialization", "[tree]") {
     REQUIRE( file.seekg(0).good() );
 
     bool_tree d;
-    errors err(path.string());
-    REQUIRE( file >> with_ref_format<format::BINARY>(d, err) );
+    REQUIRE( file >> with_ref_format<format::BINARY>(d) );
 
     cmp_tree(test_tree, d);
 }
@@ -156,8 +155,7 @@ TEST_CASE("deserialize with wrong signature", "[tree]") {
     std::stringstream ss("WRONGSIGNATUREHERE!!!");
 
     bool_tree d;
-    errors err("test");
-    REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(d, err) );
+    REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(d) );
     REQUIRE( t.str().find("invalid file signature") != std::string::npos );
 }
 

@@ -2,14 +2,13 @@
 
 #include <iostream>
 #include <sstream>
-#include <utility>
 
 #include "config/config.hpp"
-#include "io/errors.hpp"
 #include "io/with_format.hpp"
-#include "../test_util.hpp"
-
 #include "io/joiner.hpp"
+
+#include "../io/log_tester.hpp"
+#include "../test_util.hpp"
 
 using namespace lf;
 
@@ -25,13 +24,12 @@ void cmp_sync(const config& cfg, const std::string& name, const config_sync& r) 
     CHECK( l.remote == r.remote );
 }
 
-std::pair<config, errors> test_parse(const std::string& yaml) {
+config test_parse(const std::string& yaml) {
     std::stringstream ss(yaml);
 
     config cfg;
-    errors errors("test");
-    REQUIRE( ss >> with_ref_format<format::YAML>(cfg, errors) );
-    return std::make_pair(cfg, errors);
+    ss >> with_ref_format<format::YAML>(cfg);
+    return cfg;
 }
 
 TEST_CASE("parse", "[config]") {
@@ -49,14 +47,13 @@ TEST_CASE("parse", "[config]") {
         "  index: pic.index\n";
 
     auto p = test_parse(yaml);
-    REQUIRE( !p.second.has_errors() );
-    cmp_sync(p.first, "home", config_sync {
+    cmp_sync(p, "home", config_sync {
         .local = test_root / "local/home", 
         .remote = test_root / "remote/home",
         .state = test_root / "local/home/.config/lf/home.state", 
         .index = test_root / "remote/home/home.index"
     });
-    cmp_sync(p.first, "pic", config_sync {
+    cmp_sync(p, "pic", config_sync {
         .local = test_root / "local/pic", 
         .remote = test_root / "remote/pic",
         .state = test_root / "local/pic/.config/lf/pic.state", 
@@ -66,14 +63,16 @@ TEST_CASE("parse", "[config]") {
 }
 
 TEST_CASE("parse array", "[config]") {
+    log_tester t;
     auto p = test_parse("[1,2,3]");
-    REQUIRE(p.second.has_errors());
+    REQUIRE(t.str().find("unable to read YAML") != std::string::npos);
 }
 
 TEST_CASE("parse without required fields", "[config]") {
+    log_tester t;
     auto p = test_parse(
         "home: \n"
         "  test: abc"
     );
-    REQUIRE(p.second.has_errors());
+    REQUIRE( t.str().find("unable to convert sync") != std::string::npos );
 }
