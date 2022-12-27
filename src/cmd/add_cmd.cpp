@@ -17,14 +17,29 @@ namespace lf {
     const char* add_cmd::names[] = { "a", "add" };
     const cmd_desc add_cmd::desc = {
         names, 
-        "(file|dir)+", "add specified file(s) to corresponding index file(s)"
+        "< [--recursive|-R] <recursive dirs>+ | [--shallow|-S] <file|dir>+ >", 
+        "add specified file(s) to corresponding index file(s)"
     };
 
     add_cmd::add_cmd() : cmd(desc) {
     }
 
     int add_cmd::run(const std::span<const char*>& args) const {
-        if (args.empty()) {
+        sync_mode mode = sync_mode::SHALLOW;
+        
+        std::span<const char*> non_opts = args;
+        if (!non_opts.empty()) {
+            std::string_view opt = args[0];
+            if (opt == "--recursive" || opt == "-R") {
+                mode = sync_mode::RECURSIVE;
+                non_opts = non_opts.subspan(1);
+            } else if (opt == "--shallow" || opt == "-S") {
+                mode = sync_mode::SHALLOW;
+                non_opts = non_opts.subspan(1);
+            }
+        }
+
+        if (non_opts.empty()) {
             log.error() && log() << desc;
             return 1;
         }
@@ -34,10 +49,9 @@ namespace lf {
             return 1;
         }
         
-        std::unordered_map<std::filesystem::path, std::pair<index_tree, bool>> index_change_map;
         for (std::string_view path_str: args) {
             try {
-                process_path(cfg, path_str, sync_mode::SHALLOW);
+                process_path(cfg, path_str, mode);
             } catch (const fs::filesystem_error& ex) {
                 log.error() && log() << "unable to add " << path_str << ", error: " << ex.what() << std::endl;
             }
@@ -50,7 +64,7 @@ namespace lf {
 
         fs::file_status status = fs::status(path);
         if (mode == sync_mode::RECURSIVE && status.type() != fs::file_type::directory) {
-            log.error() && log() << "recursive mode must be set only for existing directories, but " << path << " doesn't denote a directory" << std::endl;
+            log.error() && log() << "recursive can be used only for existing directories, but " << path << " doesn't denote a directory" << std::endl;
             return;
         }
         

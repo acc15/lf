@@ -5,7 +5,11 @@
 namespace lf {
 
 const char* sync_cmd::names[] = { "s", "sync" };
-const cmd_desc sync_cmd::desc = { names, "[list of sync names, all if empty]", "synchronizes all mirrors" };
+const cmd_desc sync_cmd::desc = { 
+    names, 
+    "[list of sync names, all if empty]+", 
+    "synchronizes mirrors"
+};
 
 sync_cmd::sync_cmd(): cmd(desc) {
 }
