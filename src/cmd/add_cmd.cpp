@@ -1,18 +1,24 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <unordered_map>
 
 #include "add_cmd.hpp"
-// #include "../index/index_entry.hpp"
+#include "../index/index_tree.hpp"
 #include "../fs/path.hpp"
 #include "../io/log.hpp"
+
 
 namespace fs = std::filesystem;
 
 namespace lf {
 
     const char* add_cmd::names[] = { "a", "add" };
-    const cmd_desc add_cmd::desc = {names, "<file|shallow-dir/*|recursive-dir/**>+", "add specified file(s) to corresponding index file(s)"};
+    const cmd_desc add_cmd::desc = {
+        names, 
+        "(file|dir)+", "add specified file(s) to corresponding index file(s)"
+    };
 
     add_cmd::add_cmd() : cmd(desc) {
     }
@@ -28,9 +34,10 @@ namespace lf {
             return 1;
         }
         
+        std::unordered_map<std::filesystem::path, std::pair<index_tree, bool>> index_change_map;
         for (std::string_view path_str: args) {
             try {
-                process_path(cfg, path_str);
+                process_path(cfg, path_str, sync_mode::SHALLOW);
             } catch (const fs::filesystem_error& ex) {
                 log.error() && log() << "unable to add " << path_str << ", error: " << ex.what() << std::endl;
             }
@@ -38,30 +45,21 @@ namespace lf {
         return 0;
     }
 
-    void add_cmd::process_path(const config& cfg, std::string_view path_str) const {
-        sync_mode mode = sync_mode::SHALLOW;
-        if (path_str.ends_with("**")) {
-            mode = sync_mode::RECURSIVE;
-            path_str.remove_suffix(2);
-        } else if (path_str.ends_with("*")) {
-            path_str.remove_suffix(1);
-        }
-
+    void add_cmd::process_path(const config& cfg, std::string_view path_str, sync_mode mode) const {
         fs::path path = normalize_path(path_str);
 
         fs::file_status status = fs::status(path);
-        if (status.type() != fs::file_type::directory) {
-            if (mode == sync_mode::RECURSIVE) {
-                log.error() && log() << "recursive mode must be set only for existing directory, but " << path << " doesn't denote a directory" << std::endl;
-                return;
-            }
-            if (status.type() == fs::file_type::not_found) {
-                log.error() && log() << "path " << path << " doesn't exists" << std::endl;
-                return;
-            }
+        if (mode == sync_mode::RECURSIVE && status.type() != fs::file_type::directory) {
+            log.error() && log() << "recursive mode must be set only for existing directories, but " << path << " doesn't denote a directory" << std::endl;
+            return;
+        }
+        
+        if (mode != sync_mode::NONE && status.type() == fs::file_type::not_found) {
+            log.error() && log() << "path " << path << " doesn't exists" << std::endl;
+            return;
         }
 
-        log.info() && log() << "add " << path << " with mode " << mode << std::endl;
+        log.debug() && log() << "adding " << path << " with mode " << mode << std::endl;
         for (const auto& sync_pair: cfg) {
             const config_sync& sync = sync_pair.second;
             if (!is_subpath(path, sync.local)) {
