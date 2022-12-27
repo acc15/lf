@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "add_cmd.hpp"
-#include "../index/index_entry.hpp"
+// #include "../index/index_entry.hpp"
 #include "../fs/path.hpp"
 #include "../io/log.hpp"
 
@@ -61,10 +61,11 @@ namespace lf {
             }
         }
 
-        std::cout << "adding " << path << " with mode " << mode << std::endl;
+        log.info() && log() << "add " << path << " with mode " << mode << std::endl;
         for (const auto& sync_pair: cfg) {
             const config_sync& sync = sync_pair.second;
             if (!is_subpath(path, sync.local)) {
+                log.debug() && log() << "sync " << sync_pair.first << " skipped due to different base path: " << sync.local << std::endl;
                 continue;
             }
             add_path(sync, relative_path(path, sync.local), mode);

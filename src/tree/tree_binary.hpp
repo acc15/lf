@@ -1,19 +1,22 @@
 #pragma once
 
+#include "tree.hpp"
+
+#include <cstring>
+
 #include <algorithm>
 #include <istream>
 #include <ostream>
 #include <vector>
 
-#include "tree.hpp"
 #include "../io/with_format.hpp"
 
 namespace lf {
 
-    extern const char* const tree_signature;
+    extern const char tree_signature[3];
     extern const uint8_t tree_version;
 
-    template <typename T>
+    template <tree_data T>
     struct tree_binary {
 
         using tree_type = tree<T>;
@@ -34,7 +37,7 @@ namespace lf {
             s << with_ref_format<format::BINARY>(tree.data);
 
             std::vector<entry_map_ptr> queue;
-            add_entries(tree.value.entries, queue);
+            add_entries(tree.entries, queue);
 
             while (!queue.empty()) {
                 const auto e = queue.back();
@@ -62,17 +65,77 @@ namespace lf {
         }
 
         static std::istream& read(std::istream& s, tree_type& tree, errors& err) {
+            
+            char signature[std::size(tree_signature)];
+            uint8_t version;
+
+            if (!(s >> signature)) {
+                err << "unable to read file signature: " << errors::end;
+                return s;
+            }
+            
+            if (std::strcmp(signature, tree_signature) != 0) {
+                err << "invalid file signature: " << signature << errors::end;
+                s.setstate(std::istream::failbit);
+                return s;
+            }
+
+            if (!(s >> version)) {
+                err << "unable to read tree version" << errors::end;
+                return s;
+            }
+
+            if (version != 0) {
+                err << "invalid file version: " << static_cast<unsigned int>(version) << errors::end;
+                s.setstate(std::istream::failbit);
+                return s;
+            }
+
+            if (!(s >> with_ref_format<format::BINARY>(tree.data))) {
+                return s;
+            }
+
+            std::vector<entry_map*> stack;
+            stack.push_back(&tree.entries);
+
+            do {
+
+                std::istream::int_type next = s.peek();
+                if (next == std::istream::traits_type::eof()) {
+                    break;
+                }
+
+                if (next == 0) {
+                    s.get();
+                    stack.pop_back();
+                    continue;
+                }
+                
+                std::string name;
+                if (!getline(s, name, '\0')) {
+                    break;
+                }
+
+                tree_type& entry = (*stack.back())[name];
+                if (!(s >> with_ref_format<format::BINARY>(entry.data))) {
+                    break;
+                }
+
+                stack.push_back(&entry.entries);
+
+            } while (!stack.empty());
+
             return s;
         }
 
     };
 
-    template <typename T>
+    template <tree_data T>
     std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const tree<T>&> tree) {
-        return tree_binary<T>::write(s, tree);
+        return tree_binary<T>::write(s, tree.value);
     }
     
-    template <typename T>
+    template <tree_data T>
     std::istream& operator>>(std::istream& s, with_format_and_errors<format::BINARY, tree<T>&> tree) {
         return tree_binary<T>::read(s, tree.value, tree.err);
     }

@@ -34,12 +34,7 @@ add_library(lf_core
     # index files
     src/index/sync_mode.hpp
     src/index/sync_mode.cpp
-    src/index/index_flags.hpp
-    src/index/index_flags.cpp
-    src/index/index_entry.hpp
-    src/index/index_entry.cpp
-    src/index/index_entry_print.cpp
-    src/index/index_entry_binary.cpp
+    src/index/index_tree.hpp
 
     # config files
     src/config/config.hpp
@@ -85,11 +80,6 @@ add_executable(lf_test
     test/unicode/unicode.cpp
 
     test/tree/tree.cpp
-
-    test/index/index_cmp.hpp
-    test/index/index_cmp.cpp
-    test/index/index_flags.cpp
-    test/index/index_entry.cpp
 
     test/cmd/cmd_desc.cpp
     test/io/log_tester.hpp

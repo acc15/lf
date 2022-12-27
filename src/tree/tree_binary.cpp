@@ -2,7 +2,7 @@
 
 namespace lf {
 
-    const char* const tree_signature = "LF";
+    const char tree_signature[3] = "LF";
     const uint8_t tree_version = 0;
     
 }

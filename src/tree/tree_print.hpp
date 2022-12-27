@@ -8,7 +8,7 @@
 
 namespace lf {
 
-    template <typename T>
+    template <tree_data T>
     struct tree_print {
 
         using tree_type = tree<T>;
@@ -71,7 +71,7 @@ namespace lf {
 
     };
 
-    template <typename T>
+    template <tree_data T>
     std::ostream& operator<<(std::ostream& s, const tree<T>& node) {
         return tree_print<T>::print(s, node);
     }

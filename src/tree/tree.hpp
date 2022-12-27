@@ -7,18 +7,23 @@
 
 namespace lf {
 
-    template <std::default_initializable T> requires std::equality_comparable<T>
+    template<typename T>
+    concept tree_data = std::default_initializable<T> && std::equality_comparable<T>;
+
+    template <tree_data T>
     struct tree {
         
         using entry_map = std::unordered_map<std::string, tree<T>>;
         using value_type = T;
-        using node_type = tree<value_type>;
+        using tree_type = tree<value_type>;
 
-        T data;
+        static const T default_data;
+
+        T data = {};
         entry_map entries = {};
 
-        node_type* node(const std::filesystem::path& path) {
-            node_type* e = this;
+        tree_type* node(const std::filesystem::path& path) {
+            tree_type* e = this;
             for (const auto& el: path) {
                 const auto it = e->entries.find(el.string());
                 if (it == e->entries.end()) {
@@ -29,76 +34,75 @@ namespace lf {
             return e;
         }
 
-        const node_type* node(const std::filesystem::path& path) const {
-            return const_cast<node_type*>(this)->node(path);
+        const tree_type* node(const std::filesystem::path& path) const {
+            return const_cast<tree_type*>(this)->node(path);
+        }
+
+        bool set(const value_type& other) {
+            if (data == other) {
+                return false;
+            }
+            data = other;
+            return true;
         }
 
         value_type get(const std::filesystem::path& path) const {
-            const node_type* e = node(path);
+            const tree_type* e = node(path);
             return e != nullptr ? e->data : value_type();
         }
 
-        void set(const std::filesystem::path& path, const value_type& data) {
-            
-            if (path.empty()) {
-                this->data = data;
-                return;
-            }
-
-            const auto removal_pair = compute_removal_pair(path, data);
-            if (removal_pair.first == nullptr) {
-                create_entry(path).data = data;
-                return;
-            }
-
-            if (removal_pair.second != nullptr) {
-                removal_pair.first->entries.erase(*removal_pair.second);
-            }
-
+        bool set(const std::filesystem::path& path, const value_type& data) {
+            return path.empty() ? set(data) : data != default_data 
+                ? create_node(path).set(data) 
+                : set_default(path);
         }
 
     private:
-        node_type& create_entry(const std::filesystem::path& path) {
-            node_type* e = this;
+        tree_type& create_node(const std::filesystem::path& path) {
+            tree_type* e = this;
             for (const auto& el: path) {
                 e = &e->entries[el.string()];
             }
             return *e;
         }
 
-        std::pair<node_type*, const std::string*> compute_removal_pair(const std::filesystem::path& path, const value_type& data) {
-            value_type default_value{};
+        bool set_default(const std::filesystem::path& path) {
 
-            std::pair<node_type*, const std::string*> removal_pair(nullptr, nullptr);
-            if (data != default_value) {
-                return removal_pair;
-            }
+            tree_type* e = this;
 
-            node_type* e = this;
-            removal_pair.first = e;
+            tree_type* removal_node = e;
+            const std::string* removal_key = nullptr;
 
             for (const auto& el: path) {
                 std::string key = el.string();
                 auto eit = e->entries.find(key);
                 if (eit == e->entries.end()) {
-                    removal_pair.second = nullptr;
-                    return removal_pair;
+                    return removal_node->remove(e->entries.empty() ? removal_key : nullptr);
                 }
-                if (removal_pair.second == nullptr || e->entries.size() > 1 || e->data != default_value) {
-                    removal_pair.first = e;
-                    removal_pair.second = &eit->first;
+                if (removal_key == nullptr || e->entries.size() > 1 || e->data != default_data) {
+                    removal_node = e;
+                    removal_key =  &eit->first;
                 }
                 e = &eit->second;
             }
 
-            if (!e->entries.empty()) {
-                removal_pair.second = nullptr;
-            }
+            // e pointing to node specified by path
+            return e->entries.empty() 
+                ? removal_node->remove(removal_key) 
+                : e->set(default_data);
+        }
 
-            return removal_pair;
+        bool remove(const std::string* key_ptr) {
+            if (key_ptr == nullptr) {
+                return false;
+            }
+            entries.erase(*key_ptr);
+            return true;
         }
 
     };
+
+    template <tree_data T> const T tree<T>::default_data = {};
 
 }
 

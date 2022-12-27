@@ -6,7 +6,7 @@
 namespace lf {
 
     struct log_tester {
-        log_tester(log::level level);
+        log_tester(log::level level = log::default_level);
         ~log_tester();
         
         std::string str() const;

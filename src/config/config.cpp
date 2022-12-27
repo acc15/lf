@@ -68,7 +68,7 @@ namespace lf {
             return config_path;
         }
 
-        const fs::path rel_path = fs::path("lf") / "lf.yaml";
+        const fs::path rel_path = "lf/lf.yaml";
 
 #if __linux__
         const char* home = std::getenv("HOME");

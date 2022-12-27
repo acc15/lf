@@ -63,11 +63,13 @@ namespace lf {
             return std::min(static_cast<level>(v - 1), MUTE);
         }
 
-        std::string lower_str = level_str;
-        std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), [](char ch) { return ch >= 0 ? std::toupper(ch) : ch; });
+        std::string upper_str = level_str;
+        std::transform(upper_str.begin(), upper_str.end(), upper_str.begin(), [](char ch) { return ch >= 0 ? std::toupper(ch) : ch; });
         
-        size_t index = std::find(level_names, level_names + std::size(level_names), lower_str) - level_names;
-        return std::min(static_cast<level>(index), MUTE);
+        const auto it = std::find(std::begin(level_names), std::end(level_names), upper_str);
+        return it == std::end(level_names) 
+            ? default_level 
+            : static_cast<level>(it - std::begin(level_names));
     }
 
     struct log log;
