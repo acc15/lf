@@ -102,17 +102,6 @@ TEST_CASE("print", "[tree]") {
     );
 }
 
-TEST_CASE("get", "[tree]") {
-    REQUIRE(test_tree.get(test_index_path));
-    REQUIRE_FALSE(test_tree.get("a/b/c"));
-}
-
-TEST_CASE("set update flags", "[tree]") {
-    bool_tree tree;
-    tree.set(test_index_path, true);
-    REQUIRE(tree.get(test_index_path));
-}
-
 template <typename T>
 void cmp_tree(const tree<T>& l, const tree<T>& r) {
     {
@@ -134,6 +123,17 @@ void cmp_tree(const tree<T>& l, const tree<T>& r) {
             FAIL_CHECK("missing node in r tree");
         }
     }
+}
+
+TEST_CASE("get", "[tree]") {
+    REQUIRE(test_tree.get(test_index_path));
+    REQUIRE_FALSE(test_tree.get("a/b/c"));
+}
+
+TEST_CASE("set update flags", "[tree]") {
+    bool_tree tree;
+    tree.set(test_index_path, true);
+    REQUIRE(tree.get(test_index_path));
 }
 
 TEST_CASE("serialization", "[tree]") {

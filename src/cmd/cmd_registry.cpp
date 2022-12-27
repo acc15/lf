@@ -5,13 +5,19 @@
 #include "cmd_registry.hpp"
 #include "sync_cmd.hpp"
 #include "add_cmd.hpp"
+#include "rm_cmd.hpp"
 
 namespace lf {
 
 const sync_cmd _sync;
 const add_cmd _add;
+const rm_cmd _rm;
 
-const cmd* const cmd_registry::_list[] = { &_sync, &_add };
+const cmd* const cmd_registry::_list[] = { 
+    &_sync, 
+    &_add, 
+    &_rm 
+};
 
 cmd_registry::cmd_registry() {
     for (auto cmd: _list) {

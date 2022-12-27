@@ -5,26 +5,36 @@
 #include <string_view>
 #include <filesystem>
 #include <fstream>
+#include <concepts>
+#include <typeinfo>
 
 #include "../fs/path.hpp"
 
 #include "log.hpp"
-#include "with_format.hpp"
+#include "format.hpp"
 
 namespace lf {
 
-	template <auto Format, typename T>
-	bool load_file(const std::filesystem::path& path, std::string_view name, T& ref) {
-		log.info() && log() << "loading " << name << " from " << path << "..." << std::endl;
+    template <typename T>
+    concept serialization_desc = requires {
+        typename T::type;
+        T::format;
+        {T::name} -> std::convertible_to<std::string_view>;
+    };
+
+	template <serialization_desc Desc>
+	bool load_file(const std::filesystem::path& path, typename Desc::type& ref) {
+        log.debug() && log() << "loading " << Desc::name << " from " << path << "..." << std::endl;
         std::ifstream file(path);
         if (!file) {
             log.error() && log() << "unable to open file " << path << " for reading: " << strerror(errno) << std::endl;
             return false;
         }
 
-        file >> with_ref_format<Format>(ref);
+        file >> with_ref_format<Desc::format>(ref);
         if (file.fail() || file.bad()) {
-            log.debug() && log() << "load file " << path << " failed with "
+            // assumes that real error already printed
+            log.error() && log() << "load file " << path << " failed with "
 				<< (file.fail() ? " failbit" : "") 
 				<< (file.bad() ? " badbit" : "") 
 				<< std::endl;
@@ -34,15 +44,19 @@ namespace lf {
         if (!file.eof()) {
             log.trace() && log() << "file " << path << "wasn't fully read (no eofbit)" << std::endl;
         }
+
+        log.debug() && log() << Desc::name << " has been successfully loaded from " << path << std::endl;
         return true;
 	}
 
-	template <auto Format, typename T>
-	bool save_file(const std::filesystem::path& path, std::string_view name, const T& ref) {
-		log.info() && log() << "saving " << name << " to " << path << "..." << std::endl;
+	template <serialization_desc Desc>
+	bool save_file(const std::filesystem::path& path, const typename Desc::type& ref) {
+		log.debug() && log() << "saving " << Desc::name << " to " << path << "..." << std::endl;
         
-        if (!create_parent_dirs(path)) {
-            log.error() && log() << "unable to create parent directories for " << path << std::endl;
+        try {
+            create_parent_dirs(path);
+        } catch (const std::runtime_error& e) {
+            log.error() && log() << "unable to create parent directories for " << e.what() << std::endl;
             return false;
         }
 
@@ -52,14 +66,16 @@ namespace lf {
             return false;
         }
 
-        file << with_ref_format<Format>(ref);
+        file << with_ref_format<Desc::format>(ref);
         if (file.fail() || file.bad()) {
-            log.debug() && log() << "save file " << path << " failed with "
+            log.error() && log() << "save file " << path << " failed with "
                 << (file.fail() ? " failbit" : "") 
 				<< (file.bad() ? " badbit" : "") 
 				<< std::endl;
             return false;
         }
+
+        log.debug() && log() << Desc::name << " has been successfully saved to " << path << std::endl;
         return true;
 	}
 

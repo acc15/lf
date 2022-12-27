@@ -34,7 +34,10 @@ add_library(lf_core
     # index files
     src/index/sync_mode.hpp
     src/index/sync_mode.cpp
+    src/index/indexer.hpp
+    src/index/indexer.cpp
     src/index/index_tree.hpp
+    src/index/index_tree.cpp
 
     # config files
     src/config/config.hpp
@@ -47,7 +50,7 @@ add_library(lf_core
     src/io/null_stream.hpp
     src/io/null_stream.cpp
     src/io/joiner.hpp
-    src/io/with_format.hpp
+    src/io/format.hpp
     src/io/serialization.hpp
     src/fs/path.hpp 
     src/fs/path.cpp
@@ -61,6 +64,8 @@ add_library(lf_core
     src/cmd/sync_cmd.cpp
     src/cmd/add_cmd.hpp 
     src/cmd/add_cmd.cpp 
+    src/cmd/rm_cmd.hpp 
+    src/cmd/rm_cmd.cpp 
     src/cmd/cmd_registry.hpp 
     src/cmd/cmd_registry.cpp
  )

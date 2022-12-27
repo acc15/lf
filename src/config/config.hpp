@@ -1,9 +1,11 @@
+#pragma once
+
 #include <filesystem>
 #include <string>
 #include <unordered_map>
 #include <istream>
 
-#include "../io/with_format.hpp"
+#include "../io/format.hpp"
 
 namespace lf {
 
@@ -18,5 +20,11 @@ namespace lf {
     std::istream& operator>>(std::istream& s, with_format<format::YAML, config&> dest);
 
     std::filesystem::path get_config_path();
+
+    struct config_desc {
+        using type = config;
+        static const lf::format format = lf::format::YAML;
+        static const char* const name;
+    };
 
 }

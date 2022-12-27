@@ -1,18 +1,14 @@
+#pragma once
+
 #include "cmd.hpp"
-#include "../config/config.hpp"
-#include "../index/sync_mode.hpp"
 
 namespace lf {
-
-    class add_cmd: public cmd {
+    class rm_cmd: public cmd {
     public:
-        
         static const char* names[];
         static const cmd_desc desc;
 
-        add_cmd();
+        rm_cmd();
         int run(const std::span<const char*>& args) const override;
-
     };
-
 }

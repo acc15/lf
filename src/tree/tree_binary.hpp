@@ -9,7 +9,7 @@
 #include <ostream>
 #include <vector>
 
-#include "../io/with_format.hpp"
+#include "../io/format.hpp"
 #include "../io/log.hpp"
 
 namespace lf {

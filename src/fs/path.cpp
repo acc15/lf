@@ -24,10 +24,10 @@ namespace lf {
         return rel_path;
     }
 
-    bool create_parents_dirs(const std::filesystem::path& path) {
-        return path.has_parent_path() 
-            ? fs::create_directories(path.parent_path()) 
-            : true;
+    void create_parent_dirs(const fs::path& path) {
+        if (path.has_parent_path()) {
+            fs::create_directories(path.parent_path());
+        }
     }
 
 }

@@ -58,7 +58,7 @@ namespace lf {
                 try {
                     load_config_sync(name, pair.second, dest.value);
                 } catch (const std::runtime_error& e) {
-                    log.warn() && log() << "unable to convert sync \"" << name << "\" entry" << std::endl;
+                    log.warn() && log() << "unable to convert sync \"" << name << "\" entry: " << e.what() << std::endl;
                 }
             }
         } catch (const std::runtime_error& e) {
@@ -102,5 +102,7 @@ namespace lf {
         return fs::path(home != nullptr ? home : "/") / "Library" / "Preferences" / rel_path;
 #endif
     }
+
+    const char* const config_desc::name = "config";
 
 }

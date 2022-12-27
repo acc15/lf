@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "config/config.hpp"
-#include "io/with_format.hpp"
+#include "io/format.hpp"
 #include "io/joiner.hpp"
 
 #include "../io/log_tester.hpp"
