@@ -1,14 +1,15 @@
 #pragma once
 
+#include "config/config.hpp"
+
 #include <span>
 #include <unordered_map>
 #include <filesystem>
 #include <utility>
 #include <string_view>
 
-#include "../config/config.hpp"
-#include "index_tree.hpp"
-#include "sync_mode.hpp"
+#include "index/index_tree.hpp"
+#include "index/sync_mode.hpp"
 
 namespace lf {
 

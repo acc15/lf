@@ -5,9 +5,9 @@
 #include <algorithm>
 #include <string>
 
-#include "../util/string.hpp"
-#include "log.hpp"
-#include "null_stream.hpp"
+#include "util/string.hpp"
+#include "io/log.hpp"
+#include "io/null_stream.hpp"
 
 namespace lf {
 

@@ -1,16 +1,9 @@
 #include <iostream>
-#include "cmd_desc.hpp"
 #include "sync_cmd.hpp"
 
 namespace lf {
 
-const cmd_desc sync_cmd::desc = { 
-    { "s", "sync" }, 
-    "[list of sync names, all if empty]+", 
-    "synchronizes mirrors"
-};
-
-sync_cmd::sync_cmd(): cmd(desc) {
+sync_cmd::sync_cmd(): cmd({ "s", "sync" },  "[list of sync names, all if empty]+", "synchronizes mirrors") {
 }
 
 int sync_cmd::run([[maybe_unused]] const std::span<const char*>& args) const {

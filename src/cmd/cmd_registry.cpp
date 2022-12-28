@@ -1,11 +1,12 @@
+#include "cmd/cmd_registry.hpp"
+
 #include <ostream>
 #include <sstream>
 #include <iostream>
 
-#include "cmd_registry.hpp"
-#include "sync_cmd.hpp"
-#include "add_cmd.hpp"
-#include "rm_cmd.hpp"
+#include "cmd/sync/sync_cmd.hpp"
+#include "cmd/index/add_cmd.hpp"
+#include "cmd/index/rm_cmd.hpp"
 
 namespace lf {
 
@@ -13,47 +14,46 @@ const sync_cmd _sync;
 const add_cmd _add;
 const rm_cmd _rm;
 
-const cmd* const cmd_registry::_list[] = { 
+const cmd* const cmd_registry::list[] = { 
     &_sync, 
     &_add, 
     &_rm 
 };
 
 cmd_registry::cmd_registry() {
-    for (auto cmd: _list) {
-        for (auto name: cmd->desc.names) {
+    for (const cmd* cmd: list) {
+        for (const char* name: cmd->names) {
             _names[name] = cmd;
         }
     }
 }
 
-std::ostream& cmd_registry::usage(std::ostream& s) const {
-    const size_t sz = std::size(_list);
-    if constexpr (sz == 0) {
-        return s;
-    }
-
-    s << "Usage: " << std::endl << std::endl;
-    for (const auto& cmd: _list) {
-        s << cmd->desc;
-    }
-    return s;
-}
-
 int cmd_registry::run(std::span<const char*> args) const {
     if (args.empty()) {
-        usage(std::cout);
+        std::cout << *this;
         return 0;
     }
 
     const char* cmd_name = args[0];
     const auto it = _names.find(cmd_name);
     if (it == _names.end()) {
-        std::cerr << "Unknown command: " << cmd_name << std::endl << std::endl;
-        usage(std::cerr);
+        std::cerr << "Unknown command: " << cmd_name << std::endl << std::endl << *this;
         return 1;
     }
     return it->second->run(args.subspan(1));
+}
+
+std::ostream& operator<<(std::ostream& s, const cmd_registry& r) {
+    const size_t sz = std::size(r.list);
+    if constexpr (sz == 0) {
+        return s;
+    }
+
+    s << "Usage: " << std::endl << std::endl;
+    for (const cmd* cmd: r.list) {
+        s << *cmd;
+    }
+    return s;
 }
 
 const cmd_registry cmds;

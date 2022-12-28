@@ -1,16 +1,14 @@
 #include "add_cmd.hpp"
-#include "../io/log.hpp"
-#include "../index/indexer.hpp"
+#include "../../io/log.hpp"
+#include "../../index/indexer.hpp"
 
 namespace lf {
 
-    const cmd_desc add_cmd::desc = {
+    add_cmd::add_cmd() : cmd(
         { "a", "add" }, 
         "< [--recursive|-R] <recursive dirs>+ | [--shallow|-S] <file|dir>+ >", 
         "adds specified file and directories to corresponding index files"
-    };
-
-    add_cmd::add_cmd() : cmd(desc) {
+    ) {
     }
 
     int add_cmd::run(const std::span<const char*>& args) const {
@@ -29,7 +27,7 @@ namespace lf {
         }
 
         if (non_opts.empty()) {
-            log.error() && log() << desc;
+            log.error() && log() << *this;
             return 1;
         }
 

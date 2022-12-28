@@ -20,6 +20,7 @@ else()
 endif()
 
 find_package(Catch2 REQUIRED)
+include_directories(src)
 
 add_library(lf_core  
 
@@ -40,7 +41,6 @@ add_library(lf_core
     # config files
     src/config/config.hpp
     src/config/config.cpp
-    src/config/config_util.hpp
     src/config/config_parser.hpp
     src/util/string.hpp
     src/util/string.cpp
@@ -58,16 +58,14 @@ add_library(lf_core
     src/fs/path.cpp
     src/fs/util.hpp 
     src/fs/util.cpp
-    src/cmd/cmd_desc.hpp
-    src/cmd/cmd_desc.cpp
     src/cmd/cmd.hpp 
     src/cmd/cmd.cpp
-    src/cmd/sync_cmd.hpp 
-    src/cmd/sync_cmd.cpp
-    src/cmd/add_cmd.hpp 
-    src/cmd/add_cmd.cpp 
-    src/cmd/rm_cmd.hpp 
-    src/cmd/rm_cmd.cpp 
+    src/cmd/sync/sync_cmd.hpp 
+    src/cmd/sync/sync_cmd.cpp
+    src/cmd/index/add_cmd.hpp 
+    src/cmd/index/add_cmd.cpp 
+    src/cmd/index/rm_cmd.hpp 
+    src/cmd/index/rm_cmd.cpp 
     src/cmd/cmd_registry.hpp 
     src/cmd/cmd_registry.cpp
  )
@@ -87,7 +85,7 @@ add_executable(lf_test
 
     test/tree/tree.cpp
 
-    test/cmd/cmd_desc.cpp
+    test/cmd/cmd.cpp
     test/io/log_tester.hpp
     test/io/log_tester.cpp
     test/io/log.cpp
@@ -98,7 +96,6 @@ add_executable(lf_test
     test/util/string.cpp
  )
 
-target_include_directories(lf_test PRIVATE src)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
 
 # install(TARGETS lf

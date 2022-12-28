@@ -1,14 +1,13 @@
 #pragma once
 
-#include "tree.hpp"
+#include "tree/tree.hpp"
+#include "io/format.hpp"
+#include "io/log.hpp"
 
 #include <cstring>
 #include <algorithm>
 #include <iostream>
 #include <vector>
-
-#include "../io/format.hpp"
-#include "../io/log.hpp"
 
 namespace lf {
 

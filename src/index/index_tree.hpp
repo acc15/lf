@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../tree/tree.hpp"
-#include "sync_mode.hpp"
+#include "tree/tree.hpp"
+#include "index/sync_mode.hpp"
 
 namespace lf {
     

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../io/format.hpp"
+#include "io/format.hpp"
 
 namespace lf {
     

@@ -12,14 +12,13 @@ namespace lf
     class cmd_registry {
     public:
         cmd_registry();
-        std::ostream& usage(std::ostream&) const;
-
         int run(std::span<const char*> args) const;
-
+        static const cmd* const list[];
     private:
         std::unordered_map<std::string_view, const cmd*> _names;
-        static const cmd* const _list[];
     };
+
+    std::ostream& operator<<(std::ostream& s, const cmd_registry& r);
 
     extern const cmd_registry cmds;
 

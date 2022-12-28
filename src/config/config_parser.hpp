@@ -4,8 +4,8 @@
 #include <concepts>
 #include <string_view>
 
-#include "../util/string.hpp"
-#include "../io/log.hpp"
+#include "util/string.hpp"
+#include "io/log.hpp"
 
 namespace lf {
 

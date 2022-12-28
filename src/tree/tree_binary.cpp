@@ -1,4 +1,4 @@
-#include "tree_binary.hpp"
+#include "tree/tree_binary.hpp"
 
 namespace lf {
 

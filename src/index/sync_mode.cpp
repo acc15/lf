@@ -1,5 +1,5 @@
-#include "sync_mode.hpp"
-#include "../util/pick.hpp"
+#include "index/sync_mode.hpp"
+#include "util/pick.hpp"
 
 namespace lf {
     

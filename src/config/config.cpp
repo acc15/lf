@@ -3,9 +3,8 @@
 #include <string>
 #include <fstream>
 
-#include "config.hpp"
-#include "config_parser.hpp"
-#include "../io/log.hpp"
+#include "config/config.hpp"
+#include "config/config_parser.hpp"
 
 namespace fs = std::filesystem;
 
@@ -89,7 +88,7 @@ namespace lf {
             return config_path;
         }
 
-        const fs::path rel_path = "lf/lf.yaml";
+        const fs::path rel_path = "lf/lf.conf";
 
 #if __linux__
         const char* home = std::getenv("HOME");
@@ -110,6 +109,8 @@ namespace lf {
 #elif __APPLE__
         const char* home = std::getenv("HOME");
         return fs::path(home != nullptr ? home : "/") / "Library" / "Preferences" / rel_path;
+#else
+#       error Unknown platform!
 #endif
     }
 

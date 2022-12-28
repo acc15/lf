@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "path.hpp"
+#include "fs/path.hpp"
 
 namespace fs = std::filesystem;
 

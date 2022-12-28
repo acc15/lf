@@ -7,10 +7,9 @@
 #include <fstream>
 #include <concepts>
 
-#include "../fs/path.hpp"
-
-#include "log.hpp"
-#include "format.hpp"
+#include "fs/path.hpp"
+#include "io/log.hpp"
+#include "io/format.hpp"
 
 namespace lf {
 

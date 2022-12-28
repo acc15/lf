@@ -1,21 +1,24 @@
 #pragma once
 
 #include <span>
+#include <vector>
 #include <string_view>
-
-#include "cmd_desc.hpp"
+#include <ostream>
 
 namespace lf {
 
-class cmd {
-public:
-    cmd(const cmd_desc& desc);
-    
-    virtual ~cmd() = default;
-    virtual int run(const std::span<const char*>& args) const = 0;
+    class cmd {
+    public:
+        cmd(const std::vector<const char*>& names, const char* parameters, const char* description);
+        virtual ~cmd() = default;
+        virtual int run(const std::span<const char*>& args) const = 0;
 
-    const cmd_desc& desc;
+        std::vector<const char*> names;
+        const char* parameters;
+        const char* description;
+    };
 
-};
+    std::ostream& operator<<(std::ostream& s, const cmd& c);
+
 
 }

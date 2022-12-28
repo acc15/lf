@@ -1,4 +1,4 @@
-#include "index_tree.hpp"
+#include "index/index_tree.hpp"
 
 namespace lf {
 

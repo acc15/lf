@@ -18,7 +18,7 @@
 		"scope": "cpp",
 		"description": "CPP with namespace",
 		"body": [
-			"#include \"${TM_FILENAME_BASE}.hpp\"",
+			"#include \"${RELATIVE_FILEPATH/src\\/(.*)\\.cpp/$1.hpp/}\"",
 			"",
 			"namespace lf {",
 			"",

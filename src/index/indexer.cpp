@@ -1,10 +1,10 @@
-#include "indexer.hpp"
+#include "index/indexer.hpp"
 
-#include "../fs/path.hpp"
-#include "../io/log.hpp"
-#include "../config/config_util.hpp"
-#include "../io/serialization.hpp"
-#include "../tree/tree_binary.hpp"
+#include "fs/path.hpp"
+#include "io/log.hpp"
+#include "config/config.hpp"
+#include "io/serialization.hpp"
+#include "tree/tree_binary.hpp"
 
 namespace fs = std::filesystem;
 
@@ -44,9 +44,9 @@ namespace lf {
             return false;
         }
 
-        return find_syncs_by_path(cfg, path, [&path, &mode, this](const std::string& name, const config_sync& sync) {
-            log.info() && log() << "setting " << path << " mode to " << mode << " in \"" << name << "\" sync index " << sync.index << std::endl;
-            set_index_mode(sync, relative_path(path, sync.local), mode);
+        return find_config_sync_by_path(cfg, path, [&path, &mode, this](const auto& e) {
+            log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e.first << "\" sync index " << e.second.index << std::endl;
+            set_index_mode(e.second, relative_path(path, e.second.local), mode);
         });
     }
 
