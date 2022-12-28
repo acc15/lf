@@ -5,7 +5,6 @@
 namespace lf {
     class rm_cmd: public cmd {
     public:
-        static const char* names[];
         static const cmd_desc desc;
 
         rm_cmd();

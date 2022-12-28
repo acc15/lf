@@ -56,7 +56,6 @@ int cmd_registry::run(std::span<const char*> args) const {
     return it->second->run(args.subspan(1));
 }
 
-
 const cmd_registry cmds;
 
 }

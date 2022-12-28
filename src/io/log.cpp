@@ -1,9 +1,7 @@
-#include <cctype>
 #include <cstdlib>
 
 #include <iostream>
 #include <iterator>
-#include <ostream>
 #include <algorithm>
 #include <string>
 

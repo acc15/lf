@@ -8,19 +8,19 @@
 
 namespace lf
 {
-    
-class cmd_registry {
-public:
-    cmd_registry();
-    std::ostream& usage(std::ostream&) const;
 
-    int run(std::span<const char*> args) const;
+    class cmd_registry {
+    public:
+        cmd_registry();
+        std::ostream& usage(std::ostream&) const;
 
-private:
-    std::unordered_map<std::string_view, const cmd*> _names;
-    static const cmd* const _list[];
-};
+        int run(std::span<const char*> args) const;
 
-extern const cmd_registry cmds;
+    private:
+        std::unordered_map<std::string_view, const cmd*> _names;
+        static const cmd* const _list[];
+    };
+
+    extern const cmd_registry cmds;
 
 }

@@ -7,7 +7,7 @@ namespace lf
 {
     struct cmd_desc
     {
-        std::span<const char*> names;
+        std::initializer_list<const char*> names;
         const char* parameters;
         const char* description;
     };

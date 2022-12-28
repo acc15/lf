@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <fstream>
 #include <concepts>
-#include <typeinfo>
 
 #include "../fs/path.hpp"
 
@@ -23,18 +22,19 @@ namespace lf {
     };
 
 	template <serialization_desc Desc>
-	bool load_file(const std::filesystem::path& path, typename Desc::type& ref) {
+	bool load_file(const std::filesystem::path& path, typename Desc::type& ref, bool optional = false) {
         log.debug() && log() << "loading " << Desc::name << " from " << path << "..." << std::endl;
         std::ifstream file(path);
         if (!file) {
-            log.error() && log() << "unable to open file " << path << " for reading: " << strerror(errno) << std::endl;
+            (optional ? log.debug() : log.error()) && 
+                log() << "unable to open " << Desc::name << " file " << path << " for reading: " << strerror(errno) << std::endl;
             return false;
         }
 
         file >> with_ref_format<Desc::format>(ref);
         if (file.fail() || file.bad()) {
             // assumes that real error already printed
-            log.error() && log() << "load file " << path << " failed with "
+            log.error() && log() << "loading of " << Desc::name << " file " << path << " failed with "
 				<< (file.fail() ? " failbit" : "") 
 				<< (file.bad() ? " badbit" : "") 
 				<< std::endl;
@@ -42,7 +42,7 @@ namespace lf {
         }
 
         if (!file.eof()) {
-            log.trace() && log() << "file " << path << "wasn't fully read (no eofbit)" << std::endl;
+            log.trace() && log() << Desc::name << " file " << path << "wasn't fully read (no eofbit)" << std::endl;
         }
 
         log.debug() && log() << Desc::name << " has been successfully loaded from " << path << std::endl;

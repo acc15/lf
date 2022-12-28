@@ -3,10 +3,8 @@
 #include "tree.hpp"
 
 #include <cstring>
-
 #include <algorithm>
-#include <istream>
-#include <ostream>
+#include <iostream>
 #include <vector>
 
 #include "../io/format.hpp"

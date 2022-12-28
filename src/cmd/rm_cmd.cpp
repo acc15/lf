@@ -4,9 +4,8 @@
 
 namespace lf {
 
-    const char* rm_cmd::names[] = { "r", "rm" };
     const cmd_desc rm_cmd::desc = {
-        names, 
+        { "r", "rm" }, 
         "<file|dir>+", 
         "removes specified files and directories from corresponding index files"
     };

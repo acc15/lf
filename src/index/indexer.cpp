@@ -2,7 +2,7 @@
 
 #include "../fs/path.hpp"
 #include "../io/log.hpp"
-#include "../config/config.hpp"
+#include "../config/config_util.hpp"
 #include "../io/serialization.hpp"
 #include "../tree/tree_binary.hpp"
 
@@ -43,24 +43,11 @@ namespace lf {
             log.error() && log() << "path " << path << " doesn't exists" << std::endl;
             return false;
         }
-       
-        bool sync_found = false;
-        for (const auto& sync_pair: cfg) {
-            const config_sync& sync = sync_pair.second;
-            if (!is_subpath(path, sync.local)) {
-                log.debug() && log() << "sync \"" << sync_pair.first << "\" skipped due to base path mismatch (" << sync.local << " and " << path << ")" << std::endl;
-            }
 
-            log.info() && log() << "setting " << path << " mode to " << mode << " in \"" << sync_pair.first << "\" sync index " << sync.index << std::endl;
+        return find_syncs_by_path(cfg, path, [&path, &mode, this](const std::string& name, const config_sync& sync) {
+            log.info() && log() << "setting " << path << " mode to " << mode << " in \"" << name << "\" sync index " << sync.index << std::endl;
             set_index_mode(sync, relative_path(path, sync.local), mode);
-            sync_found = true;
-        }
-
-        if (!sync_found) {
-            log.error() && log() << "no configured syncs found for path " << path << std::endl;
-            return false;
-        }
-        return true;
+        });
     }
 
     bool indexer::save_changes() const {
@@ -86,7 +73,7 @@ namespace lf {
 
         const auto emplace_result = _indexes.emplace(index_path, std::make_pair(index_tree {}, false));
         if (emplace_result.second) {
-            load_file<index_desc>(index_path, emplace_result.first->second.first);
+            load_file<index_desc>(index_path, emplace_result.first->second.first, true);
         }
         return emplace_result.first->second;
     }

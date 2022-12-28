@@ -1,6 +1,7 @@
 {
 	"hpp": {
 		"prefix": "hpp",
+		"scope": "cpp",
 		"description": "Header file with namespace",
 		"body": [
 			"#pragma once",
@@ -12,6 +13,7 @@
 	},
 	"cpp": {
 		"prefix": "cpp",
+		"scope": "cpp",
 		"description": "CPP with namespace",
 		"body": [
 			"#include \"${TM_FILENAME_BASE}.hpp\"",

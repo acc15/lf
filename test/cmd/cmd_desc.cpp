@@ -7,8 +7,7 @@
 using namespace lf;
 
 TEST_CASE("print", "[cmd_desc]") {
-    const char* names[] = {"a", "b", "c"};
-    cmd_desc desc = {names, "params", "description"};
+    cmd_desc desc = {{"a", "b", "c"}, "params", "description"};
 
     std::stringstream ss;
     ss << desc;

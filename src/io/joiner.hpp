@@ -1,15 +1,16 @@
 #include <ostream>
+#include <ranges>
 
 namespace lf {
 
-    template <typename Range>
+    template <std::ranges::range Range>
     struct joiner {
         joiner(const Range& range, std::string_view separator): range(range), separator(separator) {}
         const Range& range; 
         std::string_view separator;
     };
 
-    template <typename Range>
+    template <std::ranges::range Range>
     std::ostream& operator<<(std::ostream& s, const joiner<Range>& joiner) {
         auto it = joiner.range.begin();
         const auto end = joiner.range.end();

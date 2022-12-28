@@ -1,5 +1,4 @@
 #include "null_stream.hpp"
-#include <ostream>
 
 namespace lf {
 

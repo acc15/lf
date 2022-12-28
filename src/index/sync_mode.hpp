@@ -1,8 +1,6 @@
 #pragma once
 
-#include <cstdint>
-#include <ostream>
-#include <istream>
+#include <iostream>
 
 #include "../io/format.hpp"
 

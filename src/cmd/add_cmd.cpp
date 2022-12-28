@@ -1,14 +1,11 @@
 #include "add_cmd.hpp"
-#include "../config/config.hpp"
 #include "../io/log.hpp"
-#include "../io/serialization.hpp"
 #include "../index/indexer.hpp"
 
 namespace lf {
 
-    const char* add_cmd::names[] = { "a", "add" };
     const cmd_desc add_cmd::desc = {
-        names, 
+        { "a", "add" }, 
         "< [--recursive|-R] <recursive dirs>+ | [--shallow|-S] <file|dir>+ >", 
         "adds specified file and directories to corresponding index files"
     };
