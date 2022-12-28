@@ -20,8 +20,6 @@ else()
 endif()
 
 find_package(Catch2 REQUIRED)
-find_package(yaml-cpp REQUIRED)
-link_libraries(yaml-cpp)
 
 add_library(lf_core  
 
@@ -42,6 +40,10 @@ add_library(lf_core
     # config files
     src/config/config.hpp
     src/config/config.cpp
+    src/config/config_util.hpp
+    src/config/config_parser.hpp
+    src/util/string.hpp
+    src/util/string.cpp
     src/util/pick.hpp
     src/util/console.hpp
     src/util/console.cpp
@@ -90,8 +92,10 @@ add_executable(lf_test
     test/io/log_tester.cpp
     test/io/log.cpp
 
+    test/config/config_parser.cpp
     test/config/config.cpp
     test/fs/path.cpp
+    test/util/string.cpp
  )
 
 target_include_directories(lf_test PRIVATE src)

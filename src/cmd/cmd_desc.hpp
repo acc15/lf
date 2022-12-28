@@ -1,13 +1,13 @@
 #pragma once
 
-#include <span>
+#include <vector>
 #include <ostream>
 
 namespace lf
 {
     struct cmd_desc
     {
-        std::initializer_list<const char*> names;
+        std::vector<const char*> names;
         const char* parameters;
         const char* description;
     };

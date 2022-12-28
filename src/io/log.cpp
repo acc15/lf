@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <string>
 
+#include "../util/string.hpp"
 #include "log.hpp"
 #include "null_stream.hpp"
 
@@ -62,7 +63,7 @@ namespace lf {
         }
 
         std::string upper_str = level_str;
-        std::transform(upper_str.begin(), upper_str.end(), upper_str.begin(), [](char ch) { return ch >= 0 ? std::toupper(ch) : ch; });
+        upper_inplace(upper_str);
         
         const auto it = std::find(std::begin(level_names), std::end(level_names), upper_str);
         return it == std::end(level_names) 

@@ -13,6 +13,7 @@ namespace lf {
         
         std::string str() const;
         std::vector<std::string> lines();
+        bool contains(std::string_view v) const;
 
         std::stringstream out;
         log::level original_min_level;

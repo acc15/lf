@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -19,32 +20,33 @@ void cmp_sync(const config& cfg, const std::string& name, const config_sync& r) 
     REQUIRE( it != cfg.end() );
 
     const config_sync& l = it->second;
-    CHECK( l.index == r.index );
     CHECK( l.local == r.local );
     CHECK( l.remote == r.remote );
+    CHECK( l.index == r.index );
+    CHECK( l.state == r.state );
 }
 
 config test_parse(const std::string& yaml) {
     std::stringstream ss(yaml);
 
     config cfg;
-    ss >> with_ref_format<format::YAML>(cfg);
+    ss >> with_ref_format<format::TEXT>(cfg);
     return cfg;
 }
 
 TEST_CASE("parse", "[config]") {
 
     const std::string yaml = 
-        "home: \n"
-        "  local: " + test_pstr("local/home") + "\n"
-        "  remote: " + test_pstr("remote/home") + "\n"
-        "  state: .config/lf/home.state\n"
-        "  index: home.index\n"
-        "pic: \n"
-        "  local: " + test_pstr("local/pic") + "\n"
-        "  remote: " + test_pstr("remote/pic") + "\n"
-        "  state: .config/lf/pic.state\n"
-        "  index: pic.index\n";
+        "[home]\n"
+        "local=" + test_pstr("local/home") + "\n"
+        "remote=" + test_pstr("remote/home") + "\n"
+        "state=.config/lf/home.state\n"
+        "index=home.index\n"
+        "[pic]\n"
+        "local=" + test_pstr("local/pic") + "\n"
+        "remote=" + test_pstr("remote/pic") + "\n"
+        "state=.config/lf/pic.state\n"
+        "index=pic.index\n";
 
     auto p = test_parse(yaml);
     cmp_sync(p, "home", config_sync {
@@ -62,17 +64,24 @@ TEST_CASE("parse", "[config]") {
 
 }
 
-TEST_CASE("parse array", "[config]") {
+TEST_CASE("empty section", "[config]") {
     log_tester t;
-    auto p = test_parse("[1,2,3]");
-    REQUIRE(t.str().find("unable to read YAML") != std::string::npos);
+    test_parse("state=test.abc");
+    REQUIRE_THAT(t.str(), Catch::Matchers::ContainsSubstring("empty section"));
 }
 
-TEST_CASE("parse without required fields", "[config]") {
+TEST_CASE("parse partial", "[config]") {
     log_tester t;
     auto p = test_parse(
-        "home: \n"
-        "  test: abc"
+        "[home]\n"
+        "index=test.index\n"
     );
-    REQUIRE( t.str().find("unable to convert sync") != std::string::npos );
+    REQUIRE( p.empty() );
+    
+    const auto msg = t.str();
+    REQUIRE(msg.find("remote") != std::string::npos);
+    REQUIRE(msg.find("local") != std::string::npos);
+    REQUIRE(msg.find("state") != std::string::npos);
 }
+
+

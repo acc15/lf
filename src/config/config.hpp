@@ -21,11 +21,11 @@ namespace lf {
 
     struct config_desc {
         using type = config;
-        static const lf::format format = lf::format::YAML;
+        static const lf::format format = lf::format::TEXT;
         static const char* const name;
     };
 
-    std::istream& operator>>(std::istream& s, with_format<format::YAML, config&> dest);
+    std::istream& operator>>(std::istream& s, with_format<format::TEXT, config&> dest);
 
     std::filesystem::path get_config_path();
 

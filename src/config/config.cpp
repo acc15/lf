@@ -2,74 +2,84 @@
 #include <cstring>
 #include <string>
 #include <fstream>
-#include <yaml-cpp/yaml.h>
 
 #include "config.hpp"
+#include "config_parser.hpp"
 #include "../io/log.hpp"
 
 namespace fs = std::filesystem;
 
 namespace lf {
 
-    void load_config_sync(const std::string& name, const YAML::Node node, config& config) {
-
-        fs::path local = node["local"].as<std::string>();
-        fs::path state = node["state"].as<std::string>();
-        fs::path remote = node["remote"].as<std::string>();
-        fs::path index = node["index"].as<std::string>();
-
-        if (local.is_relative()) {
-            log.warn() && log() << name << ".local must be absolute path" << std::endl;
-            return;
+    bool check_config_path_specified(const std::string& name, const std::filesystem::path& p, const char* key) {
+        if (!p.empty()) {
+            return true;
         }
-
-        if (remote.is_relative()) {
-            log.warn() && log() << name << ".remote must be absolute path" << std::endl;
-            return;
-        }
-
-        if (index.is_relative()) {
-            index = remote / index;
-        }
-        
-        if (state.is_relative()) {
-            state = local / state;
-        }
-
-        const auto result = config.emplace(name, config_sync { 
-            .local = std::move(local),
-            .remote = std::move(remote),
-            .state = std::move(state),
-            .index = std::move(index)
-        });
-
-        if (!result.second) {
-            log.warn() && log() << "duplicate sync \"" << name << "\" entry" << std::endl;
-        }
+        log.error() && log() << "sync \"" << name << "\" " << key << " path isn't specified" << std::endl;
+        return false;
     }
 
-    std::istream& operator>>(std::istream& s, with_format<format::YAML, config&> dest) {
-        dest.value.clear();
-
-        try {
-            YAML::Node node = YAML::Load(s);
-            for (const auto& pair: node) {
-                const std::string name = pair.first.as<std::string>();
-                try {
-                    load_config_sync(name, pair.second, dest.value);
-                } catch (const std::runtime_error& e) {
-                    log.warn() && log() << "unable to convert sync \"" << name << "\" entry: " << e.what() << std::endl;
-                }
-            }
-        } catch (const std::runtime_error& e) {
-            log.error() && log() << "unable to read YAML: " << e.what() << std::endl;
-        }
+    std::istream& operator>>(std::istream& s, with_format<format::TEXT, config&> dest) {
+        config& cfg = dest.value;
+        cfg.clear();
         
-        if (dest.value.empty()) {
+        parse_config(s, [&cfg](const config_entry& e) {
+            if (e.section.empty()) {
+                log.error() && log() << "empty section at line " << e.line << std::endl;
+                return;
+            }
+            if (e.value.empty()) {
+                log.error() && log() << "empty value for key " << e.key << " at line " << e.line << std::endl;
+                return;
+            }
+
+            config_sync& sync = cfg[e.section];
+            if (e.key == "local") {
+                sync.local = e.value;
+                if (!sync.local.is_absolute()) {
+                    log.error() && log() << "local path must be absolute at line " << e.line << ": " << e.value << std::endl;
+                }
+            } else if (e.key == "remote") {
+                sync.remote = e.value;
+                if (!sync.remote.is_absolute()) {
+                    log.error() && log() << "remote path must be absolute at line " << e.line << ": " << e.value << std::endl;
+                }
+            } else if (e.key == "index") {
+                sync.index = e.value;
+            } else if (e.key == "state") {
+                sync.state = e.value;
+            } else {
+                log.error() && log() << "invalid key " << e.key << " at line " << e.line << std::endl;
+            }
+        });
+
+        auto it = cfg.begin();
+        while (it != cfg.end()) {
+            config_sync& sync = it->second;
+            
+            bool valid = check_config_path_specified(it->first, sync.local, "local");
+            valid &= check_config_path_specified(it->first, sync.remote, "remote");
+            valid &= check_config_path_specified(it->first, sync.index, "index");
+            valid &= check_config_path_specified(it->first, sync.state, "state");
+
+            if (valid) {
+                if (sync.index.is_relative()) {
+                    sync.index = sync.remote / sync.index;
+                }
+                if (sync.state.is_relative()) {
+                    sync.state = sync.local / sync.state;
+                }
+                ++it;
+            } else {
+                s.setstate(std::ios_base::failbit);
+                it = cfg.erase(it);
+            }
+        }
+
+        if (cfg.empty()) {
             log.error() && log() << "config doesn't have any valid sync entry" << std::endl;
             s.setstate(std::istream::failbit);
         }
-
         return s;
     }
     

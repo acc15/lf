@@ -4,7 +4,7 @@ namespace lf {
 
 	enum class format {
 		BINARY,
-		YAML
+		TEXT
 	};
 
 	template <auto Format, typename T>
