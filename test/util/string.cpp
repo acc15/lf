@@ -4,7 +4,6 @@
 
 using namespace lf;
 
-
 TEST_CASE("rtrim", "[string]") {
 	REQUIRE(rtrim("  abc   ") == "  abc");
 	REQUIRE(rtrim("abc") == "abc");
