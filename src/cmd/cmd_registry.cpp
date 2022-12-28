@@ -7,17 +7,20 @@
 #include "cmd/sync/sync_cmd.hpp"
 #include "cmd/index/add_cmd.hpp"
 #include "cmd/index/rm_cmd.hpp"
+#include "cmd/info/index_cmd.hpp"
 
 namespace lf {
 
 const sync_cmd _sync;
 const add_cmd _add;
 const rm_cmd _rm;
+const index_cmd _index;
 
 const cmd* const cmd_registry::list[] = { 
     &_sync, 
     &_add, 
-    &_rm 
+    &_rm,
+    &_index
 };
 
 cmd_registry::cmd_registry() {
@@ -44,8 +47,7 @@ int cmd_registry::run(std::span<const char*> args) const {
 }
 
 std::ostream& operator<<(std::ostream& s, const cmd_registry& r) {
-    const size_t sz = std::size(r.list);
-    if constexpr (sz == 0) {
+    if (std::size(r.list) == 0) {
         return s;
     }
 

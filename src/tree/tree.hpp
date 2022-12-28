@@ -13,8 +13,8 @@ namespace lf {
     template <tree_data T>
     struct tree {
         
-        using entry_map = std::unordered_map<std::string, tree<T>>;
         using value_type = T;
+        using entry_map = std::unordered_map<std::string, tree<T>>;
         using tree_type = tree<value_type>;
 
         static const T default_data;

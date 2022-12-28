@@ -12,7 +12,20 @@
 using namespace lf;
 using namespace std::filesystem;
 
-using bool_tree = tree<bool>;
+struct bool_tree: public tree<bool> {
+    static const char file_signature[];
+    static const uint8_t file_version;
+
+    bool_tree(): tree() {
+    }
+    
+    bool_tree(const bool& data, const entry_map& entries): tree {.data = data, .entries = entries} {
+    }
+
+};
+
+const char bool_tree::file_signature[] = "TEST";
+const uint8_t bool_tree::file_version = 0;
 
 namespace lf {
     
@@ -30,43 +43,40 @@ namespace lf {
 
 }
 
-const bool_tree test_tree = {
-    .data = false,
-    .entries = {
-        { "a", bool_tree { .data = false, .entries = {
-            { "1.json", bool_tree { .data = false } }, 
-            { "2.yaml", bool_tree { .data = false } }
-        }}},
-        { "b", bool_tree {.data = false, .entries = {
-            { "3.sql", bool_tree { .data = true } }, 
-            { "4.jpg", bool_tree { .data = false } }
-        }}},
-        { "c", bool_tree {.data = false, .entries = {
-            { "5.cpp", bool_tree { .data = false } }, 
-            { "6.hpp", bool_tree { .data = true } }
-        }}},
-        { "d", bool_tree {.data = false, .entries = {
-            { "7.txt", bool_tree { .data = true } }, 
-            { "8.bin", bool_tree { .data = true } }
-        }}},
-        { "e", bool_tree { .data = true, .entries = {
-            { "9.json", bool_tree { .data = false } }, 
-            { "10.yaml", bool_tree { .data = false } }
-        }}},
-        { "f", bool_tree {.data = true, .entries = {
-            { "11.sql", bool_tree { .data = true } }, 
-            { "12.jpg", bool_tree { .data = false } }
-        }}},
-        { "g", bool_tree {.data = true, .entries = {
-            { "13.cpp", bool_tree { .data = false } }, 
-            { "14.hpp", bool_tree { .data = true } }
-        }}},
-        { "h", bool_tree {.data = true, .entries = {
-            { "15.txt", bool_tree { .data = true } }, 
-            { "16.bin", bool_tree { .data = true } }
-        }}}
-    }
-};
+const bool_tree test_tree(false, {
+    { "a", tree<bool> { .data = false, .entries = {
+        { "1.json", tree<bool> { .data = false } }, 
+        { "2.yaml", tree<bool> { .data = false } }
+    }}},
+    { "b", tree<bool> {.data = false, .entries = {
+        { "3.sql", tree<bool> { .data = true } }, 
+        { "4.jpg", tree<bool> { .data = false } }
+    }}},
+    { "c", tree<bool> {.data = false, .entries = {
+        { "5.cpp", tree<bool> { .data = false } }, 
+        { "6.hpp", tree<bool> { .data = true } }
+    }}},
+    { "d", tree<bool> {.data = false, .entries = {
+        { "7.txt", tree<bool> { .data = true } }, 
+        { "8.bin", tree<bool> { .data = true } }
+    }}},
+    { "e", tree<bool> { .data = true, .entries = {
+        { "9.json", tree<bool> { .data = false } }, 
+        { "10.yaml", tree<bool> { .data = false } }
+    }}},
+    { "f", tree<bool> {.data = true, .entries = {
+        { "11.sql", tree<bool> { .data = true } }, 
+        { "12.jpg", tree<bool> { .data = false } }
+    }}},
+    { "g", tree<bool> {.data = true, .entries = {
+        { "13.cpp", tree<bool> { .data = false } }, 
+        { "14.hpp", tree<bool> { .data = true } }
+    }}},
+    { "h", tree<bool> {.data = true, .entries = {
+        { "15.txt", tree<bool> { .data = true } }, 
+        { "16.bin", tree<bool> { .data = true } }
+    }}}
+});
 
 const path test_index_path = "b/3.sql";
 

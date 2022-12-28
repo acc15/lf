@@ -5,7 +5,10 @@
 
 namespace lf {
     
-    using index_tree = tree<sync_mode>;
+    struct index_tree: tree<sync_mode> {
+        static const char file_signature[4];
+        static const uint8_t file_version;
+    };
 
     struct index_desc {
         using type = index_tree;

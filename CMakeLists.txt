@@ -28,7 +28,6 @@ add_library(lf_core
     src/tree/tree.hpp
     src/tree/tree_print.hpp
     src/tree/tree_binary.hpp
-    src/tree/tree_binary.cpp
 
     # index files
     src/index/sync_mode.hpp
@@ -58,16 +57,19 @@ add_library(lf_core
     src/fs/path.cpp
     src/fs/util.hpp 
     src/fs/util.cpp
+    
     src/cmd/cmd.hpp 
     src/cmd/cmd.cpp
+    src/cmd/cmd_registry.hpp 
+    src/cmd/cmd_registry.cpp
     src/cmd/sync/sync_cmd.hpp 
     src/cmd/sync/sync_cmd.cpp
     src/cmd/index/add_cmd.hpp 
     src/cmd/index/add_cmd.cpp 
     src/cmd/index/rm_cmd.hpp 
     src/cmd/index/rm_cmd.cpp 
-    src/cmd/cmd_registry.hpp 
-    src/cmd/cmd_registry.cpp
+    src/cmd/info/index_cmd.hpp 
+    src/cmd/info/index_cmd.cpp 
  )
 
 add_executable(lf 
