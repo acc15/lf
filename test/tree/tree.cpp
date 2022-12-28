@@ -7,7 +7,7 @@
 #include "tree/tree_print.hpp"
 #include "tree/tree_binary.hpp"
 
-#include "../io/log_tester.hpp"
+#include "io/log_tester.hpp"
 
 using namespace lf;
 using namespace std::filesystem;

@@ -8,8 +8,8 @@
 #include "io/format.hpp"
 #include "io/joiner.hpp"
 
-#include "../io/log_tester.hpp"
-#include "../test_util.hpp"
+#include "io/log_tester.hpp"
+#include "test_util.hpp"
 
 using namespace lf;
 

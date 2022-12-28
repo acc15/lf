@@ -7,7 +7,7 @@
 #include <locale>
 #include <set>
 
-#include "../test_util.hpp"
+#include "test_util.hpp"
 
 using namespace lf;
 

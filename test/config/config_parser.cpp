@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "config/config_parser.hpp"
-#include "../io/log_tester.hpp"
+#include "io/log_tester.hpp"
 
 struct config_item {
     std::size_t line;
