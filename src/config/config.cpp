@@ -3,6 +3,8 @@
 #include <string>
 #include <fstream>
 
+#include "io/serialization.hpp"
+
 #include "config/config.hpp"
 #include "config/config_parser.hpp"
 
@@ -20,7 +22,7 @@ namespace lf {
 
     std::istream& operator>>(std::istream& s, with_format<format::TEXT, config&> dest) {
         config& cfg = dest.value;
-        cfg.clear();
+        cfg.syncs.clear();
         
         parse_config(s, [&cfg](const config_entry& e) {
             if (e.section.empty()) {
@@ -32,7 +34,7 @@ namespace lf {
                 return;
             }
 
-            config_sync& sync = cfg[e.section];
+            config_sync& sync = cfg.syncs[e.section];
             if (e.key == "local") {
                 sync.local = e.value;
                 if (!sync.local.is_absolute()) {
@@ -52,8 +54,8 @@ namespace lf {
             }
         });
 
-        auto it = cfg.begin();
-        while (it != cfg.end()) {
+        auto it = cfg.syncs.begin();
+        while (it != cfg.syncs.end()) {
             config_sync& sync = it->second;
             
             bool valid = check_config_path_specified(it->first, sync.local, "local");
@@ -71,18 +73,18 @@ namespace lf {
                 ++it;
             } else {
                 s.setstate(std::ios_base::failbit);
-                it = cfg.erase(it);
+                it = cfg.syncs.erase(it);
             }
         }
 
-        if (cfg.empty()) {
+        if (cfg.syncs.empty()) {
             log.error() && log() << "config doesn't have any valid sync entry" << std::endl;
             s.setstate(std::istream::failbit);
         }
         return s;
     }
     
-    fs::path get_config_path() {
+    fs::path config::get_path() {
         const char* config_path = std::getenv("LF_CONFIG");
         if (config_path != nullptr) {
             return config_path;
@@ -114,6 +116,30 @@ namespace lf {
 #endif
     }
 
-    const char* const config_desc::name = "config";
+    bool config::load() {
+        return load_file<config>(get_path(), *this);
+    }
+
+    config::match_map config::find_matches(const std::filesystem::path &p) const {
+        match_map result;
+        for (const auto& e: syncs) {
+            const std::filesystem::path& local_path = e.second.local;
+            if (!is_subpath(p, local_path)) {
+                continue;
+            }
+            result[std::distance(local_path.begin(), local_path.end())].push_back(&e);
+        }
+        return result;
+    }
+
+    config::match_vec config::find_most_specific_matches(const std::filesystem::path& p) const {
+        match_map m = find_matches(p);
+        if (m.empty()) {
+            return config::match_vec();
+        }
+        return m.rbegin()->second;
+    }
+
+    const char* const config::name = "config";
 
 }

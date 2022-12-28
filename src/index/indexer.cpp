@@ -12,7 +12,7 @@ namespace lf {
 
     bool indexer::process(const std::span<const char*> paths, sync_mode mode) {
         config cfg;
-        if (!load_file<config_desc>(get_config_path(), cfg)) {
+        if (!cfg.load()) {
             return false;
         }
         
@@ -44,17 +44,24 @@ namespace lf {
             return false;
         }
 
-        return find_config_sync_by_path(cfg, path, [&path, &mode, this](const auto& e) {
-            log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e.first << "\" sync index " << e.second.index << std::endl;
-            set_index_mode(e.second, relative_path(path, e.second.local), mode);
-        });
+        config::match_vec matches = cfg.find_most_specific_matches(path);
+        if (matches.empty()) {
+            log.error() && log() << "no configured syncs found for path " << path << std::endl;
+            return false;
+        }
+
+        for (const auto* e: matches) {
+            log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e->first << "\" sync index " << e->second.index << std::endl;
+            set_index_mode(e->second, relative_path(path, e->second.local), mode);
+        }
+        return true;
     }
 
     bool indexer::save_changes() const {
         bool success = true;
         for (const auto& p: _indexes) {
             if (p.second.second) {
-                success &= save_file<index_desc>(p.first, p.second.first);
+                success &= save_file<index_tree>(p.first, p.second.first);
             }
         }
         return success;
@@ -73,7 +80,7 @@ namespace lf {
 
         const auto emplace_result = _indexes.emplace(index_path, std::make_pair(index_tree {}, false));
         if (emplace_result.second) {
-            load_file<index_desc>(index_path, emplace_result.first->second.first, true);
+            load_file<index_tree>(index_path, emplace_result.first->second.first, true);
         }
         return emplace_result.first->second;
     }

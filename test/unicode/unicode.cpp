@@ -11,7 +11,7 @@
 
 using namespace lf;
 
-const std::filesystem::path unicode_dir = test_dir / "unicode" / "testdir";
+const std::filesystem::path unicode_dir = test_dir_path / "unicode" / "testdir";
 
 TEST_CASE("unicode env", "[unicode]") {   
     const char* expect_env = "русский текст";

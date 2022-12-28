@@ -37,6 +37,10 @@ add_library(lf_core
     src/index/index_tree.hpp
     src/index/index_tree.cpp
 
+    # state
+    src/state/state_tree.hpp
+    src/state/state_tree.cpp
+
     # config files
     src/config/config.hpp
     src/config/config.cpp

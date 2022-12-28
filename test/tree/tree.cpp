@@ -12,7 +12,7 @@
 using namespace lf;
 using namespace std::filesystem;
 
-struct bool_tree: public tree<bool> {
+struct bool_tree: tree<bool> {
     static const char file_signature[];
     static const uint8_t file_version;
 

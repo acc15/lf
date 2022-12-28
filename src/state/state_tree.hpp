@@ -1,12 +1,11 @@
 #pragma once
 
 #include "tree/tree.hpp"
-#include "index/sync_mode.hpp"
+#include "io/format.hpp"
 
 namespace lf {
-    
-    struct index_tree: tree<sync_mode> {
-        using type = index_tree;
+
+    struct state_tree: tree<bool> {
         static const lf::format format = lf::format::BINARY;
         static const char* const name;
         static const char file_signature[4];
