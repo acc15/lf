@@ -8,6 +8,7 @@ namespace lf {
     struct log {
 
         enum level { TRACE, DEBUG, INFO, WARN, ERROR, MUTE };
+        static const char* const level_names[6];
 
         bool trace();
         bool debug();
@@ -25,7 +26,6 @@ namespace lf {
 
         static const char* const env_name;
         static const level default_level = INFO;
-        static const char* const level_names[];
         static level get_default_min_level();
 
         std::ostream& default_stream(level level);

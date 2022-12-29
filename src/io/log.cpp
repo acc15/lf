@@ -12,7 +12,7 @@
 namespace lf {
 
     const char* const log::env_name = "LF_LEVEL";
-    const char* const log::level_names[] = { "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "MUTE" };
+    const char* const log::level_names[6] = { "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "MUTE" };
 
     std::ostream& log::default_stream(log::level level) {
         return level < min_level ? nullout : level >= ERROR ? std::cerr : std::cout;

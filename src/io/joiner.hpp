@@ -3,17 +3,17 @@
 
 namespace lf {
 
-    template <std::ranges::range Range>
+    template <typename Range>
     struct joiner {
         joiner(const Range& range, std::string_view separator): range(range), separator(separator) {}
         const Range& range; 
         std::string_view separator;
     };
 
-    template <std::ranges::range Range>
+    template <typename Range>
     std::ostream& operator<<(std::ostream& s, const joiner<Range>& joiner) {
-        auto it = joiner.range.begin();
-        const auto end = joiner.range.end();
+        auto it = std::begin(joiner.range);
+        const auto end = std::end(joiner.range);
         if (it == end) {
             return s;
         }
