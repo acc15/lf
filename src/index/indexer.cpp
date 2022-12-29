@@ -17,7 +17,7 @@ namespace lf {
         for (std::string_view path: paths) {
             success &= process_path(cfg, path, mode);
         }
-        return success & save_changes();
+        return success && save_changes();
     }
 
     bool indexer::process_path(const config& cfg, std::string_view path_str, sync_mode mode) {
@@ -55,7 +55,12 @@ namespace lf {
         bool success = true;
         for (const auto& p: _indexes) {
             if (p.second.second) {
-                success &= save_file<index_tree>(p.first, p.second.first);
+                try {
+                    save_file<index_tree>(p.first, p.second.first);
+                } catch (const std::runtime_error& e) {
+                    log.error() && log() << e.what() << std::endl;
+                    success = false;
+                }
             }
         }
         return success;
@@ -74,7 +79,11 @@ namespace lf {
 
         const auto emplace_result = _indexes.emplace(index_path, std::make_pair(index_tree {}, false));
         if (emplace_result.second) {
-            load_file<index_tree>(index_path, emplace_result.first->second.first, true);
+            try {
+                load_file<index_tree>(index_path, emplace_result.first->second.first);
+            } catch (const std::runtime_error& e) {
+                log.debug() && log() << e.what() << std::endl;
+            }
         }
         return emplace_result.first->second;
     }

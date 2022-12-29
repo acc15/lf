@@ -118,12 +118,7 @@ namespace lf {
     }
 
     config config::load() {
-        config cfg;
-        fs::path path = get_path();
-        if (!load_file<config>(path, cfg)) {
-            throw std::runtime_error((std::stringstream() << "unable to load config from " << path).str());
-        } 
-        return cfg;
+        return load_file<config>(get_path());
     }
 
     config::match_map config::find_matches(const std::filesystem::path &p) const {

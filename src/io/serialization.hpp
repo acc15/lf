@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <concepts>
+#include <exception>
 
 #include "fs/path.hpp"
 #include "io/log.hpp"
@@ -20,60 +21,61 @@ namespace lf {
     };
 
 	template <serializable T>
-	bool load_file(const std::filesystem::path& path, T& ref, bool optional = false) {
+	void load_file(const std::filesystem::path& path, T& result) {
         log.debug() && log() << "loading " << T::name << " from " << path << "..." << std::endl;
         std::ifstream file(path);
+        
         if (!file) {
-            log.with(optional ? log::DEBUG : log::ERROR) && 
-                log() << "unable to open " << T::name << " file " << path << " for reading: " << strerror(errno) << std::endl;
-            return false;
+            throw std::runtime_error((std::stringstream() 
+                << "unable to open " << T::name << " file " << path << " for reading: " << strerror(errno)
+            ).str());
         }
 
-        file >> with_ref_format<T::format>(ref);
+        file >> with_ref_format<T::format>(result);
         if (file.fail() || file.bad()) {
-            log.error() && log() << "unable to load " << T::name << " file from " << path << ", failed with"
-				<< (file.fail() ? " failbit" : "") 
-				<< (file.bad() ? " badbit" : "") 
-				<< std::endl;
-			return false;
+            throw std::runtime_error((std::stringstream() 
+                << "unable to read " << T::name << " file from " << path << ", failed with"
+                << (file.fail() ? " failbit" : "") 
+                << (file.bad() ? " badbit" : "")
+            ).str());
         }
 
         if (!file.eof()) {
             log.trace() && log() << T::name << " file " << path << "wasn't fully read (no eofbit)" << std::endl;
         }
 
-        log.debug() && log() << T::name << " has been successfully loaded from " << path << std::endl;
-        return true;
+        log.debug() && log() << T::name << " file has been successfully loaded from " << path << std::endl;
 	}
 
 	template <serializable T>
-	bool save_file(const std::filesystem::path& path, const T& ref) {
+	T load_file(const std::filesystem::path& path) {
+        T result;
+        load_file(path, result);
+        return result;
+	}
+
+	template <serializable T>
+	void save_file(const std::filesystem::path& path, const T& ref) {
 		log.debug() && log() << "saving " << T::name << " to " << path << "..." << std::endl;
-        
-        try {
-            create_parent_dirs(path);
-        } catch (const std::runtime_error& e) {
-            log.error() && log() << "unable to create parent directories for " << e.what() << std::endl;
-            return false;
-        }
+        create_parent_dirs(path);
 
         std::ofstream file(path);
         if (!file) {
-            log.error() && log() << "unable to open file at " << path << " for writing: " << strerror(errno) << std::endl;
-            return false;
+            throw std::runtime_error((std::stringstream() 
+                << "unable to open file at " << path << " for writing: " << strerror(errno)
+            ).str());
         }
 
         file << with_ref_format<T::format>(ref);
         if (file.fail() || file.bad()) {
-            log.error() && log() << "save file " << path << " failed with "
+            throw std::runtime_error((std::stringstream() 
+                << "save file " << path << " failed with "
                 << (file.fail() ? " failbit" : "") 
 				<< (file.bad() ? " badbit" : "") 
-				<< std::endl;
-            return false;
+            ).str());
         }
 
         log.debug() && log() << T::name << " has been successfully saved to " << path << std::endl;
-        return true;
 	}
 
 }
