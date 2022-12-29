@@ -33,14 +33,14 @@ TEST_CASE("upper", "[string]") {
 	REQUIRE(upper("abcD") == "ABCD");
 }
 
-TEST_CASE("lower_inplace", "[string]") {
+TEST_CASE("lower inplace", "[string]") {
 	std::string str = "юtrAceд";
-	lower_inplace(str);
+	lower(str);
 	REQUIRE( str == "юtraceд");
 }
 
-TEST_CASE("upper_inplace", "[string]") {
+TEST_CASE("upper inplace", "[string]") {
 	std::string str = "юtrAceд";
-	upper_inplace(str);
+	upper(str);
 	REQUIRE( str == "юTRACEд" );
 }

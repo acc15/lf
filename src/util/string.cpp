@@ -1,26 +1,29 @@
 #include "util/string.hpp"
 
+#include <algorithm>
+#include <iterator>
+
 namespace lf {
 
 	bool is_ascii(char c) {
 		return c >= 0;
 	}
 
+	char lower(char ch) {
+		return is_ascii(ch) ? static_cast<char>(std::tolower(ch)) : ch;
+	}
+
+	char upper(char ch) {
+		return is_ascii(ch) ? static_cast<char>(std::toupper(ch)) : ch;
+	}
+
+	bool is_whitespace(char ch) {
+		return is_ascii(ch) && std::isspace(ch);
+	}
+
 	template <std::input_iterator I, std::sentinel_for<I> S>
 	size_t count_first_spaces(const I first, const S last) {
-		return std::distance(first, std::find_if_not(first, last, [](const auto& ch) { return is_ascii(ch) && std::isspace(ch); }));
-	}
-
-	template <std::output_iterator<char> Out, std::invocable<char> UnaryOp>
-	void transform_ascii(std::string_view str, Out out, UnaryOp op) {
-		std::transform(str.begin(), str.end(), out, [&op](char ch) { return is_ascii(ch) ? op(ch) : ch; });
-	}
-
-	template <std::invocable<char> UnaryOp>
-	std::string transform_ascii(std::string_view str, UnaryOp op) {
-		std::string result;
-		transform_ascii(str, std::back_inserter(result), op);
-		return result;
+		return std::distance(first, std::find_if_not(first, last, &is_whitespace));
 	}
 
 	std::string_view rtrim(std::string_view str) {
@@ -38,19 +41,25 @@ namespace lf {
 	}
 
 	std::string lower(std::string_view str) {
-		return transform_ascii(str, static_cast<int (*)(int)>(&std::tolower));
+		std::string result;
+		result.reserve(str.size());
+		std::transform(str.begin(), str.end(), std::back_inserter(result), static_cast<char (*)(char)>(&lower));
+		return result;
 	}
 
 	std::string upper(std::string_view str) {
-		return transform_ascii(str, static_cast<int (*)(int)>(&std::toupper));
+		std::string result;
+		result.reserve(str.size());
+		std::transform(str.begin(), str.end(), std::back_inserter(result), static_cast<char (*)(char)>(&upper));
+		return result;
 	}
 
-	void lower_inplace(std::string& str) {
-		transform_ascii(str, str.begin(), static_cast<int (*)(int)>(&std::tolower));
+	void lower(std::string& str) {
+		std::transform(str.begin(), str.end(), str.begin(), static_cast<char (*)(char)>(&lower));
 	}
 
-	void upper_inplace(std::string& str) {
-		transform_ascii(str, str.begin(), static_cast<int (*)(int)>(&std::toupper));
+	void upper(std::string& str) {
+		std::transform(str.begin(), str.end(), str.begin(), static_cast<char (*)(char)>(&upper));
 	}
 
 }

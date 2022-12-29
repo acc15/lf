@@ -6,27 +6,25 @@
 #include "io/log.hpp"
 #include "io/null_stream.hpp"
 
-using namespace lf;
-
 
 TEST_CASE("log stream", "[log]") {
-    log.min_level = log::INFO;
+    lf::log.min_level = lf::log::INFO;
 
-    log.info();
-    CHECK(&log() == &std::cout);
+    lf::log.info();
+    CHECK(&lf::log() == &std::cout);
     
-    log.error();
-    CHECK(&log() == &std::cerr);
+    lf::log.error();
+    CHECK(&lf::log() == &std::cerr);
 
-    log.min_level = log::MUTE;
-    CHECK(&log() == &nullout);
+    lf::log.min_level = lf::log::MUTE;
+    CHECK(&lf::log() == &lf::nullout);
 }
 
 TEST_CASE("stream override", "[log]") {
     std::stringstream test_stream;
-    log.stream = &test_stream;
-    log() << "abc" << std::endl;
-    log.stream = nullptr;
+    lf::log.stream = &test_stream;
+    lf::log() << "abc" << std::endl;
+    lf::log.stream = nullptr;
 
     REQUIRE(test_stream.str() == "abc\n");
 }

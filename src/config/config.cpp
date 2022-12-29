@@ -107,7 +107,7 @@ namespace lf {
         if (local_app_data != nullptr) {
             return fs::path(local_app_data) / rel_path;
         }
-        const char* program_data = std::getenv("PROGRAMDATA")
+        const char* program_data = std::getenv("PROGRAMDATA");
         if (program_data != nullptr) {
             return fs::path(program_data) / rel_path;
         }

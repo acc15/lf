@@ -64,7 +64,7 @@ namespace lf {
         }
 
         std::string upper_str = level_str;
-        upper_inplace(upper_str);
+        upper(upper_str);
         
         const auto it = std::find(std::begin(level_names), std::end(level_names), upper_str);
         return it == std::end(level_names) 

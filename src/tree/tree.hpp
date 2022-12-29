@@ -51,9 +51,9 @@ namespace lf {
             return e != nullptr ? e->data : value_type();
         }
 
-        bool set(const std::filesystem::path& path, const value_type& data) {
-            return path.empty() ? set(data) : data != default_data 
-                ? create_node(path).set(data) 
+        bool set(const std::filesystem::path& path, const value_type& new_data) {
+            return path.empty() ? set(new_data) : new_data != default_data
+                ? create_node(path).set(new_data)
                 : set_default(path);
         }
 
