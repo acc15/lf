@@ -22,7 +22,7 @@ namespace lf {
 
 	template <serializable T>
 	void load_file(const std::filesystem::path& path, T& result) {
-        log.debug() && log() << "loading " << T::name << " from " << path << "..." << std::endl;
+        log.debug() && log() << "loading " << T::name << " file from " << path << "..." << std::endl;
         std::ifstream file(path);
         
         if (!file) {
