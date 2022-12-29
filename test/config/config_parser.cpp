@@ -38,6 +38,9 @@ config_vec test_parse_config(const std::string& text) {
             .value = static_cast<std::string>(e.value)
         });
     });
+    REQUIRE(ss.eof());
+    REQUIRE_FALSE(ss.fail());
+    REQUIRE_FALSE(ss.bad());
     return result;
 }
 
@@ -53,7 +56,8 @@ TEST_CASE("parse", "[config_parser]") {
         "  [other]\n"
         " a = c\n"
         "[]\n"
-        "again_no_section  =yes"
+        "again_no_section  =yes\n"
+        ""
     );
     config_vec expected = {
         config_item { .line = 1, .section = "", .key = "no_section", .value = "yes" },

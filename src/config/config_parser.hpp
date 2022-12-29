@@ -17,7 +17,7 @@ namespace lf {
     };
 
     template <std::invocable<const config_entry&> Callback>
-    void parse_config(std::istream& s, Callback callback) {
+    std::istream& parse_config(std::istream& s, Callback callback) {
 
         config_entry entry = { .line = 0, .section {}, .key {}, .value {} };
         std::string line;
@@ -50,7 +50,16 @@ namespace lf {
 
             entry.value = ltrim(sv.substr(sz + 1));
             callback(entry); 
-
         }
+
+        using iob = std::ios_base;
+
+        iob::iostate state = s.rdstate();
+        if (state == (iob::eofbit | iob::failbit)) {
+            state &= ~iob::failbit;
+            s.clear(state);
+        }
+
+        return s;
     }
 }

@@ -72,8 +72,8 @@ add_library(lf_core
     src/cmd/index/add_cmd.cpp 
     src/cmd/index/rm_cmd.hpp 
     src/cmd/index/rm_cmd.cpp 
-    src/cmd/info/index_cmd.hpp 
-    src/cmd/info/index_cmd.cpp 
+    src/cmd/info/info_cmd.hpp 
+    src/cmd/info/info_cmd.cpp 
  )
 
 add_executable(lf 

@@ -31,7 +31,7 @@ namespace lf {
 
         file >> with_ref_format<T::format>(ref);
         if (file.fail() || file.bad()) {
-            log.error() && log() << "loading of " << T::name << " file " << path << " failed with "
+            log.error() && log() << "unable to load " << T::name << " file from " << path << ", failed with"
 				<< (file.fail() ? " failbit" : "") 
 				<< (file.bad() ? " badbit" : "") 
 				<< std::endl;

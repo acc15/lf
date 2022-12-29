@@ -7,20 +7,20 @@
 #include "cmd/sync/sync_cmd.hpp"
 #include "cmd/index/add_cmd.hpp"
 #include "cmd/index/rm_cmd.hpp"
-#include "cmd/info/index_cmd.hpp"
+#include "cmd/info/info_cmd.hpp"
 
 namespace lf {
 
 const sync_cmd _sync;
 const add_cmd _add;
 const rm_cmd _rm;
-const index_cmd _index;
+const info_cmd _info;
 
 const cmd* const cmd_registry::list[] = { 
     &_sync, 
     &_add, 
     &_rm,
-    &_index
+    &_info
 };
 
 cmd_registry::cmd_registry() {

@@ -11,11 +11,8 @@ namespace fs = std::filesystem;
 namespace lf {
 
     bool indexer::process(const std::span<const char*> paths, sync_mode mode) {
-        config cfg;
-        if (!cfg.load()) {
-            return false;
-        }
-        
+        const config cfg = config::load();
+
         bool success = true;
         for (std::string_view path: paths) {
             success &= process_path(cfg, path, mode);
@@ -35,7 +32,9 @@ namespace lf {
 
         fs::file_status status = fs::status(path);
         if (mode == sync_mode::RECURSIVE && status.type() != fs::file_type::directory) {
-            log.error() && log() << "recursive can be used only for existing directories, but " << path << " doesn't denote a directory" << std::endl;
+            log.error() && log() << "recursive can be used only for existing directories, but " 
+                << path << " doesn't denote a directory" 
+                << std::endl;
             return false;
         }
         
@@ -45,11 +44,6 @@ namespace lf {
         }
 
         config::match_vec matches = cfg.find_most_specific_matches(path);
-        if (matches.empty()) {
-            log.error() && log() << "no configured syncs found for path " << path << std::endl;
-            return false;
-        }
-
         for (const auto* e: matches) {
             log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e->first << "\" sync index " << e->second.index << std::endl;
             set_index_mode(e->second, relative_path(path, e->second.local), mode);

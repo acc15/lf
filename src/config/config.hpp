@@ -6,10 +6,9 @@
 #include <istream>
 #include <concepts>
 #include <map>
+#include <vector>
 
 #include "io/format.hpp"
-#include "io/log.hpp"
-#include "fs/path.hpp"
 
 namespace lf {
 
@@ -27,14 +26,15 @@ namespace lf {
         static const char* const name;
 
         using sync_map = std::unordered_map<std::string, config_sync>;
-        using match_vec = std::vector<sync_map::const_pointer>;
+        using match_pair_ptr = sync_map::const_pointer;
+        using match_vec = std::vector<match_pair_ptr>;
         using match_map = std::map<std::ptrdiff_t, match_vec>;
 
         static std::filesystem::path get_path();
         
         sync_map syncs; 
 
-        bool load();
+        static config load();
         match_map find_matches(const std::filesystem::path& p) const;
         match_vec find_most_specific_matches(const std::filesystem::path& p) const;
 

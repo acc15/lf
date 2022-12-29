@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "io/serialization.hpp"
+#include "io/log.hpp"
 
 #include "config/config.hpp"
 #include "config/config_parser.hpp"
@@ -116,8 +117,13 @@ namespace lf {
 #endif
     }
 
-    bool config::load() {
-        return load_file<config>(get_path(), *this);
+    config config::load() {
+        config cfg;
+        fs::path path = get_path();
+        if (!load_file<config>(path, cfg)) {
+            throw std::runtime_error((std::stringstream() << "unable to load config from " << path).str());
+        } 
+        return cfg;
     }
 
     config::match_map config::find_matches(const std::filesystem::path &p) const {
@@ -135,6 +141,7 @@ namespace lf {
     config::match_vec config::find_most_specific_matches(const std::filesystem::path& p) const {
         match_map m = find_matches(p);
         if (m.empty()) {
+            log.error() && log() << "no configured syncs found for path " << p << std::endl;
             return config::match_vec();
         }
         return m.rbegin()->second;
