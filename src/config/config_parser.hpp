@@ -38,19 +38,19 @@ namespace lf {
                 continue;
             }
 
-            std::string_view::size_type sz = sv.find('=');
-            if (sz == std::string_view::npos) {
+            std::string_view::size_type eq_pos = sv.find('=');
+            if (eq_pos == std::string_view::npos) {
                 log.error() && log() << "invalid input line at " << entry.line << ": " << line << std::endl;
                 continue;
             }
 
-            entry.key = rtrim(sv.substr(0, sz));
+            entry.key = rtrim(sv.substr(0, eq_pos));
             if (entry.key.empty()) {
                 log.error() && log() << "empty key at " << entry.line << ": " << line << std::endl;
                 continue;
             }
 
-            entry.value = ltrim(sv.substr(sz + 1));
+            entry.value = ltrim(sv.substr(eq_pos + 1));
             callback(entry); 
         }
         return reset_fail_on_eof(s);
