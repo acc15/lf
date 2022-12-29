@@ -4,7 +4,7 @@
 
 namespace lf {
 
-    rm_cmd::rm_cmd(): cmd({ "r", "rm" }, "<file|dir>+", "removes specified files and directories from corresponding index files") {
+    rm_cmd::rm_cmd(): cmd({ "r", "rm" }, "< file | dir >+", "removes specified files and directories from corresponding index files") {
     }
 
     int rm_cmd::run(const std::span<const char*>& args) const {
