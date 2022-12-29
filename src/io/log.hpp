@@ -23,8 +23,9 @@ namespace lf {
         level next_level = reset_level;
         std::ostream* stream = nullptr;
 
+        static const char* const env_name;
         static const level default_level = INFO;
-        static const char* level_names[];
+        static const char* const level_names[];
         static level get_default_min_level();
 
         std::ostream& default_stream(level level);

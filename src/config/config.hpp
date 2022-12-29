@@ -21,9 +21,9 @@ namespace lf {
 
     struct config {
 
-        using type = config;
         static const lf::format format = lf::format::TEXT;
         static const char* const name;
+        static const char* const env_name;
 
         using sync_map = std::unordered_map<std::string, config_sync>;
         using match_pair_ptr = sync_map::const_pointer;
@@ -31,6 +31,7 @@ namespace lf {
         using match_map = std::map<std::ptrdiff_t, match_vec>;
 
         static std::filesystem::path get_path();
+        static std::filesystem::path get_default_path();
         
         sync_map syncs; 
 

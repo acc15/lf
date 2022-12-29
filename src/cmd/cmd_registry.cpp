@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 
+#include "config/config.hpp"
+
 #include "cmd/sync/sync_cmd.hpp"
 #include "cmd/index/add_cmd.hpp"
 #include "cmd/index/rm_cmd.hpp"
@@ -55,6 +57,11 @@ std::ostream& operator<<(std::ostream& s, const cmd_registry& r) {
     for (const cmd* cmd: r.list) {
         s << *cmd;
     }
+    s << std::endl 
+        << "Environment variables: " << std::endl << std::endl
+        << config::env_name << " - custom config file path, defaults to " << config::get_default_path() << std::endl
+        << log::env_name << " - logging level (TRACE|DEBUG|INFO|WARN|ERROR|MUTE)" << std::endl;
+
     return s;
 }
 
