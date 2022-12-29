@@ -8,17 +8,17 @@
 
 namespace lf {
 
-    template <tree_data T>
+    template <tree_data T, template <typename, typename> typename Map>
     struct tree_print {
 
-        using tree_type = tree<T>;
-        using entry_map = typename tree_type::entry_map;
+        using tree_type = tree<T, Map>;
+        using map_type = typename tree_type::map_type;
         using queue_type = std::vector<tree_print>;
 
-        typename entry_map::const_pointer entry;
+        typename map_type::const_pointer entry;
         bool last;
 
-        static void add_entries(const entry_map& entries, queue_type& queue) {
+        static void add_entries(const map_type& entries, queue_type& queue) {
             if (entries.empty()) {
                 return;
             }
@@ -71,9 +71,9 @@ namespace lf {
 
     };
 
-    template <tree_data T>
-    std::ostream& operator<<(std::ostream& s, const tree<T>& node) {
-        return tree_print<T>::print(s, node);
+    template <tree_data T, template <typename, typename> typename Map>
+    std::ostream& operator<<(std::ostream& s, const tree<T, Map>& node) {
+        return tree_print<T, Map>::print(s, node);
     }
 
 }

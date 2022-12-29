@@ -30,7 +30,7 @@ add_library(lf_core
     src/tree/tree_binary.hpp
 
     # index files
-    src/index/sync_mode.hpp
+    src/index/sync_mode.hpp 
     src/index/sync_mode.cpp
     src/index/indexer.hpp
     src/index/indexer.cpp
@@ -92,7 +92,7 @@ add_executable(lf_test
     test/unicode/unicode.cpp
 
     test/tree/tree.cpp
-
+    
     test/cmd/cmd.cpp
     test/io/log_tester.hpp
     test/io/log_tester.cpp

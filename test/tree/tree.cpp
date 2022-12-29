@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 
 #include "tree/tree.hpp"
 #include "tree/tree_print.hpp"
@@ -12,20 +13,23 @@
 using namespace lf;
 using namespace std::filesystem;
 
-struct bool_tree: tree<bool> {
+using bool_tree = tree<bool, std::map>;
+
+struct bool_root : bool_tree {
+    
     static const char file_signature[];
     static const uint8_t file_version;
 
-    bool_tree(): tree() {
+    bool_root(): bool_tree() {
     }
     
-    bool_tree(const bool& data, const entry_map& entries): tree {.data = data, .entries = entries} {
+    bool_root(bool data, const map_type& entries): bool_tree { .data = data, .entries = entries } {
     }
 
 };
 
-const char bool_tree::file_signature[] = "TEST";
-const uint8_t bool_tree::file_version = 0;
+const char bool_root::file_signature[] = "TEST";
+const uint8_t bool_root::file_version = 0;
 
 namespace lf {
     
@@ -43,77 +47,79 @@ namespace lf {
 
 }
 
-const bool_tree test_tree(false, {
-    { "a", tree<bool> { .data = false, .entries = {
-        { "1.json", tree<bool> { .data = false } }, 
-        { "2.yaml", tree<bool> { .data = false } }
+const bool_root test_tree(false, {
+    { "a", bool_tree { .data = false, .entries = {
+        { "01.json", bool_tree { .data = false } }, 
+        { "02.yaml", bool_tree { .data = false } }
     }}},
-    { "b", tree<bool> {.data = false, .entries = {
-        { "3.sql", tree<bool> { .data = true } }, 
-        { "4.jpg", tree<bool> { .data = false } }
+    { "b", bool_tree { .data = false, .entries = {
+        { "03.sql", bool_tree { .data = true } }, 
+        { "04.jpg", bool_tree { .data = false } }
     }}},
-    { "c", tree<bool> {.data = false, .entries = {
-        { "5.cpp", tree<bool> { .data = false } }, 
-        { "6.hpp", tree<bool> { .data = true } }
+    { "c", bool_tree { .data = false, .entries = {
+        { "05.cpp", bool_tree { .data = false } }, 
+        { "06.hpp", bool_tree { .data = true } }
     }}},
-    { "d", tree<bool> {.data = false, .entries = {
-        { "7.txt", tree<bool> { .data = true } }, 
-        { "8.bin", tree<bool> { .data = true } }
+    { "d", bool_tree { .data = false, .entries = {
+        { "07.txt", bool_tree { .data = true } }, 
+        { "08.bin", bool_tree { .data = true } }
     }}},
-    { "e", tree<bool> { .data = true, .entries = {
-        { "9.json", tree<bool> { .data = false } }, 
-        { "10.yaml", tree<bool> { .data = false } }
+    { "e", bool_tree { .data = true, .entries = {
+        { "09.json", bool_tree { .data = false } }, 
+        { "10.yaml", bool_tree { .data = false } }
     }}},
-    { "f", tree<bool> {.data = true, .entries = {
-        { "11.sql", tree<bool> { .data = true } }, 
-        { "12.jpg", tree<bool> { .data = false } }
+    { "f", bool_tree { .data = true, .entries = {
+        { "11.sql", bool_tree { .data = true } }, 
+        { "12.jpg", bool_tree { .data = false } }
     }}},
-    { "g", tree<bool> {.data = true, .entries = {
-        { "13.cpp", tree<bool> { .data = false } }, 
-        { "14.hpp", tree<bool> { .data = true } }
+    { "g", bool_tree { .data = true, .entries = {
+        { "13.cpp", bool_tree { .data = false } }, 
+        { "14.hpp", bool_tree { .data = true } }
     }}},
-    { "h", tree<bool> {.data = true, .entries = {
-        { "15.txt", tree<bool> { .data = true } }, 
-        { "16.bin", tree<bool> { .data = true } }
+    { "h", bool_tree { .data = true, .entries = {
+        { "15.txt", bool_tree { .data = true } }, 
+        { "16.bin", bool_tree { .data = true } }
     }}}
 });
 
-const path test_index_path = "b/3.sql";
+const path test_index_path = "b/03.sql";
 
 TEST_CASE("print", "[tree]") {
     std::stringstream ss;
     ss << std::boolalpha << test_tree;
-    REQUIRE(ss.str() == 
+    
+    const std::string str = ss.str();
+    REQUIRE(str == 
         "<root> [false]\n"
-        "├── g [true]\n"
-        "│   ├── 14.hpp [true]\n"
-        "│   └── 13.cpp [false]\n"
-        "├── f [true]\n"
-        "│   ├── 12.jpg [false]\n"
-        "│   └── 11.sql [true]\n"
-        "├── e [true]\n"
-        "│   ├── 10.yaml [false]\n"
-        "│   └── 9.json [false]\n"
-        "├── c [false]\n"
-        "│   ├── 6.hpp [true]\n"
-        "│   └── 5.cpp [false]\n"
-        "├── h [true]\n"
-        "│   ├── 16.bin [true]\n"
-        "│   └── 15.txt [true]\n"
+        "├── a [false]\n"
+        "│   ├── 01.json [false]\n"
+        "│   └── 02.yaml [false]\n"
         "├── b [false]\n"
-        "│   ├── 4.jpg [false]\n"
-        "│   └── 3.sql [true]\n"
+        "│   ├── 03.sql [true]\n"
+        "│   └── 04.jpg [false]\n"
+        "├── c [false]\n"
+        "│   ├── 05.cpp [false]\n"
+        "│   └── 06.hpp [true]\n"
         "├── d [false]\n"
-        "│   ├── 8.bin [true]\n"
-        "│   └── 7.txt [true]\n"
-        "└── a [false]\n"
-        "    ├── 2.yaml [false]\n"
-        "    └── 1.json [false]\n"
+        "│   ├── 07.txt [true]\n"
+        "│   └── 08.bin [true]\n"
+        "├── e [true]\n"
+        "│   ├── 09.json [false]\n"
+        "│   └── 10.yaml [false]\n"
+        "├── f [true]\n"
+        "│   ├── 11.sql [true]\n"
+        "│   └── 12.jpg [false]\n"
+        "├── g [true]\n"
+        "│   ├── 13.cpp [false]\n"
+        "│   └── 14.hpp [true]\n"
+        "└── h [true]\n"
+        "    ├── 15.txt [true]\n"
+        "    └── 16.bin [true]\n"
     );
 }
 
-template <typename T>
-void cmp_tree(const tree<T>& l, const tree<T>& r) {
+template <tree_data T, template <typename, typename> typename Map>
+void cmp_tree(const tree<T, Map>& l, const tree<T, Map>& r) {
     {
         INFO("l=" << l.data << ",r=" << r.data);
         CHECK(l.data == r.data);
@@ -153,7 +159,7 @@ TEST_CASE("serialization", "[tree]") {
     REQUIRE( file << with_ref_format<format::BINARY>(test_tree) );
     REQUIRE( file.seekg(0).good() );
 
-    bool_tree d;
+    bool_root d;
     REQUIRE( file >> with_ref_format<format::BINARY>(d) );
 
     cmp_tree(test_tree, d);
@@ -164,7 +170,7 @@ TEST_CASE("deserialize with wrong signature", "[tree]") {
 
     std::stringstream ss("WRONGSIGNATUREHERE!!!");
 
-    bool_tree d;
+    bool_root d;
     REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(d) );
     REQUIRE( t.str().find("invalid file signature") != std::string::npos );
 }

@@ -15,33 +15,33 @@ namespace lf {
     extern const char tree_signature[3];
     extern const uint8_t tree_version;
 
-    template <typename T>
-    concept serializable_tree = std::derived_from<T, tree<typename T::value_type>> && requires {
-        { T::file_signature } -> std::convertible_to<const char*>;
-        { T::file_version } -> std::convertible_to<std::uint8_t>;
+    template <typename Tree>
+    concept serializable_tree = requires {
+        { Tree::file_signature } -> std::convertible_to<const char*>;
+        { Tree::file_version } -> std::convertible_to<std::uint8_t>;
     };
 
     template <serializable_tree Tree>
     struct tree_binary {
 
-        using tree_type = Tree;
-        using entry_type = tree<typename Tree::value_type>;
-        using entry_map = typename tree_type::entry_map;
-        using entry_map_ptr = typename entry_map::const_pointer;
-        using entry_map_ref = typename entry_map::const_reference;
+        using map_type = typename Tree::map_type;
+        using mapped_type = typename map_type::mapped_type;
 
-        static void add_entries(const entry_map& entries, std::vector<entry_map_ptr>& queue) {
+        using entry_map_ptr = typename map_type::const_pointer;
+        using entry_map_ref = typename map_type::const_reference;
+
+        static void add_entries(const map_type& entries, std::vector<entry_map_ptr>& queue) {
             std::for_each(entries.begin(), entries.end(), [&queue](entry_map_ref e) { queue.push_back(&e); });
         }
 
-        static std::ostream& write(std::ostream& s, const tree_type& tree) {
+        static std::ostream& write(std::ostream& s, const Tree& tree) {
             
-            if (!(s << tree_type::file_signature)) {
+            if (!(s << Tree::file_signature)) {
                 log.error() && log() << "unable to write file signature: " << strerror(errno) << std::endl;
                 return s;
             }
 
-            if (!(s << tree_type::file_version)) {
+            if (!(s << Tree::file_version)) {
                 log.error() && log() << "unable to write file version: " << strerror(errno) << std::endl;
                 return s;
             }
@@ -98,9 +98,9 @@ namespace lf {
             return s;
         }
 
-        static std::istream& read(std::istream& s, tree_type& tree) {
+        static std::istream& read(std::istream& s, Tree& tree) {
             
-            char signature[std::size(tree_type::file_signature)];
+            char signature[std::size(Tree::file_signature)];
             uint8_t version;
 
             if (!(s >> signature)) {
@@ -108,7 +108,7 @@ namespace lf {
                 return s;
             }
             
-            if (std::strcmp(signature, tree_type::file_signature) != 0) {
+            if (std::strcmp(signature, Tree::file_signature) != 0) {
                 log.error() && log() << "invalid file signature: " << signature << std::endl;
                 s.setstate(std::istream::failbit);
                 return s;
@@ -119,7 +119,7 @@ namespace lf {
                 return s;
             }
 
-            if (version != tree_type::file_version) {
+            if (version != Tree::file_version) {
                 log.error() && log() << "invalid file version: " << static_cast<unsigned int>(version) << std::endl;
                 s.setstate(std::istream::failbit);
                 return s;
@@ -130,7 +130,7 @@ namespace lf {
                 return s;
             }
 
-            std::vector<entry_map*> stack;
+            std::vector<map_type*> stack;
             stack.push_back(&tree.entries);
 
             do {
@@ -152,7 +152,7 @@ namespace lf {
                     break;
                 }
 
-                entry_type& entry = (*stack.back())[name];
+                mapped_type& entry = (*stack.back())[name];
                 if (!(s >> with_ref_format<format::BINARY>(entry.data))) {
                     log.error() && log() << "unable to read entry " << name << " data: " << strerror(errno) << std::endl;
                     break;
