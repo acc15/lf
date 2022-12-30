@@ -16,7 +16,7 @@ namespace lf {
     extern const uint8_t tree_version;
 
     template <typename Tree>
-    concept serializable_tree = requires {
+    concept serializable_tree = std::derived_from<Tree, tree<typename Tree::data_type>> && requires {
         { Tree::file_signature } -> std::convertible_to<const char*>;
         { Tree::file_version } -> std::convertible_to<std::uint8_t>;
     };
@@ -25,8 +25,7 @@ namespace lf {
     struct tree_binary {
 
         using map_type = typename Tree::map_type;
-        using mapped_type = typename map_type::mapped_type;
-
+        using nested_tree = typename map_type::mapped_type;
         using entry_map_ptr = typename map_type::const_pointer;
         using entry_map_ref = typename map_type::const_reference;
 
@@ -152,7 +151,7 @@ namespace lf {
                     break;
                 }
 
-                mapped_type& entry = (*stack.back())[name];
+                nested_tree& entry = (*stack.back())[name];
                 if (!(s >> with_ref_format<format::BINARY>(entry.data))) {
                     log.error() && log() << "unable to read entry " << name << " data: " << strerror(errno) << std::endl;
                     break;

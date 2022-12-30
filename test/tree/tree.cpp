@@ -13,18 +13,12 @@
 using namespace lf;
 using namespace std::filesystem;
 
-using bool_tree = tree<bool, std::map>;
+using bool_tree = tree<bool>;
 
 struct bool_root : bool_tree {
     
     static const char file_signature[];
     static const uint8_t file_version;
-
-    bool_root(): bool_tree() {
-    }
-    
-    bool_root(bool data, const map_type& entries): bool_tree { .data = data, .entries = entries } {
-    }
 
 };
 
@@ -47,46 +41,49 @@ namespace lf {
 
 }
 
-const bool_root test_tree(false, {
-    { "a", bool_tree { .data = false, .entries = {
-        { "01.json", bool_tree { .data = false } }, 
-        { "02.yaml", bool_tree { .data = false } }
+const bool_root test_tree = 
+{{ false, {
+    { "a", bool_tree { false, {
+        { "01.json", bool_tree { false } }, 
+        { "02.yaml", bool_tree { false } }
     }}},
-    { "b", bool_tree { .data = false, .entries = {
-        { "03.sql", bool_tree { .data = true } }, 
-        { "04.jpg", bool_tree { .data = false } }
+    { "b", bool_tree { false, {
+        { "03.sql", bool_tree { true } }, 
+        { "04.jpg", bool_tree { false } }
     }}},
-    { "c", bool_tree { .data = false, .entries = {
-        { "05.cpp", bool_tree { .data = false } }, 
-        { "06.hpp", bool_tree { .data = true } }
+    { "c", bool_tree { false, {
+        { "05.cpp", bool_tree { false } }, 
+        { "06.hpp", bool_tree { true } }
     }}},
-    { "d", bool_tree { .data = false, .entries = {
-        { "07.txt", bool_tree { .data = true } }, 
-        { "08.bin", bool_tree { .data = true } }
+    { "d", bool_tree { false, {
+        { "07.txt", bool_tree { true } }, 
+        { "08.bin", bool_tree { true } }
     }}},
-    { "e", bool_tree { .data = true, .entries = {
-        { "09.json", bool_tree { .data = false } }, 
-        { "10.yaml", bool_tree { .data = false } }
+    { "e", bool_tree { true, {
+        { "09.json", bool_tree { false } }, 
+        { "10.yaml", bool_tree { false } }
     }}},
-    { "f", bool_tree { .data = true, .entries = {
-        { "11.sql", bool_tree { .data = true } }, 
-        { "12.jpg", bool_tree { .data = false } }
+    { "f", bool_tree { true, {
+        { "11.sql", bool_tree { true } }, 
+        { "12.jpg", bool_tree { false } }
     }}},
-    { "g", bool_tree { .data = true, .entries = {
-        { "13.cpp", bool_tree { .data = false } }, 
-        { "14.hpp", bool_tree { .data = true } }
+    { "g", bool_tree { true, {
+        { "13.cpp", bool_tree { false } }, 
+        { "14.hpp", bool_tree { true } }
     }}},
-    { "h", bool_tree { .data = true, .entries = {
-        { "15.txt", bool_tree { .data = true } }, 
-        { "16.bin", bool_tree { .data = true } }
+    { "h", bool_tree { true, {
+        { "15.txt", bool_tree { true } }, 
+        { "16.bin", bool_tree { true } }
     }}}
-});
+}}};
 
 const path test_index_path = "b/03.sql";
 
 TEST_CASE("print", "[tree]") {
     std::stringstream ss;
-    ss << std::boolalpha << test_tree;
+
+    ss << std::boolalpha;
+    tree_print<bool, tree_entry_name_order<bool>>::print(ss, test_tree);
     
     const std::string str = ss.str();
     REQUIRE(str == 
@@ -118,8 +115,8 @@ TEST_CASE("print", "[tree]") {
     );
 }
 
-template <tree_data T, template <typename, typename> typename Map>
-void cmp_tree(const tree<T, Map>& l, const tree<T, Map>& r) {
+template <tree_data T>
+void cmp_tree(const tree<T>& l, const tree<T>& r) {
     {
         INFO("l=" << l.data << ",r=" << r.data);
         CHECK(l.data == r.data);

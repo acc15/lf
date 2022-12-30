@@ -10,11 +10,12 @@ namespace lf {
     template<typename T>
     concept tree_data = std::default_initializable<T> && std::equality_comparable<T>;
 
-    template <tree_data T, template <typename, typename> typename Map = std::unordered_map>
+    template <tree_data T>
     struct tree {
         
         using data_type = T;
-        using map_type = Map<std::string, tree>;
+        using map_type = std::unordered_map<std::string, tree>;
+        using entry_ptr = typename map_type::const_pointer;
 
         static const data_type default_data;
 
@@ -101,7 +102,7 @@ namespace lf {
 
     };
 
-    template <tree_data T, template <typename, typename> typename Map> const T tree<T, Map>::default_data = {};
+    template <tree_data T> const T tree<T>::default_data = {};
 
 }
 
