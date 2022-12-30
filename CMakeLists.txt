@@ -50,6 +50,7 @@ add_library(lf_core
     src/util/pick.hpp
     src/util/console.hpp
     src/util/console.cpp
+    src/util/sort.hpp
     src/io/log.hpp
     src/io/log.cpp
     src/io/null_stream.hpp
