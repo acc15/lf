@@ -9,6 +9,7 @@
 #include <exception>
 
 #include "fs/path.hpp"
+#include "fs/error.hpp"
 #include "io/log.hpp"
 #include "io/format.hpp"
 
@@ -17,18 +18,24 @@ namespace lf {
     template <typename T>
     concept serializable = requires {
         T::format;
+        {T::binary} -> std::convertible_to<bool>;
         {T::name} -> std::convertible_to<std::string_view>;
     };
 
-    std::system_error create_system_error(const std::string& message);
+    template <serializable T>
+    constexpr std::ios_base::openmode get_serializable_openmode() {
+        return static_cast<std::ios_base::openmode>(T::binary ? std::ios_base::binary : 0);
+    }
 
 	template <serializable T>
 	void load_file(const std::filesystem::path& path, T& result) {
-        log.debug() && log() << "loading " << T::name << " file from " << path << "..." << std::endl;
-        std::ifstream file(path);
+        const std::ios_base::openmode flags = std::ios_base::in | get_serializable_openmode<T>();
+        log.debug() && log() << "loading " << T::name << " file from " << path << " with flags " << flags << "..." << std::endl;
+        
+        std::ifstream file(path, flags);
         
         if (!file) {
-            throw create_system_error((std::stringstream() 
+            throw_fs_error(path, (std::stringstream() 
                 << "unable to open " << T::name << " file " << path << " for reading"
             ).str());
         }
@@ -58,12 +65,14 @@ namespace lf {
 
 	template <serializable T>
 	void save_file(const std::filesystem::path& path, const T& ref) {
-		log.debug() && log() << "saving " << T::name << " to " << path << "..." << std::endl;
+        const std::ios_base::openmode flags = std::ios_base::out | std::ios_base::trunc | get_serializable_openmode<T>(); 
+		log.debug() && log() << "saving " << T::name << " to " << path << " with flags " << flags << "..." << std::endl;
+
         create_parent_dirs(path);
 
-        std::ofstream file(path);
+        std::ofstream file(path, flags);
         if (!file) {
-            throw create_system_error((std::stringstream() 
+            throw_fs_error(path, (std::stringstream() 
                 << "unable to open " << T::name << " file at " << path << " for writing"
             ).str());
         }

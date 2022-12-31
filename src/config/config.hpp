@@ -16,6 +16,7 @@ namespace lf {
     struct config {
 
         static const lf::format format = lf::format::TEXT;
+        static const bool binary = false;
         static const char* const name;
         static const char* const env_name;
 

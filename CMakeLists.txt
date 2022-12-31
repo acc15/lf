@@ -63,8 +63,9 @@ add_library(lf_core
     src/fs/path.cpp
     src/fs/util.hpp 
     src/fs/util.cpp
+    src/fs/error.hpp
+    src/fs/error.cpp
     src/fs/serialization.hpp
-    src/fs/serialization.cpp
     
     src/cmd/cmd.hpp 
     src/cmd/cmd.cpp
@@ -103,6 +104,7 @@ add_executable(lf_test
     test/config/config_parser.cpp
     test/config/config.cpp
     test/fs/path.cpp
+    test/fs/serialization.cpp
     test/util/string.cpp
  )
 
