@@ -95,7 +95,7 @@ TEST_CASE("find_local_matches", "[config]") {
 
     auto test_path = home_path / "pic" / "test.jpg";
     
-    config::match_vec found_syncs = cfg.find_most_specific_matches(test_path);
+    config::sync_entry_vec found_syncs = cfg.find_most_specific_local_matches(test_path);
     REQUIRE( found_syncs.size() == 1 );
     REQUIRE( found_syncs[0]->first == "pic" );
     

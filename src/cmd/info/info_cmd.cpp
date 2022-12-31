@@ -39,12 +39,12 @@ namespace lf {
         }
 
         const fs::path path = std::filesystem::current_path();
-        const config::match_vec v = cfg.find_most_specific_matches(path);
+        const config::sync_entry_vec v = cfg.find_most_specific_local_matches(path);
         if (v.empty()) {
             return 1;
         }
 
-        for (const config::match_pair_ptr p: v) {
+        for (config::sync_entry_ptr p: v) {
             if (print_state) {
                 print_tree<state_tree>(p->first, p->second.state);
             }

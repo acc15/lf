@@ -131,8 +131,23 @@ namespace lf {
         return cfg;
     }
 
-    config::match_map config::find_matches(const std::filesystem::path &p) const {
-        match_map result;
+    config::sync_entry_vec config::find_name_matches(const std::span<const char*>& names) const {
+        sync_entry_vec result;
+        if (names.empty()) {
+            std::transform(syncs.begin(), syncs.end(), std::back_inserter(result), [](const auto& ref) { return &ref; });
+            return result;
+        }
+        for (const char* name: names) {
+            const auto it = syncs.find(name);
+            if (it != syncs.end()) {
+                result.push_back(&(*it));
+            }
+        }
+        return result;
+    }
+
+    config::sync_entry_match_map config::find_local_matches(const std::filesystem::path &p) const {
+        sync_entry_match_map result;
         for (const auto& e: syncs) {
             const std::filesystem::path& local_path = e.second.local;
             if (!is_subpath(p, local_path)) {
@@ -143,11 +158,11 @@ namespace lf {
         return result;
     }
 
-    config::match_vec config::find_most_specific_matches(const std::filesystem::path& p) const {
-        match_map m = find_matches(p);
+    config::sync_entry_vec config::find_most_specific_local_matches(const std::filesystem::path& p) const {
+        sync_entry_match_map m = find_local_matches(p);
         if (m.empty()) {
             log.error() && log() << "no configured syncs found for path " << p << std::endl;
-            return config::match_vec();
+            return config::sync_entry_vec();
         }
         return m.rbegin()->second;
     }

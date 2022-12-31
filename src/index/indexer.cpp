@@ -43,7 +43,7 @@ namespace lf {
             return false;
         }
 
-        config::match_vec matches = cfg.find_most_specific_matches(path);
+        config::sync_entry_vec matches = cfg.find_most_specific_local_matches(path);
         for (const auto* e: matches) {
             log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e->first << "\" sync index " << e->second.index << std::endl;
             set_index_mode(e->second, relative_path(path, e->second.local), mode);

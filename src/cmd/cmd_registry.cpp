@@ -61,7 +61,7 @@ namespace lf {
         s << std::endl 
             << "Environment variables: " << std::endl << std::endl
             << config::env_name << " - custom config file path, defaults to " << config::get_default_path() << std::endl
-            << log::env_name << " - logging level (" << joiner(log::level_names, "|") << "), defaults to " << log::level_names[log::default_level] << std::endl;
+            << log::env_name << " - logging level (" << join("|", log::level_names) << "), defaults to " << log::level_names[log::default_level] << std::endl;
 
         return s;
     }
