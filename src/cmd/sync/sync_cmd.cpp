@@ -4,7 +4,7 @@
 #include "config/config.hpp"
 #include "io/log.hpp"
 #include "io/joiner.hpp"
-#include "io/serialization.hpp"
+#include "fs/serialization.hpp"
 #include "index/index_tree.hpp"
 #include "state/state_tree.hpp"
 #include "tree/tree_binary.hpp"

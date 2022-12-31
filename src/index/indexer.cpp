@@ -3,7 +3,7 @@
 #include "fs/path.hpp"
 #include "io/log.hpp"
 #include "config/config.hpp"
-#include "io/serialization.hpp"
+#include "fs/serialization.hpp"
 #include "tree/tree_binary.hpp"
 
 namespace fs = std::filesystem;

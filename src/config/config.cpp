@@ -3,7 +3,7 @@
 #include <string>
 #include <fstream>
 
-#include "io/serialization.hpp"
+#include "fs/serialization.hpp"
 #include "io/log.hpp"
 
 #include "config/config.hpp"

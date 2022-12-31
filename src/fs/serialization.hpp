@@ -20,14 +20,16 @@ namespace lf {
         {T::name} -> std::convertible_to<std::string_view>;
     };
 
+    std::system_error create_system_error(const std::string& message);
+
 	template <serializable T>
 	void load_file(const std::filesystem::path& path, T& result) {
         log.debug() && log() << "loading " << T::name << " file from " << path << "..." << std::endl;
         std::ifstream file(path);
         
         if (!file) {
-            throw std::runtime_error((std::stringstream() 
-                << "unable to open " << T::name << " file " << path << " for reading: " << strerror(errno)
+            throw create_system_error((std::stringstream() 
+                << "unable to open " << T::name << " file " << path << " for reading"
             ).str());
         }
 
@@ -61,8 +63,8 @@ namespace lf {
 
         std::ofstream file(path);
         if (!file) {
-            throw std::runtime_error((std::stringstream() 
-                << "unable to open file at " << path << " for writing: " << strerror(errno)
+            throw create_system_error((std::stringstream() 
+                << "unable to open " << T::name << " file at " << path << " for writing"
             ).str());
         }
 

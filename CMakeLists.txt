@@ -57,13 +57,14 @@ add_library(lf_core
     src/io/null_stream.cpp
     src/io/joiner.hpp
     src/io/format.hpp
-    src/io/serialization.hpp
     src/io/util.hpp
     src/io/util.cpp
     src/fs/path.hpp 
     src/fs/path.cpp
     src/fs/util.hpp 
     src/fs/util.cpp
+    src/fs/serialization.hpp
+    src/fs/serialization.cpp
     
     src/cmd/cmd.hpp 
     src/cmd/cmd.cpp
