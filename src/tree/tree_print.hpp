@@ -80,8 +80,8 @@ namespace lf {
     };
 
     template <tree_concept Tree>
-    std::ostream& operator<<(std::ostream& s, const Tree& node) {
-        return tree_print<Tree>::print(s, node);
+    std::ostream& operator<<(std::ostream& s, const Tree& tree) {
+        return tree_print<Tree>::print(s, tree);
     }
 
 }
