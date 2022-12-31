@@ -47,7 +47,7 @@ namespace lf {
                 return;
             }
 
-            config_sync& sync = cfg.syncs[e.section];
+            config::sync& sync = cfg.syncs[e.section];
             if (e.key == "local") {
                 sync.local = e.value;
             } else if (e.key == "remote") {
@@ -63,7 +63,7 @@ namespace lf {
 
         auto it = cfg.syncs.begin();
         while (it != cfg.syncs.end()) {
-            config_sync& sync = it->second;
+            config::sync& sync = it->second;
             
             bool valid = check_config_path_absolute(it->first, sync.local, "local");
             valid &= check_config_path_absolute(it->first, sync.remote, "remote");

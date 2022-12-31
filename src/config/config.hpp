@@ -13,20 +13,20 @@
 
 namespace lf {
 
-    struct config_sync {
-        std::filesystem::path local;
-        std::filesystem::path remote;
-        std::filesystem::path state;
-        std::filesystem::path index;
-    };
-
     struct config {
 
         static const lf::format format = lf::format::TEXT;
         static const char* const name;
         static const char* const env_name;
 
-        using sync_map = std::unordered_map<std::string, config_sync>;
+        struct sync {
+            std::filesystem::path local;
+            std::filesystem::path remote;
+            std::filesystem::path state;
+            std::filesystem::path index;
+        };
+
+        using sync_map = std::unordered_map<std::string, sync>;
         using sync_entry_ptr = sync_map::const_pointer;
         using sync_entry_vec = std::vector<sync_entry_ptr>;
         using sync_entry_match_map = std::map<std::ptrdiff_t, sync_entry_vec>;

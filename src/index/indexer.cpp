@@ -66,7 +66,7 @@ namespace lf {
         return success;
     }
 
-    void indexer::set_index_mode(const config_sync& sync, const std::filesystem::path& rel_path, sync_mode mode) {
+    void indexer::set_index_mode(const config::sync& sync, const std::filesystem::path& rel_path, sync_mode mode) {
         index_change& change = load_index(sync.index);
         change.second |= change.first.set(rel_path, mode);
     }

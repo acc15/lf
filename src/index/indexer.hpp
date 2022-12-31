@@ -26,7 +26,7 @@ namespace lf {
 
         index_map _indexes;
 
-        void set_index_mode(const config_sync& sync, const std::filesystem::path& rel_path, sync_mode mode);
+        void set_index_mode(const config::sync& sync, const std::filesystem::path& rel_path, sync_mode mode);
         index_change& load_index(const std::filesystem::path& index_path);
         
     };
