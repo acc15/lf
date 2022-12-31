@@ -11,30 +11,34 @@
 
 namespace lf {
 
-    template <tree_data T, typename Less = std::less<std::string>>
+    template <tree_concept Tree, typename Less = std::less<std::string>>
     struct tree_entry_name_order {
-        using entry_ptr = typename tree<T>::entry_ptr;
+        using entry_ptr = typename Tree::entry_ptr;
         const Less less;
         bool operator()(entry_ptr l, entry_ptr r) {
             return less(l->first, r->first);
         }
     };
 
-    template <tree_data T, typename Order = void>
+    template <tree_concept Tree, typename Order = void>
     struct tree_print {
 
-        using tree_type = tree<T>;
+        using tree_type = Tree;
         using map_type = typename tree_type::map_type;
         using entry_ptr = typename tree_type::entry_ptr;
         using queue_type = std::vector<entry_ptr>;
         using entry_sorter = sorter<Order>;
 
         static void add_entries(const map_type& entries, queue_type& queue) {
-            queue.reserve(queue.size() + entries.size());
+            queue.resize(queue.size() + entries.size());
+
+            const auto begin = queue.rbegin();
+            auto end = begin;
             for (const auto& entry: entries) {
-                queue.push_back(&entry);
+                *end = &entry;
+                ++end;
             }
-            entry_sorter::sort(queue.rbegin(), queue.rbegin() + entries.size());
+            entry_sorter::sort(begin, end);
         }
 
         static std::ostream& print(std::ostream& s, const tree_type& node) {
@@ -75,9 +79,9 @@ namespace lf {
 
     };
 
-    template <tree_data T>
-    std::ostream& operator<<(std::ostream& s, const tree<T>& node) {
-        return tree_print<T>::print(s, node);
+    template <tree_concept Tree>
+    std::ostream& operator<<(std::ostream& s, const Tree& node) {
+        return tree_print<Tree>::print(s, node);
     }
 
 }

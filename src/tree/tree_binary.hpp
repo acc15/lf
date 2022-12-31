@@ -16,15 +16,16 @@ namespace lf {
     extern const uint8_t tree_version;
 
     template <typename Tree>
-    concept serializable_tree = std::derived_from<Tree, tree<typename Tree::data_type>> && requires {
+    concept serializable_tree_concept = tree_concept<Tree> && requires {
         { Tree::file_signature } -> std::convertible_to<const char*>;
         { Tree::file_version } -> std::convertible_to<std::uint8_t>;
     };
 
-    template <serializable_tree Tree>
+    template <serializable_tree_concept Tree>
     struct tree_binary {
 
-        using map_type = typename Tree::map_type;
+        using tree_type = Tree;
+        using map_type = typename tree_type::map_type;
         using nested_tree = typename map_type::mapped_type;
         using entry_map_ptr = typename map_type::const_pointer;
         using entry_map_ref = typename map_type::const_reference;
@@ -33,14 +34,14 @@ namespace lf {
             std::for_each(entries.begin(), entries.end(), [&queue](entry_map_ref e) { queue.push_back(&e); });
         }
 
-        static std::ostream& write(std::ostream& s, const Tree& tree) {
+        static std::ostream& write(std::ostream& s, const tree_type& tree) {
             
-            if (!(s << Tree::file_signature)) {
+            if (!(s << tree_type::file_signature)) {
                 log.error() && log() << "unable to write file signature: " << strerror(errno) << std::endl;
                 return s;
             }
 
-            if (!(s << Tree::file_version)) {
+            if (!(s << tree_type::file_version)) {
                 log.error() && log() << "unable to write file version: " << strerror(errno) << std::endl;
                 return s;
             }
@@ -97,9 +98,9 @@ namespace lf {
             return s;
         }
 
-        static std::istream& read(std::istream& s, Tree& tree) {
+        static std::istream& read(std::istream& s, tree_type& tree) {
             
-            char signature[std::size(Tree::file_signature)];
+            char signature[std::size(tree_type::file_signature)];
             uint8_t version;
 
             if (!(s >> signature)) {
@@ -107,7 +108,7 @@ namespace lf {
                 return s;
             }
             
-            if (std::strcmp(signature, Tree::file_signature) != 0) {
+            if (std::strcmp(signature, tree_type::file_signature) != 0) {
                 log.error() && log() << "invalid file signature: " << signature << std::endl;
                 s.setstate(std::istream::failbit);
                 return s;
@@ -118,7 +119,7 @@ namespace lf {
                 return s;
             }
 
-            if (version != Tree::file_version) {
+            if (version != tree_type::file_version) {
                 log.error() && log() << "invalid file version: " << static_cast<unsigned int>(version) << std::endl;
                 s.setstate(std::istream::failbit);
                 return s;
@@ -166,12 +167,12 @@ namespace lf {
 
     };
 
-    template <serializable_tree Tree>
+    template <serializable_tree_concept Tree>
     std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const Tree&> tree) {
         return tree_binary<Tree>::write(s, tree.value);
     }
     
-    template <serializable_tree Tree>
+    template <serializable_tree_concept Tree>
     std::istream& operator>>(std::istream& s, with_format<format::BINARY, Tree&> tree) {
         return tree_binary<Tree>::read(s, tree.value);
     }

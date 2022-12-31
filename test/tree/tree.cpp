@@ -83,7 +83,7 @@ TEST_CASE("print", "[tree]") {
     std::stringstream ss;
 
     ss << std::boolalpha;
-    tree_print<bool, tree_entry_name_order<bool>>::print(ss, test_tree);
+    tree_print<bool_tree, tree_entry_name_order<bool_tree>>::print(ss, test_tree);
     
     const std::string str = ss.str();
     REQUIRE(str == 
