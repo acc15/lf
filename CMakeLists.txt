@@ -55,6 +55,8 @@ add_library(lf_core
     src/io/log.cpp
     src/io/null_stream.hpp
     src/io/null_stream.cpp
+    src/io/format_stream.hpp
+    src/io/format_stream.cpp
     src/io/joiner.hpp
     src/io/format.hpp
     src/io/util.hpp

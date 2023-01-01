@@ -11,6 +11,7 @@
 #include "fs/path.hpp"
 #include "fs/error.hpp"
 #include "io/log.hpp"
+#include "io/format_stream.hpp"
 #include "io/format.hpp"
 
 namespace lf {
@@ -33,20 +34,17 @@ namespace lf {
         log.debug() && log() << "loading " << T::name << " file from " << path << " with flags " << flags << "..." << std::endl;
         
         std::ifstream file(path, flags);
-        
         if (!file) {
-            throw_fs_error(path, (std::stringstream() 
-                << "unable to open " << T::name << " file " << path << " for reading"
-            ).str());
+            throw_fs_error(format_stream() << "unable to open " << T::name << " file for reading", path);
         }
 
         file >> with_ref_format<T::format>(result);
         if (file.fail() || file.bad()) {
-            throw std::runtime_error((std::stringstream() 
+            throw std::runtime_error(format_stream() 
                 << "unable to read " << T::name << " file from " << path << ", failed with"
                 << (file.fail() ? " failbit" : "") 
                 << (file.bad() ? " badbit" : "")
-            ).str());
+            );
         }
 
         if (!file.eof()) {
@@ -72,18 +70,16 @@ namespace lf {
 
         std::ofstream file(path, flags);
         if (!file) {
-            throw_fs_error(path, (std::stringstream() 
-                << "unable to open " << T::name << " file at " << path << " for writing"
-            ).str());
+            throw_fs_error(format_stream() << "unable to open " << T::name << " file for writing", path);
         }
 
         file << with_ref_format<T::format>(ref);
         if (file.fail() || file.bad()) {
-            throw std::runtime_error((std::stringstream() 
+            throw std::runtime_error(format_stream() 
                 << "save file " << path << " failed with "
                 << (file.fail() ? " failbit" : "") 
 				<< (file.bad() ? " badbit" : "") 
-            ).str());
+            );
         }
 
         log.debug() && log() << T::name << " has been successfully saved to " << path << std::endl;

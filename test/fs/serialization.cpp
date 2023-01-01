@@ -19,8 +19,15 @@ std::istream& operator>>(std::istream& s, with_format<format::TEXT, test_seriali
 }
 
 TEST_CASE("file not found", "[serialization]") {
-    
     test_serializable t;
-    REQUIRE_THROWS_AS(load_file(test_dir_path / "no_such_file.txt", t), file_not_found_error);
 
+    const std::filesystem::path p = test_dir_path / "no_such_file.txt";
+
+    try {
+        load_file(p, t);
+        FAIL("no exception was thrown");
+    } catch (const file_not_found_error& e) {
+        REQUIRE(p == e.path1());
+        REQUIRE(e.code().value() == ENOENT);
+    }
 }
