@@ -73,7 +73,7 @@ namespace lf {
             throw_fs_error(format_stream() << "unable to open " << T::name << " file for writing", path);
         }
 
-        file << with_ref_format<T::format>(ref);
+        file << with_cref_format<T::format>(ref);
         if (file.fail() || file.bad()) {
             throw std::runtime_error(format_stream() 
                 << "save file " << path << " failed with "

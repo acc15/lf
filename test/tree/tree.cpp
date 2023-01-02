@@ -172,6 +172,38 @@ TEST_CASE("deserialize with wrong signature", "[tree]") {
     REQUIRE( t.str().find("invalid file signature") != std::string::npos );
 }
 
+TEST_CASE("deserialize must fail on empty stream", "[tree]") {
+    bool_root result; 
+    std::stringstream ss;
+    REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(result));
+}
+
+TEST_CASE("deserialize must clear entries", "[tree]") {
+
+    bool_root result; 
+    std::stringstream ss;
+
+    bool_root t1 = {{ true, { {"a", bool_tree { true }} } }};
+    REQUIRE( ss << with_cref_format<format::BINARY>(t1) );
+    REQUIRE( ss >> with_ref_format<format::BINARY>(result) );
+    ss.str("");
+    ss.clear();
+
+    REQUIRE(result.get("") == true);
+    REQUIRE(result.get("a") == true);
+    REQUIRE(result.get("b") == false);
+
+    bool_root t2 = {{ false, { {"b", bool_tree { true }} } }};
+    REQUIRE( ss << with_cref_format<format::BINARY>(t2) );
+    REQUIRE( ss >> with_ref_format<format::BINARY>(result) );
+    ss.str("");
+    ss.clear();
+
+    REQUIRE(result.get("") == false);
+    REQUIRE(result.get("a") == false);
+    REQUIRE(result.get("b") == true);
+}
+
 TEST_CASE("set", "[tree]") {
     bool_tree tree;
     CHECK_FALSE( tree.set(false) );

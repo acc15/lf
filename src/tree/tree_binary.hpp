@@ -100,6 +100,9 @@ namespace lf {
 
         static std::istream& read(std::istream& s, tree_type& tree) {
             
+            tree.data = tree_type::default_data;
+            tree.entries.clear();
+
             char signature[std::size(tree_type::file_signature)];
             uint8_t version;
 
