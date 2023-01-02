@@ -28,8 +28,8 @@ namespace lf {
         };
 
         using sync_map = std::unordered_map<std::string, sync>;
-        using sync_entry_ptr = sync_map::const_pointer;
-        using sync_entry_vec = std::vector<sync_entry_ptr>;
+        using sync_entry = sync_map::value_type;
+        using sync_entry_vec = std::vector<const sync_entry*>;
         using sync_entry_match_map = std::map<std::ptrdiff_t, sync_entry_vec>;
 
         static std::filesystem::path get_path();

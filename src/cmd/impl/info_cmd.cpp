@@ -1,4 +1,4 @@
-#include "cmd/info/info_cmd.hpp"
+#include "cmd/impl/info_cmd.hpp"
 
 #include <iostream>
 #include <filesystem>
@@ -44,7 +44,7 @@ namespace lf {
             return 1;
         }
 
-        for (config::sync_entry_ptr p: v) {
+        for (const config::sync_entry* p: v) {
             if (print_state) {
                 print_tree<state_tree>(p->first, p->second.state);
             }

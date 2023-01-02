@@ -7,10 +7,10 @@
 #include "config/config.hpp"
 #include "io/joiner.hpp"
 
-#include "cmd/sync/sync_cmd.hpp"
-#include "cmd/index/add_cmd.hpp"
-#include "cmd/index/rm_cmd.hpp"
-#include "cmd/info/info_cmd.hpp"
+#include "cmd/impl/sync_cmd.hpp"
+#include "cmd/impl/add_cmd.hpp"
+#include "cmd/impl/rm_cmd.hpp"
+#include "cmd/impl/info_cmd.hpp"
 
 namespace lf {
 

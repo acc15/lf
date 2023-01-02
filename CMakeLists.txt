@@ -69,18 +69,21 @@ add_library(lf_core
     src/fs/error.cpp
     src/fs/serialization.hpp
     
+    src/sync/synchronizer.cpp
+    src/sync/synchronizer.hpp
+
     src/cmd/cmd.hpp 
     src/cmd/cmd.cpp
     src/cmd/cmd_registry.hpp 
     src/cmd/cmd_registry.cpp
-    src/cmd/sync/sync_cmd.hpp 
-    src/cmd/sync/sync_cmd.cpp
-    src/cmd/index/add_cmd.hpp 
-    src/cmd/index/add_cmd.cpp 
-    src/cmd/index/rm_cmd.hpp 
-    src/cmd/index/rm_cmd.cpp 
-    src/cmd/info/info_cmd.hpp 
-    src/cmd/info/info_cmd.cpp 
+    src/cmd/impl/sync_cmd.hpp 
+    src/cmd/impl/sync_cmd.cpp
+    src/cmd/impl/add_cmd.hpp 
+    src/cmd/impl/add_cmd.cpp 
+    src/cmd/impl/rm_cmd.hpp 
+    src/cmd/impl/rm_cmd.cpp 
+    src/cmd/impl/info_cmd.hpp 
+    src/cmd/impl/info_cmd.cpp 
  )
 
 add_executable(lf 

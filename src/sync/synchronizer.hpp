@@ -9,13 +9,17 @@ namespace lf {
     class synchronizer {
     public:
 
-        void sync(config::sync_entry_ptr entry);
+        synchronizer(const config::sync_entry& sync);
 
+        void run();
 
     private:
 
-        index_tree _index;
-        index_tree _state;
+        bool init();
+
+        const config::sync_entry& sync;
+        index_tree index;
+        index_tree state;
 
     };
 

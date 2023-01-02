@@ -124,9 +124,7 @@ namespace lf {
         const fs::path path = get_path();
         config cfg = load_file<config>(path);
         if (cfg.syncs.empty()) {
-            throw std::runtime_error((std::ostringstream() 
-                << "config file at " << path << " doesn't have any valid sync entry"
-            ).str());
+            throw std::runtime_error(format_stream() << "config file at " << path << " doesn't have any valid sync entry");
         }
         return cfg;
     }
