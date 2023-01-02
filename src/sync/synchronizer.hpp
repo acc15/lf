@@ -19,7 +19,7 @@ namespace lf {
 
         const config::sync_entry& sync;
         index_tree index;
-        index_tree state;
+        state_tree state;
 
     };
 

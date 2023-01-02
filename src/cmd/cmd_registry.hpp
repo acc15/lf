@@ -3,6 +3,7 @@
 #include <ostream>
 #include <unordered_map>
 #include <string_view>
+#include <span>
 
 #include "cmd.hpp"
 

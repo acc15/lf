@@ -3,6 +3,7 @@
 #include "tree/tree.hpp"
 #include "util/sort.hpp"
 
+#include <string>
 #include <vector>
 #include <ostream>
 #include <utility>
@@ -11,10 +12,10 @@
 
 namespace lf {
 
-    template <tree_concept Tree, typename Less = std::less<std::string>>
+    template <tree_concept Tree, template <typename> typename Less = std::less>
     struct tree_entry_name_order {
         using entry_ptr = typename Tree::entry_ptr;
-        const Less less;
+        const Less<std::string> less;
         bool operator()(entry_ptr l, entry_ptr r) {
             return less(l->first, r->first);
         }

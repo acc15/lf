@@ -38,14 +38,12 @@ namespace lf {
             return false;
         }
 
-        index_tree index;
         try {
             load_file(sync.second.index, index);
         } catch (const file_not_found_error& e) {
             log.warn() && log() << e.what() << std::endl;
         }
 
-        state_tree state;
         try {
             load_file(sync.second.state, state);
         } catch (const file_not_found_error& e) {

@@ -135,8 +135,8 @@ namespace lf {
             std::transform(syncs.begin(), syncs.end(), std::back_inserter(result), [](const auto& ref) { return &ref; });
             return result;
         }
-        for (const char* name: names) {
-            const auto it = syncs.find(name);
+        for (const char* n: names) {
+            const auto it = syncs.find(n);
             if (it != syncs.end()) {
                 result.push_back(&(*it));
             }
