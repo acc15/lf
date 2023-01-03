@@ -10,51 +10,79 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    synchronizer::synchronizer(const config::sync_entry& sync): sync(sync) {
+
+    synchronizer::path_info::path_info(const std::filesystem::path& path): 
+        path(path), 
+        status(fs::status(path)), 
+        type(status.type()) 
+    {
+    }
+
+    synchronizer::synchronizer(const std::string& name, const config::sync& sync): name(name), sync(sync) {
     }
 
     void synchronizer::run() {
-        if (!init()) {
-            return;
-        }
+        while (!queue.empty()) {
 
+            const std::pair<fs::path, sync_mode>& item = queue.back();
+            const fs::path& path = item.first; 
+            const sync_mode mode = item.second;
+
+            const path_info l(sync.local / path);
+            const path_info r(sync.remote / path);
+
+            if (l.type == fs::file_type::not_found && r.type == fs::file_type::not_found) {
+                log.info() && log() << path << ": no file or directory exists in local and remote side" << std::endl;
+                continue;
+            }
+
+            if (r.type == fs::file_type::not_found) {
+                
+                if (state.get(path)) {
+                    log.info() && log() << path << ": deleting from local side as sync flag set and no entries on remote side" << std::endl;
+                    fs::remove_all(l.path);
+                    state.set(path, false);
+                    continue;
+                }
+
+                if (l.type == fs::file_type::directory) {
+                    
+                }
+
+            }
+
+            queue.pop_back();
+
+        }
     }
 
     bool synchronizer::init() {
+        queue.clear();
 
         log.info() && log() 
-            << "syncing \"" << sync.first 
-            << "\", local: " << sync.second.local 
-            << ", remote: " << sync.second.remote 
+            << "syncing \"" << name 
+            << "\", local: " << sync.local 
+            << ", remote: " << sync.remote 
             << std::endl;
         
-        if (!fs::exists(sync.second.local)) {
-            log.error() && log() << "local path of sync \"" << sync.first << "\" doesn't exists" << std::endl;
-            return false;
-        }
-
-        if (!fs::exists(sync.second.remote)) {
-            log.error() && log() << "remote path of sync \"" << sync.first << "\" doesn't exists" << std::endl;
-            return false;
-        }
-
         try {
-            load_file(sync.second.index, index);
+            load_file(sync.index, index);
         } catch (const file_not_found_error& e) {
             log.warn() && log() << e.what() << std::endl;
         }
 
         try {
-            load_file(sync.second.state, state);
+            load_file(sync.state, state);
         } catch (const file_not_found_error& e) {
             log.debug() && log() << e.what() << std::endl;
         }
 
         if (index.data == sync_mode::NONE && index.entries.empty()) {
-            log.info() && log() << "index of sync \"" << sync.first << "\" is empty, nothing to sync" << std::endl;
+            log.info() && log() << "index of sync \"" << name << "\" is empty, nothing to sync" << std::endl;
             return false;
         }
         
+        queue.push_back(std::make_pair(fs::path(), index.data));
         return true;
     }
 
