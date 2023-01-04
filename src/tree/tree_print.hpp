@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tree/tree.hpp"
+#include "tree/tree_order.hpp"
 #include "util/sort.hpp"
 #include "io/format.hpp"
 
@@ -13,23 +14,14 @@
 
 namespace lf {
 
-    template <tree_concept Tree, template <typename> typename Less = std::less>
-    struct tree_entry_name_order {
-        using entry_ptr = typename Tree::entry_ptr;
-        const Less<std::string> less;
-        bool operator()(entry_ptr l, entry_ptr r) {
-            return less(l->first, r->first);
-        }
-    };
-
-    template <tree_concept Tree, typename Order = void>
+    template <tree_concept Tree, typename EntryOrder = void>
     struct tree_print {
 
         using tree_type = Tree;
         using map_type = typename tree_type::map_type;
         using entry_ptr = typename tree_type::entry_ptr;
         using queue_type = std::vector<entry_ptr>;
-        using entry_sorter = sorter<Order>;
+        using entry_sorter = sorter<EntryOrder>;
 
         static void add_entries(const map_type& entries, queue_type& queue) {
             queue.resize(queue.size() + entries.size());

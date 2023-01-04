@@ -7,8 +7,6 @@
 
 #include "sync/synchronizer.hpp"
 
-namespace fs = std::filesystem;
-
 namespace lf {
 
     sync_cmd::sync_cmd(): cmd({ "s", "sync" },  "( sync names )*", "synchronizes mirrors") {
@@ -29,9 +27,9 @@ namespace lf {
         for (const config::sync_entry* p: syncs) {
             synchronizer s(p->first, p->second);
             try {
-                if (s.init()) {
-                    s.run();
-                }
+                s.load();
+                s.run();
+                s.save();
             } catch (const std::runtime_error& e) {
                 log.error() && log() << "unable to sync \"" << p->first << "\": " << e.what() << std::endl;
             }

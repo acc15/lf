@@ -19,12 +19,12 @@ namespace lf {
             path_info(const std::filesystem::path& path);
         };
 
-        // struct queue_item {
-        //     std::filesystem::path path;
-        //     sync_mode mode;
-        //     index_tree* index;
-        //     state_tree* state;
-        // };
+        struct queue_item {
+            std::filesystem::path path;
+            sync_mode mode;
+            index_tree* index;
+            state_tree* state;
+        };
 
 
         synchronizer(const std::string& name, const config::sync& sync);
@@ -38,11 +38,11 @@ namespace lf {
         std::vector<std::pair<std::filesystem::path, sync_mode>> queue;
 
         void run();
-        bool init();
+        void load();
+        void save();
 
     private:
-        void local_to_remote(const path_info& l, const path_info& r);
-        void remote_to_local(const path_info& l, const path_info& r);
+
 
     };
 

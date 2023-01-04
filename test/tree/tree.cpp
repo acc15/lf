@@ -278,6 +278,22 @@ TEST_CASE("set must keep entries with children", "[tree]") {
     REQUIRE( tree.node(nested_path) != nullptr );
 }
 
+TEST_CASE("set must remove entries with children when remove_default_subtree", "[tree]") {
+    
+    const path intermediate_path = "a/b";
+    const path nested_path = intermediate_path / "c/test.yaml";
+
+    bool_tree tree;
+    CHECK( tree.set(intermediate_path, true) );
+    CHECK( tree.set(nested_path, true) );
+    REQUIRE( tree.node(nested_path) != nullptr );
+
+    CHECK( tree.set(intermediate_path, false, false) );
+    REQUIRE( tree.entries.empty() );
+
+}
+
+
 TEST_CASE("set must keep entries with single children", "[tree]") {
 
     const path common_path = "a/b";

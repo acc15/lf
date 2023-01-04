@@ -51,10 +51,10 @@ namespace lf {
             return e != nullptr ? e->data : T();
         }
 
-        bool set(const std::filesystem::path& path, const T& new_data) {
+        bool set(const std::filesystem::path& path, const T& new_data, bool keep_default_subtree = true) {
             return path.empty() ? set(new_data) : new_data != default_data
                 ? create_node(path).set(new_data)
-                : set_default(path);
+                : set_default(path, keep_default_subtree);
         }
 
     private:
@@ -66,7 +66,7 @@ namespace lf {
             return *e;
         }
 
-        bool set_default(const std::filesystem::path& path) {
+        bool set_default(const std::filesystem::path& path, bool keep_default_subtree) {
 
             tree* e = this;
 
@@ -87,7 +87,7 @@ namespace lf {
             }
 
             // e pointing to node specified by path
-            return e->entries.empty() 
+            return !keep_default_subtree || e->entries.empty() 
                 ? removal_node->remove(removal_key) 
                 : e->set(default_data);
         }

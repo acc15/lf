@@ -22,6 +22,7 @@ namespace lf {
     }
 
     void synchronizer::run() {
+        queue = { std::make_pair(fs::path(), index.data) };
         while (!queue.empty()) {
 
             const std::pair<fs::path, sync_mode>& item = queue.back();
@@ -56,9 +57,8 @@ namespace lf {
         }
     }
 
-    bool synchronizer::init() {
-        queue.clear();
-
+    void synchronizer::load() {
+        
         log.info() && log() 
             << "syncing \"" << name 
             << "\", local: " << sync.local 
@@ -76,9 +76,11 @@ namespace lf {
         } catch (const file_not_found_error& e) {
             log.debug() && log() << e.what() << std::endl;
         }
-        
-        queue.push_back(std::make_pair(fs::path(), index.data));
-        return true;
+
+    }
+
+    void synchronizer::save() {
+        save_file(sync.state, state);
     }
 
 }
