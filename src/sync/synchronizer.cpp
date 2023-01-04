@@ -1,7 +1,7 @@
 #include "sync/synchronizer.hpp"
 #include "io/log.hpp"
 #include "fs/serialization.hpp"
-#include "tree/tree_binary.hpp"
+#include "tree/binary.hpp"
 
 #include <filesystem>
 #include <vector>

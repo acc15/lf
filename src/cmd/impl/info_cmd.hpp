@@ -2,8 +2,8 @@
 
 #include "cmd/cmd.hpp"
 #include "fs/serialization.hpp"
-#include "tree/tree_print.hpp"
-#include "tree/tree_binary.hpp"
+#include "tree/print.hpp"
+#include "tree/binary.hpp"
 
 #include <iostream>
 

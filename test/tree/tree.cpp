@@ -5,8 +5,8 @@
 #include <map>
 
 #include "tree/tree.hpp"
-#include "tree/tree_print.hpp"
-#include "tree/tree_binary.hpp"
+#include "tree/print.hpp"
+#include "tree/binary.hpp"
 
 #include "io/log_tester.hpp"
 
