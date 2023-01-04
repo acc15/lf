@@ -17,8 +17,6 @@ namespace lf {
         using map_type = Map<std::string, tree>;
         using entry_ptr = typename map_type::const_pointer;
 
-        static const data_type default_data;
-
         data_type data = {};
         map_type entries = {};
 
@@ -52,7 +50,7 @@ namespace lf {
         }
 
         bool set(const std::filesystem::path& path, const T& new_data, bool keep_default_subtree = true) {
-            return path.empty() ? set(new_data) : new_data != default_data
+            return path.empty() ? set(new_data) : new_data != data_type {}
                 ? create_node(path).set(new_data)
                 : set_default(path, keep_default_subtree);
         }
@@ -77,9 +75,9 @@ namespace lf {
                 std::string key = el.string();
                 auto eit = e->entries.find(key);
                 if (eit == e->entries.end()) {
-                    return removal_node->remove(e->entries.empty() ? removal_key : nullptr);
+                    return e->entries.empty() ? removal_node->remove(removal_key) : false;
                 }
-                if (removal_key == nullptr || e->entries.size() > 1 || e->data != default_data) {
+                if (removal_key == nullptr || e->entries.size() > 1 || e->data != data_type {}) {
                     removal_node = e;
                     removal_key =  &eit->first;
                 }
@@ -89,7 +87,7 @@ namespace lf {
             // e pointing to node specified by path
             return !keep_default_subtree || e->entries.empty() 
                 ? removal_node->remove(removal_key) 
-                : e->set(default_data);
+                : e->set({});
         }
 
         bool remove(const std::string* key_ptr) {
@@ -102,10 +100,9 @@ namespace lf {
 
     };
 
-    template <tree_data T, template<typename...> typename Map> const T tree<T, Map>::default_data = {};
-
     template <typename Tree>
     concept tree_concept = requires (Tree& t) {
+        // using IIFE to describe tree with template-template parameter
         []<tree_data T, template <typename...> typename Map>(tree<T, Map>&){}(t);
     };
 
