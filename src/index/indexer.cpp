@@ -38,7 +38,7 @@ namespace lf {
             return false;
         }
         
-        if (mode != sync_mode::NONE && status.type() == fs::file_type::not_found) {
+        if (mode != sync_mode::UNSPECIFIED && status.type() == fs::file_type::not_found) {
             log.error() && log() << "path " << path << " doesn't exists" << std::endl;
             return false;
         }

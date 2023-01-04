@@ -4,7 +4,8 @@ namespace lf {
 
 	enum class format {
 		BINARY,
-		TEXT
+		TEXT,
+		TREE // representation when printing tree
 	};
 
 	template <auto Format, typename T>

@@ -15,7 +15,8 @@ namespace lf {
         static const uint8_t file_version;
     };
 
-    std::istream& operator>>(std::istream& s, with_format<format::BINARY, bool&> data);
+    std::ostream& operator<<(std::ostream& s, with_format<format::TREE, const bool&> data);
     std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const bool&> data);
+    std::istream& operator>>(std::istream& s, with_format<format::BINARY, bool&> data);
 
 }

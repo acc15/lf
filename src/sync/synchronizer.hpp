@@ -19,6 +19,13 @@ namespace lf {
             path_info(const std::filesystem::path& path);
         };
 
+        // struct queue_item {
+        //     std::filesystem::path path;
+        //     sync_mode mode;
+        //     index_tree* index;
+        //     state_tree* state;
+        // };
+
 
         synchronizer(const std::string& name, const config::sync& sync);
 

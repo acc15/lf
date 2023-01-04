@@ -26,7 +26,11 @@ const char bool_root::file_signature[] = "TEST";
 const uint8_t bool_root::file_version = 0;
 
 namespace lf {
-    
+
+    std::ostream& operator<<(std::ostream& s, with_format<format::TREE, const bool&> v) {
+        return s << v.value;
+    }
+
     std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const bool&> v) {
         return s.put(v.value);
     }

@@ -76,11 +76,6 @@ namespace lf {
         } catch (const file_not_found_error& e) {
             log.debug() && log() << e.what() << std::endl;
         }
-
-        if (index.data == sync_mode::NONE && index.entries.empty()) {
-            log.info() && log() << "index of sync \"" << name << "\" is empty, nothing to sync" << std::endl;
-            return false;
-        }
         
         queue.push_back(std::make_pair(fs::path(), index.data));
         return true;

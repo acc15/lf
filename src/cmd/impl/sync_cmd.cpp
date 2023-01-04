@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    sync_cmd::sync_cmd(): cmd({ "s", "sync" },  "[list of sync names, all if empty]+", "synchronizes mirrors") {
+    sync_cmd::sync_cmd(): cmd({ "s", "sync" },  "( sync names )*", "synchronizes mirrors") {
     }
 
     int sync_cmd::run([[maybe_unused]] const std::span<const char*>& args) const {

@@ -2,6 +2,7 @@
 
 #include "tree/tree.hpp"
 #include "util/sort.hpp"
+#include "io/format.hpp"
 
 #include <string>
 #include <vector>
@@ -43,7 +44,7 @@ namespace lf {
         }
 
         static std::ostream& print(std::ostream& s, const tree_type& node) {
-            s << "<root> [" << node.data << "]" << std::endl;
+            s << "<root> [" << with_cref_format<format::TREE>(node.data) << "]" << std::endl;
 
             std::vector<bool> indents;
             queue_type queue;
@@ -65,7 +66,7 @@ namespace lf {
                 bool last = queue.empty() || queue.back() == nullptr;
                 s << (last ? "└── " : "├── ");
 
-                s << p->first << " [" << p->second.data << "]" << std::endl;
+                s << p->first << " [" << with_cref_format<format::TREE>(p->second.data) << "]" << std::endl;
                 if (p->second.entries.empty()) {
                     continue;
                 }
