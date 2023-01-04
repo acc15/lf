@@ -50,32 +50,40 @@ add_library(lf_core
     src/util/pick.hpp
     src/util/console.hpp
     src/util/console.cpp
+    src/util/sort.hpp
     src/io/log.hpp
     src/io/log.cpp
     src/io/null_stream.hpp
     src/io/null_stream.cpp
+    src/io/format_stream.hpp
+    src/io/format_stream.cpp
     src/io/joiner.hpp
     src/io/format.hpp
-    src/io/serialization.hpp
     src/io/util.hpp
     src/io/util.cpp
     src/fs/path.hpp 
     src/fs/path.cpp
     src/fs/util.hpp 
     src/fs/util.cpp
+    src/fs/error.hpp
+    src/fs/error.cpp
+    src/fs/serialization.hpp
     
+    src/sync/synchronizer.cpp
+    src/sync/synchronizer.hpp
+
     src/cmd/cmd.hpp 
     src/cmd/cmd.cpp
     src/cmd/cmd_registry.hpp 
     src/cmd/cmd_registry.cpp
-    src/cmd/sync/sync_cmd.hpp 
-    src/cmd/sync/sync_cmd.cpp
-    src/cmd/index/add_cmd.hpp 
-    src/cmd/index/add_cmd.cpp 
-    src/cmd/index/rm_cmd.hpp 
-    src/cmd/index/rm_cmd.cpp 
-    src/cmd/info/info_cmd.hpp 
-    src/cmd/info/info_cmd.cpp 
+    src/cmd/impl/sync_cmd.hpp 
+    src/cmd/impl/sync_cmd.cpp
+    src/cmd/impl/add_cmd.hpp 
+    src/cmd/impl/add_cmd.cpp 
+    src/cmd/impl/rm_cmd.hpp 
+    src/cmd/impl/rm_cmd.cpp 
+    src/cmd/impl/info_cmd.hpp 
+    src/cmd/impl/info_cmd.cpp 
  )
 
 add_executable(lf 
@@ -101,6 +109,7 @@ add_executable(lf_test
     test/config/config_parser.cpp
     test/config/config.cpp
     test/fs/path.cpp
+    test/fs/serialization.cpp
     test/util/string.cpp
  )
 

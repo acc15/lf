@@ -12,7 +12,7 @@ namespace lf {
     }
 
     std::ostream& operator<<(std::ostream& s, const cmd& c) {
-        s << "(" << joiner(c.names, "|") << ")";
+        s << "(" << join("|", c.names) << ")";
         if (c.parameters != nullptr) {
             s << " " << c.parameters;
         }

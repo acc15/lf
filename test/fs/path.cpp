@@ -2,9 +2,8 @@
 
 #include "fs/path.hpp"
 
-#include "../test_util.hpp"
+#include "test_util.hpp"
 
-// namespace fs = std::filesystem;
 using namespace lf;
 
 TEST_CASE("is_subpath", "[path]") {
@@ -14,4 +13,3 @@ TEST_CASE("is_subpath", "[path]") {
     REQUIRE_FALSE( is_subpath(test_root_path / "a", "a") );
     REQUIRE( is_subpath(test_root_path / "a", test_root_path / "a") );
 }
-

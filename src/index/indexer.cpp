@@ -3,7 +3,7 @@
 #include "fs/path.hpp"
 #include "io/log.hpp"
 #include "config/config.hpp"
-#include "io/serialization.hpp"
+#include "fs/serialization.hpp"
 #include "tree/tree_binary.hpp"
 
 namespace fs = std::filesystem;
@@ -38,12 +38,12 @@ namespace lf {
             return false;
         }
         
-        if (mode != sync_mode::NONE && status.type() == fs::file_type::not_found) {
+        if (mode != sync_mode::UNSPECIFIED && status.type() == fs::file_type::not_found) {
             log.error() && log() << "path " << path << " doesn't exists" << std::endl;
             return false;
         }
 
-        config::match_vec matches = cfg.find_most_specific_matches(path);
+        config::sync_entry_vec matches = cfg.find_most_specific_local_matches(path);
         for (const auto* e: matches) {
             log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e->first << "\" sync index " << e->second.index << std::endl;
             set_index_mode(e->second, relative_path(path, e->second.local), mode);
@@ -66,7 +66,7 @@ namespace lf {
         return success;
     }
 
-    void indexer::set_index_mode(const config_sync& sync, const std::filesystem::path& rel_path, sync_mode mode) {
+    void indexer::set_index_mode(const config::sync& sync, const std::filesystem::path& rel_path, sync_mode mode) {
         index_change& change = load_index(sync.index);
         change.second |= change.first.set(rel_path, mode);
     }

@@ -7,16 +7,16 @@
 namespace lf {
     
     enum class sync_mode {
-        NONE,
+        UNSPECIFIED,
         SHALLOW,
-        RECURSIVE
+        RECURSIVE,
+        IGNORE
     };
 
-    extern const char* sync_mode_names[4];
-    
     std::ostream& operator<<(std::ostream& s, const sync_mode& mode);
-    std::ostream& operator<<(std::ostream& s, const with_format<format::BINARY, const sync_mode&> mode);
-    std::istream& operator>>(std::istream& s, const with_format<format::BINARY, sync_mode&> mode);
+    std::ostream& operator<<(std::ostream& s, with_format<format::TREE, const sync_mode&> mode);
+    std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const sync_mode&> mode);
+    std::istream& operator>>(std::istream& s, with_format<format::BINARY, sync_mode&> mode);
 
 }
 

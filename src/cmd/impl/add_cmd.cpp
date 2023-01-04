@@ -1,12 +1,13 @@
-#include "add_cmd.hpp"
-#include "../../io/log.hpp"
-#include "../../index/indexer.hpp"
+#include "cmd/impl/add_cmd.hpp"
+#include "io/log.hpp"
+#include "index/indexer.hpp"
+#include "util/string.hpp"
 
 namespace lf {
 
     add_cmd::add_cmd() : cmd(
         { "a", "add" }, 
-        "< [--recursive|-R] <recursive dirs>+ | [--shallow|-S] <file|dir>+ >", 
+        "([--shallow|-s] (file|dir)+ | (--recursive|-r) dir+)", 
         "adds specified file and directories to corresponding index files"
     ) {
     }
@@ -16,12 +17,11 @@ namespace lf {
         
         std::span<const char*> non_opts = args;
         if (!non_opts.empty()) {
-            std::string_view opt = args[0];
-            if (opt == "--recursive" || opt == "-R") {
+            std::string opt = lower(args[0]);
+            if (opt == "--recursive" || opt == "-r") {
                 mode = sync_mode::RECURSIVE;
                 non_opts = non_opts.subspan(1);
-            } else if (opt == "--shallow" || opt == "-S") {
-                mode = sync_mode::SHALLOW;
+            } else if (opt == "--shallow" || opt == "-s") {
                 non_opts = non_opts.subspan(1);
             }
         }

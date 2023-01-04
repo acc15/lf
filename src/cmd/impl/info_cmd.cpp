@@ -1,4 +1,4 @@
-#include "cmd/info/info_cmd.hpp"
+#include "cmd/impl/info_cmd.hpp"
 
 #include <iostream>
 #include <filesystem>
@@ -14,7 +14,7 @@ namespace lf {
 
     info_cmd::info_cmd(): cmd(
         {"i", "info"}, 
-        "[ (i|index) | (s|state) ]", 
+        "[(i|index) | (s|state)]", 
         "prints info about indexed files, their sync modes and current synchronization state"
     ) {
     }
@@ -39,12 +39,12 @@ namespace lf {
         }
 
         const fs::path path = std::filesystem::current_path();
-        const config::match_vec v = cfg.find_most_specific_matches(path);
+        const config::sync_entry_vec v = cfg.find_most_specific_local_matches(path);
         if (v.empty()) {
             return 1;
         }
 
-        for (const config::match_pair_ptr p: v) {
+        for (const config::sync_entry* p: v) {
             if (print_state) {
                 print_tree<state_tree>(p->first, p->second.state);
             }

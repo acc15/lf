@@ -13,13 +13,13 @@
 
 using namespace lf;
 
-void cmp_sync(const config& cfg, const std::string& name, const config_sync& r) {
+void cmp_sync(const config& cfg, const std::string& name, const config::sync& r) {
     INFO("sync=" << name);
 
     auto it = cfg.syncs.find(name);
     REQUIRE( it != cfg.syncs.end() );
 
-    const config_sync& l = it->second;
+    const config::sync& l = it->second;
     CHECK( l.local == r.local );
     CHECK( l.remote == r.remote );
     CHECK( l.index == r.index );
@@ -49,13 +49,13 @@ TEST_CASE("parse", "[config]") {
         "index=pic.index\n";
 
     auto p = test_parse(yaml);
-    cmp_sync(p, "home", config_sync {
+    cmp_sync(p, "home", config::sync {
         .local = test_root_path / "local/home", 
         .remote = test_root_path / "remote/home",
         .state = test_root_path / "local/home/.config/lf/home.state", 
         .index = test_root_path / "remote/home/home.index"
     });
-    cmp_sync(p, "pic", config_sync {
+    cmp_sync(p, "pic", config::sync {
         .local = test_root_path / "local/pic", 
         .remote = test_root_path / "remote/pic",
         .state = test_root_path / "local/pic/.config/lf/pic.state", 
@@ -88,14 +88,14 @@ TEST_CASE("find_local_matches", "[config]") {
     auto home_path = test_root_path / "home";
     config cfg = {
         .syncs = {
-            { "home", config_sync { .local = home_path, .remote {}, .state {}, .index {} } },
-            { "pic", config_sync { .local = home_path / "pic", .remote {}, .state {}, .index {} } }
+            { "home", config::sync { .local = home_path, .remote {}, .state {}, .index {} } },
+            { "pic", config::sync { .local = home_path / "pic", .remote {}, .state {}, .index {} } }
         }
     };
 
     auto test_path = home_path / "pic" / "test.jpg";
     
-    config::match_vec found_syncs = cfg.find_most_specific_matches(test_path);
+    config::sync_entry_vec found_syncs = cfg.find_most_specific_local_matches(test_path);
     REQUIRE( found_syncs.size() == 1 );
     REQUIRE( found_syncs[0]->first == "pic" );
     

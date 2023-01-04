@@ -7,10 +7,10 @@
 #include "config/config.hpp"
 #include "io/joiner.hpp"
 
-#include "cmd/sync/sync_cmd.hpp"
-#include "cmd/index/add_cmd.hpp"
-#include "cmd/index/rm_cmd.hpp"
-#include "cmd/info/info_cmd.hpp"
+#include "cmd/impl/sync_cmd.hpp"
+#include "cmd/impl/add_cmd.hpp"
+#include "cmd/impl/rm_cmd.hpp"
+#include "cmd/impl/info_cmd.hpp"
 
 namespace lf {
 
@@ -61,7 +61,7 @@ namespace lf {
         s << std::endl 
             << "Environment variables: " << std::endl << std::endl
             << config::env_name << " - custom config file path, defaults to " << config::get_default_path() << std::endl
-            << log::env_name << " - logging level (" << joiner(log::level_names, "|") << "), defaults to " << log::level_names[log::default_level] << std::endl;
+            << log::env_name << " - logging level (" << join("|", log::level_names) << "), defaults to " << log::level_names[log::default_level] << std::endl;
 
         return s;
     }
