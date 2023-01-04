@@ -7,5 +7,6 @@
     },
     "cmake.environment": {
         "LF_LEVEL": "INFO"
-    }
+    },
+    "cmake.generator": "Ninja"
 }
