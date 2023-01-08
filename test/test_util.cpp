@@ -2,6 +2,7 @@
 #include "fs/path.hpp"
 
 #include <fstream>
+#include <sstream>
 
 namespace lf {
 
@@ -25,9 +26,9 @@ namespace lf {
 
     std::string read_text(const std::filesystem::path& path) {
         std::ifstream s(path);
-        std::string str;
-        s >> str;
-        return str;
+        std::stringstream buf;
+        s >> buf.rdbuf();
+        return buf.str();
     }
 
 }
