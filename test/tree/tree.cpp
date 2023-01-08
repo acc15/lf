@@ -4,7 +4,8 @@
 #include <fstream>
 #include <map>
 
-#include "tree/tree.hpp"
+#include "state/state_tree.hpp"
+
 #include "tree/print.hpp"
 #include "tree/binary.hpp"
 
@@ -13,73 +14,40 @@
 using namespace lf;
 using namespace std::filesystem;
 
-using bool_tree = tree<bool>;
-
-struct bool_root : bool_tree {
-    
-    static const char file_signature[];
-    static const uint8_t file_version;
-
-};
-
-const char bool_root::file_signature[] = "TEST";
-const uint8_t bool_root::file_version = 0;
-
-namespace lf {
-
-    std::ostream& operator<<(std::ostream& s, with_format<format::TREE, const bool&> v) {
-        return s << v.value;
-    }
-
-    std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const bool&> v) {
-        return s.put(v.value);
-    }
-
-    std::istream& operator>>(std::istream& s, with_format<format::BINARY, bool&> v) {
-        std::uint8_t value;
-        if (s >> value) {
-            v.value = static_cast<bool>(value);
-        }
-        return s;
-    }
-
-}
-
-const bool_root test_tree = 
-{{ false, {
-    { "a", bool_tree { false, {
-        { "01.json", bool_tree { false } }, 
-        { "02.yaml", bool_tree { false } }
+const state_tree test_tree = { false, {
+    { "a", state_tree { false, {
+        { "01.json", state_tree { false } }, 
+        { "02.yaml", state_tree { false } }
     }}},
-    { "b", bool_tree { false, {
-        { "03.sql", bool_tree { true } }, 
-        { "04.jpg", bool_tree { false } }
+    { "b", state_tree { false, {
+        { "03.sql", state_tree { true } }, 
+        { "04.jpg", state_tree { false } }
     }}},
-    { "c", bool_tree { false, {
-        { "05.cpp", bool_tree { false } }, 
-        { "06.hpp", bool_tree { true } }
+    { "c", state_tree { false, {
+        { "05.cpp", state_tree { false } }, 
+        { "06.hpp", state_tree { true } }
     }}},
-    { "d", bool_tree { false, {
-        { "07.txt", bool_tree { true } }, 
-        { "08.bin", bool_tree { true } }
+    { "d", state_tree { false, {
+        { "07.txt", state_tree { true } }, 
+        { "08.bin", state_tree { true } }
     }}},
-    { "e", bool_tree { true, {
-        { "09.json", bool_tree { false } }, 
-        { "10.yaml", bool_tree { false } }
+    { "e", state_tree { true, {
+        { "09.json", state_tree { false } }, 
+        { "10.yaml", state_tree { false } }
     }}},
-    { "f", bool_tree { true, {
-        { "11.sql", bool_tree { true } }, 
-        { "12.jpg", bool_tree { false } }
+    { "f", state_tree { true, {
+        { "11.sql", state_tree { true } }, 
+        { "12.jpg", state_tree { false } }
     }}},
-    { "g", bool_tree { true, {
-        { "13.cpp", bool_tree { false } }, 
-        { "14.hpp", bool_tree { true } }
+    { "g", state_tree { true, {
+        { "13.cpp", state_tree { false } }, 
+        { "14.hpp", state_tree { true } }
     }}},
-    { "h", bool_tree { true, {
-        { "15.txt", bool_tree { true } }, 
-        { "16.bin", bool_tree { true } }
+    { "h", state_tree { true, {
+        { "15.txt", state_tree { true } }, 
+        { "16.bin", state_tree { true } }
     }}}
-}}};
+}};
 
 const path test_index_path = "b/03.sql";
 
@@ -87,35 +55,35 @@ TEST_CASE("print", "[tree]") {
     std::stringstream ss;
 
     ss << std::boolalpha;
-    tree_print<bool_tree, tree_entry_name_order<bool_tree>>::print(ss, test_tree);
+    tree_print<state_tree, tree_entry_name_order<state_tree>>::print(ss, test_tree);
     
     const std::string str = ss.str();
     REQUIRE(str == 
-        "<root> [false]\n"
-        "├── a [false]\n"
-        "│   ├── 01.json [false]\n"
-        "│   └── 02.yaml [false]\n"
-        "├── b [false]\n"
-        "│   ├── 03.sql [true]\n"
-        "│   └── 04.jpg [false]\n"
-        "├── c [false]\n"
-        "│   ├── 05.cpp [false]\n"
-        "│   └── 06.hpp [true]\n"
-        "├── d [false]\n"
-        "│   ├── 07.txt [true]\n"
-        "│   └── 08.bin [true]\n"
-        "├── e [true]\n"
-        "│   ├── 09.json [false]\n"
-        "│   └── 10.yaml [false]\n"
-        "├── f [true]\n"
-        "│   ├── 11.sql [true]\n"
-        "│   └── 12.jpg [false]\n"
-        "├── g [true]\n"
-        "│   ├── 13.cpp [false]\n"
-        "│   └── 14.hpp [true]\n"
-        "└── h [true]\n"
-        "    ├── 15.txt [true]\n"
-        "    └── 16.bin [true]\n"
+        "<root> [ ]\n"
+        "├── a [ ]\n"
+        "│   ├── 01.json [ ]\n"
+        "│   └── 02.yaml [ ]\n"
+        "├── b [ ]\n"
+        "│   ├── 03.sql [+]\n"
+        "│   └── 04.jpg [ ]\n"
+        "├── c [ ]\n"
+        "│   ├── 05.cpp [ ]\n"
+        "│   └── 06.hpp [+]\n"
+        "├── d [ ]\n"
+        "│   ├── 07.txt [+]\n"
+        "│   └── 08.bin [+]\n"
+        "├── e [+]\n"
+        "│   ├── 09.json [ ]\n"
+        "│   └── 10.yaml [ ]\n"
+        "├── f [+]\n"
+        "│   ├── 11.sql [+]\n"
+        "│   └── 12.jpg [ ]\n"
+        "├── g [+]\n"
+        "│   ├── 13.cpp [ ]\n"
+        "│   └── 14.hpp [+]\n"
+        "└── h [+]\n"
+        "    ├── 15.txt [+]\n"
+        "    └── 16.bin [+]\n"
     );
 }
 
@@ -148,7 +116,7 @@ TEST_CASE("get", "[tree]") {
 }
 
 TEST_CASE("set update flags", "[tree]") {
-    bool_tree tree;
+    state_tree tree;
     tree.set(test_index_path, true);
     REQUIRE(tree.get(test_index_path));
 }
@@ -160,7 +128,7 @@ TEST_CASE("serialization", "[tree]") {
     REQUIRE( file << with_ref_format<format::BINARY>(test_tree) );
     REQUIRE( file.seekg(0).good() );
 
-    bool_root d;
+    state_tree d;
     REQUIRE( file >> with_ref_format<format::BINARY>(d) );
 
     cmp_tree(test_tree, d);
@@ -171,23 +139,23 @@ TEST_CASE("deserialize with wrong signature", "[tree]") {
 
     std::stringstream ss("WRONGSIGNATUREHERE!!!");
 
-    bool_root d;
+    state_tree d;
     REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(d) );
     REQUIRE( t.str().find("invalid file signature") != std::string::npos );
 }
 
 TEST_CASE("deserialize must fail on empty stream", "[tree]") {
-    bool_root result; 
+    state_tree result; 
     std::stringstream ss;
     REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(result));
 }
 
 TEST_CASE("deserialize must clear entries", "[tree]") {
 
-    bool_root result; 
+    state_tree result; 
     std::stringstream ss;
 
-    bool_root t1 = {{ true, { {"a", bool_tree { true }} } }};
+    state_tree t1 = { true, { {"a", state_tree { true }} } };
     REQUIRE( ss << with_cref_format<format::BINARY>(t1) );
     REQUIRE( ss >> with_ref_format<format::BINARY>(result) );
     ss.str("");
@@ -197,7 +165,7 @@ TEST_CASE("deserialize must clear entries", "[tree]") {
     REQUIRE(result.get("a") == true);
     REQUIRE(result.get("b") == false);
 
-    bool_root t2 = {{ false, { {"b", bool_tree { true }} } }};
+    state_tree t2 = { false, { {"b", state_tree { true }} } };
     REQUIRE( ss << with_cref_format<format::BINARY>(t2) );
     REQUIRE( ss >> with_ref_format<format::BINARY>(result) );
     ss.str("");
@@ -209,7 +177,7 @@ TEST_CASE("deserialize must clear entries", "[tree]") {
 }
 
 TEST_CASE("set", "[tree]") {
-    bool_tree tree;
+    state_tree tree;
     CHECK_FALSE( tree.set(false) );
     REQUIRE( tree.set(true) );
     CHECK_FALSE( tree.set(true) );
@@ -217,7 +185,7 @@ TEST_CASE("set", "[tree]") {
 }
 
 TEST_CASE("set must avoid creating entries with default flags only", "[tree]") {
-    bool_tree tree;
+    state_tree tree;
     REQUIRE( tree.entries.empty() );
 
     CHECK_FALSE( tree.set(test_index_path, false) );
@@ -225,7 +193,7 @@ TEST_CASE("set must avoid creating entries with default flags only", "[tree]") {
 }
 
 TEST_CASE("set must remove redunant entries", "[tree]") {
-    bool_tree tree;
+    state_tree tree;
 
     CHECK( tree.set(test_index_path, true) );
     REQUIRE( !tree.entries.empty() );
@@ -235,7 +203,7 @@ TEST_CASE("set must remove redunant entries", "[tree]") {
 }
 
 TEST_CASE("set must preserve adjanced entries when removing redunant entries", "[tree]") {
-    bool_tree tree;
+    state_tree tree;
 
     const path adjanced_path = test_index_path.parent_path() / "x.jpg";
 
@@ -251,7 +219,7 @@ TEST_CASE("set must preserve intermediate non-default nodes", "[tree]") {
     path intermediate_path = path("a") / "b";
     path file_path = intermediate_path / "c" / "file.txt";
 
-    bool_tree tree;
+    state_tree tree;
     CHECK( tree.set(intermediate_path, true) );
     CHECK( tree.set(file_path, true) );
     REQUIRE( tree.node(file_path) != nullptr );
@@ -268,7 +236,7 @@ TEST_CASE("set must keep entries with children", "[tree]") {
     const path intermediate_path = "a/b";
     const path nested_path = intermediate_path / "c/test.yaml";
 
-    bool_tree tree;
+    state_tree tree;
     CHECK( tree.set(intermediate_path, true) );
     CHECK( tree.set(nested_path, true) );
     REQUIRE( tree.node(nested_path) != nullptr );
@@ -278,21 +246,20 @@ TEST_CASE("set must keep entries with children", "[tree]") {
     REQUIRE( tree.node(nested_path) != nullptr );
 }
 
-TEST_CASE("set must remove entries with children when remove_default_subtree", "[tree]") {
+TEST_CASE("remove must remove entries with children", "[tree]") {
     
     const path intermediate_path = "a/b";
     const path nested_path = intermediate_path / "c/test.yaml";
 
-    bool_tree tree;
+    state_tree tree;
     CHECK( tree.set(intermediate_path, true) );
     CHECK( tree.set(nested_path, true) );
     REQUIRE( tree.node(nested_path) != nullptr );
 
-    CHECK( tree.set(intermediate_path, false, false) );
+    CHECK( tree.remove(intermediate_path) );
     REQUIRE( tree.entries.empty() );
 
 }
-
 
 TEST_CASE("set must keep entries with single children", "[tree]") {
 
@@ -300,7 +267,7 @@ TEST_CASE("set must keep entries with single children", "[tree]") {
     const path p1 = common_path / "x/y";
     const path p2 = common_path / "z/w";
 
-    bool_tree tree;
+    state_tree tree;
     CHECK( tree.set(p1, true) );
     CHECK_FALSE( tree.set(p2, false) );
 

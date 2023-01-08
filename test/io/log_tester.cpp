@@ -16,17 +16,4 @@ namespace lf {
         return out.str();
     }
 
-    std::vector<std::string> log_tester::lines() {
-        out.clear();
-        out.seekg(0);
-        
-        std::vector<std::string> lines;
-        
-        std::string line;
-        while (std::getline(out, line)) {
-            lines.emplace_back(std::move(line));
-        }
-        return lines;
-    }
-
 }

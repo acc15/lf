@@ -12,6 +12,8 @@ namespace lf {
         static const char* const name;
         static const char file_signature[4];
         static const uint8_t file_version;
+
+        index_tree(data_type data = {}, const map_type& map = {});
     };
 
 }

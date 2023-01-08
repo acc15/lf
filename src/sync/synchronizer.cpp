@@ -22,39 +22,47 @@ namespace lf {
     }
 
     void synchronizer::run() {
-        queue = { std::make_pair(fs::path(), index.data) };
+        
+        queue = { 
+            queue_item { 
+                .path = fs::path(), 
+                .mode = index.data, 
+                .index = &index 
+            } 
+        };
+        
         while (!queue.empty()) {
-
-            const std::pair<fs::path, sync_mode>& item = queue.back();
-            const fs::path& path = item.first; 
-            const sync_mode mode = item.second;
-
-            const path_info l(sync.local / path);
-            const path_info r(sync.remote / path);
-
-            if (l.type == fs::file_type::not_found && r.type == fs::file_type::not_found) {
-                log.info() && log() << path << ": no file or directory exists in local and remote side" << std::endl;
-                continue;
-            }
-
-            if (r.type == fs::file_type::not_found) {
-                
-                if (state.get(path)) {
-                    log.info() && log() << path << ": deleting from local side as sync flag set and no entries on remote side" << std::endl;
-                    fs::remove_all(l.path);
-                    state.set(path, false);
-                    continue;
-                }
-
-                if (l.type == fs::file_type::directory) {
-                    
-                }
-
-            }
-
+            const queue_item& item = queue.back();
+            handle(item);
             queue.pop_back();
-
         }
+
+    }
+
+    void synchronizer::handle(const queue_item& item) {
+        const path_info l(sync.local / item.path);
+        const path_info r(sync.remote / item.path);
+
+        if (l.type == fs::file_type::not_found && r.type == fs::file_type::not_found) {
+            log.info() && log() << item.path << ": no file or directory exists in local and remote side" << std::endl;
+            return;
+        }
+
+        switch (item.mode) {
+        case sync_mode::IGNORE:
+            if (r.type == fs::file_type::not_found) {
+                log.info() && log() << item.path << ": is ignored, removing from remote side" << std::endl;
+                fs::remove_all(r.path);
+            } else {
+                log.info() && log() << item.path << ": is ignored, skipping" << std::endl;
+            }
+            state.remove(item.path);
+            return;
+
+        
+            
+        }
+
     }
 
     void synchronizer::load() {

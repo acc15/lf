@@ -6,6 +6,8 @@ namespace lf {
     const char state_tree::file_signature[4] = "LFS";
     const uint8_t state_tree::file_version = 0;
 
+    state_tree::state_tree(data_type data, const map_type& map): tree { .data = data, .entries = map } {}
+
     std::ostream& operator<<(std::ostream& s, const with_format<format::TREE, const bool&> data) {
         return s.put(data.value ? '+' : ' ');
     }

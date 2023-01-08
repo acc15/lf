@@ -26,8 +26,9 @@ add_library(lf_core
 
     # tree
     src/tree/tree.hpp
-    src/tree/tree_print.hpp
-    src/tree/tree_binary.hpp
+    src/tree/order.hpp
+    src/tree/print.hpp
+    src/tree/binary.hpp
 
     # index files
     src/index/sync_mode.hpp 
@@ -50,6 +51,8 @@ add_library(lf_core
     src/util/pick.hpp
     src/util/console.hpp
     src/util/console.cpp
+    src/io/datetime.cpp
+    src/io/datetime.hpp
     src/util/sort.hpp
     src/io/log.hpp
     src/io/log.cpp
@@ -105,12 +108,15 @@ add_executable(lf_test
     test/io/log_tester.hpp
     test/io/log_tester.cpp
     test/io/log.cpp
+    test/io/datetime.cpp
 
     test/config/config_parser.cpp
     test/config/config.cpp
     test/fs/path.cpp
     test/fs/serialization.cpp
     test/util/string.cpp
+
+    test/sync/synchronizer.cpp
  )
 
 target_include_directories(lf_test PRIVATE test)

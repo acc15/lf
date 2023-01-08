@@ -13,6 +13,8 @@ namespace lf {
         static const char* const name;
         static const char file_signature[4];
         static const uint8_t file_version;
+
+        state_tree(data_type data = {}, const map_type& map = {});
     };
 
     std::ostream& operator<<(std::ostream& s, with_format<format::TREE, const bool&> data);

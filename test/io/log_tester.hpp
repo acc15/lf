@@ -12,7 +12,6 @@ namespace lf {
         ~log_tester();
         
         std::string str() const;
-        std::vector<std::string> lines();
         bool contains(std::string_view v) const;
 
         std::stringstream out;

@@ -23,9 +23,7 @@ namespace lf {
             std::filesystem::path path;
             sync_mode mode;
             index_tree* index;
-            state_tree* state;
         };
-
 
         synchronizer(const std::string& name, const config::sync& sync);
 
@@ -35,7 +33,7 @@ namespace lf {
         index_tree index;
         state_tree state;
 
-        std::vector<std::pair<std::filesystem::path, sync_mode>> queue;
+        std::vector<queue_item> queue;
 
         void run();
         void load();
@@ -43,6 +41,7 @@ namespace lf {
 
     private:
 
+        void handle(const queue_item& item);
 
     };
 

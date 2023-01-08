@@ -49,10 +49,14 @@ namespace lf {
             return e != nullptr ? e->data : T();
         }
 
-        bool set(const std::filesystem::path& path, const T& new_data, bool keep_default_subtree = true) {
+        bool set(const std::filesystem::path& path, const T& new_data) {
             return path.empty() ? set(new_data) : new_data != data_type {}
                 ? create_node(path).set(new_data)
-                : set_default(path, keep_default_subtree);
+                : set_default(path, true);
+        }
+
+        bool remove(const std::filesystem::path& path) {
+            return set_default(path, false);
         }
 
     private:
