@@ -170,3 +170,55 @@ TEST_CASE("update remote from local", "[synchronizer]") {
     REQUIRE( s.state.get(test_name) == true );
 
 }
+
+TEST_CASE("local file overwrites remote dir", "[synchronizer]") {
+    
+    auto sync = make_sync();
+    write_text(sync.local / test_name, test_content);
+    write_text(sync.remote / test_name / "x.txt", "xyz");
+
+    plus50ms_last_write_time(sync.local / test_name, sync.remote / test_name);
+
+    synchronizer s("test", sync);
+    s.index = index_tree(sync_mode::UNSPECIFIED, { {test_name, index_tree(sync_mode::SHALLOW) } });
+    s.run();
+
+    REQUIRE( fs::status(sync.remote / test_name).type() == fs::file_type::regular );
+    REQUIRE( read_text(sync.remote / test_name) == test_content );
+
+}
+
+TEST_CASE("local dir overwrites remote file", "[synchronizer]") {
+
+
+}
+
+TEST_CASE("remote file overwrites local dir", "[synchronizer]") {
+
+}
+
+TEST_CASE("remote dir overwrites local file", "[synchronizer]") {
+
+}
+
+TEST_CASE("local shallow dir to remote", "[synchronizer]") {
+
+    auto sync = make_sync();
+
+    write_text(sync.local / "a" / "a.txt", test_content);
+    write_text(sync.local / "a" / "b.txt", test_content);
+    write_text(sync.local / "a" / "c.txt", test_content);
+
+    synchronizer s("test", sync);
+    s.index = index_tree(sync_mode::UNSPECIFIED, { {"a", index_tree(sync_mode::SHALLOW, { { "a.txt", index_tree(sync_mode::IGNORE) } }) } });
+    s.run();
+
+    REQUIRE_FALSE( fs::exists(sync.remote / "a" / "b.txt") ); // ignored
+    REQUIRE(read_text(sync.remote / "a" / "b.txt") == test_content );
+    REQUIRE(read_text(sync.remote / "a" / "c.txt") == test_content );
+
+    REQUIRE_FALSE( s.state.get(fs::path("a") / "a.txt") );
+    REQUIRE( s.state.get(fs::path("a") / "b.txt") );
+    REQUIRE( s.state.get(fs::path("a") / "c.txt") );
+
+}
