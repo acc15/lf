@@ -3,6 +3,7 @@
 #include <ostream>
 #include <chrono>
 #include <string>
+#include <ctime>
 
 namespace lf {
 
@@ -12,6 +13,7 @@ namespace lf {
         bool utc = false;
     };
 
+    void time_to_tm(bool utc, const std::time_t& t, std::tm& tm);
     std::ostream& operator<<(std::ostream& s, const format_date_time& fmt);
 
 }

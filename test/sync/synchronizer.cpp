@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <thread>
+#include <string>
 
 #include "io/format_stream.hpp"
 #include "sync/synchronizer.hpp"
