@@ -11,7 +11,7 @@ namespace lf {
     class info_cmd: public cmd {
     public:
         info_cmd();
-        int run(const std::span<const char*>& args) const override;
+        int run(const opt_map& opts) const override;
 
     private:
         template<serializable Tree>

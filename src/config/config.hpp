@@ -39,7 +39,7 @@ namespace lf {
 
         static config load();
 
-        sync_entry_vec find_name_matches(const std::span<const char*>& names) const;
+        sync_entry_vec find_name_matches(const std::vector<std::string_view>& names) const;
         
         sync_entry_match_map find_local_matches(const std::filesystem::path& p) const;
         sync_entry_vec find_most_specific_local_matches(const std::filesystem::path& p) const;

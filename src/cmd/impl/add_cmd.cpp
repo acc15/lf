@@ -1,38 +1,33 @@
 #include "cmd/impl/add_cmd.hpp"
-#include "io/log.hpp"
 #include "index/indexer.hpp"
-#include "util/string.hpp"
 
 namespace lf {
 
     add_cmd::add_cmd() : cmd(
         { "a", "add" }, 
-        "([--shallow|-s] (file|dir)+ | (--recursive|-r) dir+)", 
-        "adds specified file and directories to corresponding index files"
+        "adds specified file and directories to corresponding index files",
+        {
+            opt { "shallow", 'S', "add paths with SHALLOW mode", "paths", 0, opt::UNBOUNDED },
+            opt { "recursive", 'R', "add paths with RECURSIVE mode", "dirpaths", 0, opt::UNBOUNDED },
+            opt { "ignore", 'I', "add paths with IGNORE mode", "paths", 0, opt::UNBOUNDED },
+            opt { "", '\0', "same as with --shallow", "paths", 0, opt::UNBOUNDED },
+        },
+        "shallow"
     ) {
     }
 
-    int add_cmd::run(const std::span<const char*>& args) const {
-        sync_mode mode = sync_mode::SHALLOW;
-        
-        std::span<const char*> non_opts = args;
-        if (!non_opts.empty()) {
-            std::string opt = lower(args[0]);
-            if (opt == "--recursive" || opt == "-r") {
-                mode = sync_mode::RECURSIVE;
-                non_opts = non_opts.subspan(1);
-            } else if (opt == "--shallow" || opt == "-s") {
-                non_opts = non_opts.subspan(1);
-            }
-        }
+    int add_cmd::run(const opt_map& opts) const {
 
-        if (non_opts.empty()) {
-            log.error() && log() << *this;
-            return 1;
-        }
+        config cfg = config::load();
 
         indexer indexer;
-        return indexer.process(non_opts, mode) ? 0 : 1;
+        
+        bool success = true;
+        success &= indexer.process(cfg, opts["shallow"], sync_mode::SHALLOW);
+        success &= indexer.process(cfg, opts["recursive"], sync_mode::RECURSIVE);
+        success &= indexer.process(cfg, opts["ignore"], sync_mode::IGNORE);
+        success &= indexer.save_changes();
+        return success ? 0 : 1;
     }
 
 }

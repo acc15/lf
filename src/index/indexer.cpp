@@ -10,17 +10,15 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    bool indexer::process(const std::span<const char*> paths, sync_mode mode) {
-        const config cfg = config::load();
-
+    bool indexer::process(const config& cfg, const std::vector<std::string_view>& paths, sync_mode mode) {
         bool success = true;
-        for (std::string_view path: paths) {
-            success &= process_path(cfg, path, mode);
+        for (const std::string_view& p: paths) {
+            success &= process(cfg, p, mode);
         }
-        return success && save_changes();
+        return success;
     }
 
-    bool indexer::process_path(const config& cfg, std::string_view path_str, sync_mode mode) {
+    bool indexer::process(const config& cfg, std::string_view path_str, sync_mode mode) {
 
         fs::path path;
         try {

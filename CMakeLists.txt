@@ -30,7 +30,7 @@ add_library(lf_core
     src/tree/print.hpp
     src/tree/binary.hpp
 
-    # index files
+    # index
     src/index/sync_mode.hpp 
     src/index/sync_mode.cpp
     src/index/indexer.hpp
@@ -42,18 +42,20 @@ add_library(lf_core
     src/state/state_tree.hpp
     src/state/state_tree.cpp
 
-    # config files
+    # config
     src/config/config.hpp
     src/config/config.cpp
     src/config/config_parser.hpp
+
+    # utils
     src/util/string.hpp
     src/util/string.cpp
     src/util/pick.hpp
     src/util/console.hpp
     src/util/console.cpp
-    src/io/datetime.cpp
-    src/io/datetime.hpp
     src/util/sort.hpp
+
+    # io
     src/io/log.hpp
     src/io/log.cpp
     src/io/null_stream.hpp
@@ -62,8 +64,19 @@ add_library(lf_core
     src/io/format_stream.cpp
     src/io/joiner.hpp
     src/io/format.hpp
+    src/io/datetime.cpp
+    src/io/datetime.hpp
     src/io/util.hpp
     src/io/util.cpp
+
+    # opts
+    src/opts/opt_map.hpp
+    src/opts/opt_map.cpp
+    src/opts/opt.hpp
+    src/opts/opts.hpp
+    src/opts/opts.cpp
+
+    # fs
     src/fs/path.hpp 
     src/fs/path.cpp
     src/fs/util.hpp 
@@ -72,9 +85,11 @@ add_library(lf_core
     src/fs/error.cpp
     src/fs/serialization.hpp
     
+    # sync
     src/sync/synchronizer.cpp
     src/sync/synchronizer.hpp
 
+    # cmd
     src/cmd/cmd.hpp 
     src/cmd/cmd.cpp
     src/cmd/cmd_registry.hpp 
@@ -103,6 +118,7 @@ add_executable(lf_test
     test/unicode/unicode.cpp
 
     test/tree/tree.cpp
+    test/opts/opts.cpp
     
     test/cmd/cmd.cpp
     test/io/log_tester.hpp

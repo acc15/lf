@@ -15,9 +15,8 @@ namespace lf {
 
     class indexer {
     public:
-        bool process(const std::span<const char*> paths, sync_mode mode);
-
-        bool process_path(const config& cfg, std::string_view path_str, sync_mode mode);
+        bool process(const config& cfg, const std::vector<std::string_view>& paths, sync_mode mode);
+        bool process(const config& cfg, std::string_view path_str, sync_mode mode);
         bool save_changes() const;
 
     private:

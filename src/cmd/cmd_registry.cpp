@@ -28,7 +28,7 @@ namespace lf {
 
     cmd_registry::cmd_registry() {
         for (const cmd* cmd: list) {
-            for (const char* name: cmd->names) {
+            for (std::string_view name: cmd->names) {
                 _names[name] = cmd;
             }
         }
@@ -46,7 +46,10 @@ namespace lf {
             std::cerr << "Unknown command: " << cmd_name << std::endl << std::endl << *this;
             return 1;
         }
-        return it->second->run(args.subspan(1));
+
+        const cmd& cmd = *it->second;
+        const opt_map opts = cmd.opts.parse(args.subspan(1));
+        return cmd.run(opts);
     }
 
     std::ostream& operator<<(std::ostream& s, const cmd_registry& r) {
@@ -56,9 +59,9 @@ namespace lf {
 
         s << "Usage: " << std::endl << std::endl;
         for (const cmd* cmd: r.list) {
-            s << *cmd;
+            s << *cmd << std::endl;
         }
-        s << std::endl 
+        s  
             << "Environment variables: " << std::endl << std::endl
             << config::env_name << " - custom config file path, defaults to " << config::get_default_path() << std::endl
             << log::env_name << " - logging level (" << join("|", log::level_names) << "), defaults to " << log::level_names[log::default_level] << std::endl;

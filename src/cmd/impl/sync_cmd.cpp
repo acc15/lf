@@ -9,13 +9,19 @@
 
 namespace lf {
 
-    sync_cmd::sync_cmd(): cmd({ "s", "sync" },  "( sync names )*", "synchronizes mirrors") {
-    }
+    sync_cmd::sync_cmd(): cmd(
+        { "s", "sync" }, 
+        "synchronizes mirrors", 
+        { 
+            opt { "dry", 'd', "just print actions, but don't execute them" },
+            opt { "", '\0', "configured names to synchronize", "syncs", 0, opt::UNBOUNDED }
+        }
+    ) {}
 
-    int sync_cmd::run([[maybe_unused]] const std::span<const char*>& args) const {
+    int sync_cmd::run(const opt_map& opts) const {
         const config cfg = config::load();
 
-        const config::sync_entry_vec syncs = cfg.find_name_matches(args);
+        const config::sync_entry_vec syncs = cfg.find_name_matches(opts[""]);
         if (syncs.empty()) {
             log.error() && log() 
                 << "no one sync found by supplied names, declared sync names: " 
@@ -25,6 +31,7 @@ namespace lf {
         }
 
         for (const config::sync_entry* p: syncs) {
+            // TODO handle dry flag (opt.has("dry"))
             synchronizer s(p->first, p->second);
             try {
                 s.load();

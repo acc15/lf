@@ -129,14 +129,15 @@ namespace lf {
         return cfg;
     }
 
-    config::sync_entry_vec config::find_name_matches(const std::span<const char*>& names) const {
+    config::sync_entry_vec config::find_name_matches(const std::vector<std::string_view>& names) const {
         sync_entry_vec result;
         if (names.empty()) {
             std::transform(syncs.begin(), syncs.end(), std::back_inserter(result), [](const auto& ref) { return &ref; });
             return result;
         }
-        for (const char* n: names) {
-            const auto it = syncs.find(n);
+        for (std::string_view n: names) {
+            // TODO fix map
+            const auto it = syncs.find(static_cast<std::string>(n));
             if (it != syncs.end()) {
                 result.push_back(&(*it));
             }

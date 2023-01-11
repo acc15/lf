@@ -14,28 +14,20 @@ namespace lf {
 
     info_cmd::info_cmd(): cmd(
         {"i", "info"}, 
-        "[(i|index) | (s|state)]", 
-        "prints info about indexed files, their sync modes and current synchronization state"
+        "prints info about indexed files, their sync modes and current synchronization state",
+        { opt { "index", 'I', "prints index" }, opt { "state", 'S', "prints state"} }
     ) {
     }
     
-    int info_cmd::run(const std::span<const char*>& args) const {
+    int info_cmd::run(const opt_map& opts) const {
 
         const config cfg = config::load();
 
-        bool print_index = true;
-        bool print_state = true;
-
-        if (args.size() > 0) {
-            std::string_view arg = args[0];
-            if (arg == "i" || arg == "index") {
-                print_state = false;
-            } else if (arg == "s" || arg == "state") {
-                print_index = false;
-            } else {
-                std::cout << *this;
-                return 1;
-            }
+        bool print_index = opts.has("index");
+        bool print_state = opts.has("state");
+        if (!print_index && !print_state) {
+            print_index = true;
+            print_state = true;
         }
 
         const fs::path path = std::filesystem::current_path();

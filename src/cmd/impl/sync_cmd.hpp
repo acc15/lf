@@ -9,7 +9,7 @@ namespace lf {
     class sync_cmd: public cmd {
     public:
         sync_cmd();
-        int run(const std::span<const char*>& args) const override;
+        int run(const opt_map& opts) const override;
     };
 
 }
