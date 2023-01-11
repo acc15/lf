@@ -21,6 +21,6 @@ TEST_CASE("print", "[cmd_desc]") {
 
     REQUIRE(ss.str() == 
         "a, b, c - description\n"
-        "    --opt, -o - option description\n"
+        "    -o, --opt - option description\n"
     );
 }

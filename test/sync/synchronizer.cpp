@@ -78,9 +78,10 @@ TEST_CASE("local file deleted", "[synchronizer]") {
     s.state = state_tree(false, { {test_name, state_tree(true) } });
     s.run();
 
-    // removed from state and index
-    REQUIRE_FALSE( s.state.node(test_name) == nullptr ); 
-    REQUIRE_FALSE( s.index.node(test_name) == nullptr );
+    REQUIRE( s.index.node(test_name) != nullptr );
+
+    // removed from state
+    REQUIRE( s.state.node(test_name) == nullptr ); 
 
     REQUIRE_FALSE( fs::exists(sync.remote / test_name) );
     REQUIRE_FALSE( fs::exists(sync.local  / test_name) );
@@ -169,7 +170,7 @@ TEST_CASE("update file", "[synchronizer]") {
 
 }
 
-TEST_CASE("type ovewrite", "[synchronizer]") {
+TEST_CASE("file/dir ovewrite", "[synchronizer]") {
     
     bool local_or_remote = GENERATE(true, false);
     bool file_or_dir = GENERATE(true, false);
