@@ -136,8 +136,7 @@ namespace lf {
             return result;
         }
         for (std::string_view n: names) {
-            // TODO fix map
-            const auto it = syncs.find(static_cast<std::string>(n));
+            const auto it = syncs.find(n);
             if (it != syncs.end()) {
                 result.push_back(&(*it));
             }

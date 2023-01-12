@@ -131,6 +131,7 @@ add_executable(lf_test
     test/fs/path.cpp
     test/fs/serialization.cpp
     test/util/string.cpp
+    test/util/string_map.cpp
 
     test/sync/synchronizer.cpp
  )

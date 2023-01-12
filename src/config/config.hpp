@@ -2,7 +2,6 @@
 
 #include <filesystem>
 #include <string>
-#include <unordered_map>
 #include <istream>
 #include <concepts>
 #include <map>
@@ -10,6 +9,7 @@
 #include <span>
 
 #include "io/format.hpp"
+#include "util/string_map.hpp"
 
 namespace lf {
 
@@ -27,7 +27,7 @@ namespace lf {
             std::filesystem::path index;
         };
 
-        using sync_map = std::unordered_map<std::string, sync>;
+        using sync_map = unordered_string_map<sync>;
         using sync_entry = sync_map::value_type;
         using sync_entry_vec = std::vector<const sync_entry*>;
         using sync_entry_match_map = std::map<std::ptrdiff_t, sync_entry_vec>;
