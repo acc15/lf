@@ -1,7 +1,7 @@
 #pragma once
 
-#include "index/index_tree.hpp"
-#include "state/state_tree.hpp"
+#include "index/index.hpp"
+#include "state/state.hpp"
 #include "config/config.hpp"
 
 #include <vector>
@@ -29,8 +29,8 @@ namespace lf {
         const std::string& name;
         const config::sync& sync;
 
-        index_tree index;
-        state_tree state;
+        tracked_index index;
+        tracked_state state;
 
         std::vector<queue_item> queue;
 

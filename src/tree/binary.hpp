@@ -12,9 +12,6 @@
 
 namespace lf {
 
-    extern const char tree_signature[3];
-    extern const uint8_t tree_version;
-
     template <typename Tree>
     concept serializable_tree_concept = tree_concept<Tree> && requires {
         { Tree::file_signature } -> std::convertible_to<const char*>;

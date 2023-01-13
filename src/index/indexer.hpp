@@ -8,10 +8,8 @@
 #include <utility>
 #include <string_view>
 
-#include "index/index_tree.hpp"
+#include "index/index.hpp"
 #include "index/sync_mode.hpp"
-
-#include "util/change_state.hpp"
 
 namespace lf {
 
@@ -24,14 +22,13 @@ namespace lf {
         bool is_successful() const;
 
     private:
-        using index_change = change_state<index_tree>;
-        using index_map = std::unordered_map<std::filesystem::path, index_change>;
+        using index_map = std::unordered_map<std::filesystem::path, tracked_index>;
 
         bool success = true;
         index_map _indexes;
 
         void set_index_mode(const config::sync& sync, const std::filesystem::path& rel_path, sync_mode mode);
-        index_change& load_index(const std::filesystem::path& index_path);
+        tracked_index& load_index(const std::filesystem::path& index_path);
         
     };
 

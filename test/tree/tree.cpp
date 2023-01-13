@@ -4,7 +4,7 @@
 #include <fstream>
 #include <map>
 
-#include "state/state_tree.hpp"
+#include "state/state.hpp"
 
 #include "tree/print.hpp"
 #include "tree/binary.hpp"
@@ -14,38 +14,38 @@
 using namespace lf;
 using namespace std::filesystem;
 
-const state_tree test_tree = { false, {
-    { "a", state_tree { false, {
-        { "01.json", state_tree { false } }, 
-        { "02.yaml", state_tree { false } }
+const state test_tree = { false, {
+    { "a", state { false, {
+        { "01.json", state { false } }, 
+        { "02.yaml", state { false } }
     }}},
-    { "b", state_tree { false, {
-        { "03.sql", state_tree { true } }, 
-        { "04.jpg", state_tree { false } }
+    { "b", state { false, {
+        { "03.sql", state { true } }, 
+        { "04.jpg", state { false } }
     }}},
-    { "c", state_tree { false, {
-        { "05.cpp", state_tree { false } }, 
-        { "06.hpp", state_tree { true } }
+    { "c", state { false, {
+        { "05.cpp", state { false } }, 
+        { "06.hpp", state { true } }
     }}},
-    { "d", state_tree { false, {
-        { "07.txt", state_tree { true } }, 
-        { "08.bin", state_tree { true } }
+    { "d", state { false, {
+        { "07.txt", state { true } }, 
+        { "08.bin", state { true } }
     }}},
-    { "e", state_tree { true, {
-        { "09.json", state_tree { false } }, 
-        { "10.yaml", state_tree { false } }
+    { "e", state { true, {
+        { "09.json", state { false } }, 
+        { "10.yaml", state { false } }
     }}},
-    { "f", state_tree { true, {
-        { "11.sql", state_tree { true } }, 
-        { "12.jpg", state_tree { false } }
+    { "f", state { true, {
+        { "11.sql", state { true } }, 
+        { "12.jpg", state { false } }
     }}},
-    { "g", state_tree { true, {
-        { "13.cpp", state_tree { false } }, 
-        { "14.hpp", state_tree { true } }
+    { "g", state { true, {
+        { "13.cpp", state { false } }, 
+        { "14.hpp", state { true } }
     }}},
-    { "h", state_tree { true, {
-        { "15.txt", state_tree { true } }, 
-        { "16.bin", state_tree { true } }
+    { "h", state { true, {
+        { "15.txt", state { true } }, 
+        { "16.bin", state { true } }
     }}}
 }};
 
@@ -55,7 +55,7 @@ TEST_CASE("print", "[tree]") {
     std::stringstream ss;
 
     ss << std::boolalpha;
-    tree_print<state_tree, tree_entry_name_order<state_tree>>::print(ss, test_tree);
+    tree_print<state, tree_entry_name_order<state>>::print(ss, test_tree);
     
     const std::string str = ss.str();
     REQUIRE(str == 
@@ -87,7 +87,7 @@ TEST_CASE("print", "[tree]") {
     );
 }
 
-template <tree_data T>
+template <tree_data_concept T>
 void cmp_tree(const tree<T>& l, const tree<T>& r) {
     {
         INFO("l=" << l.data << ",r=" << r.data);
@@ -116,7 +116,7 @@ TEST_CASE("get", "[tree]") {
 }
 
 TEST_CASE("set update flags", "[tree]") {
-    state_tree tree;
+    state tree;
     tree.set(test_index_path, true);
     REQUIRE(tree.get(test_index_path));
 }
@@ -128,7 +128,7 @@ TEST_CASE("serialization", "[tree]") {
     REQUIRE( file << with_ref_format<format::BINARY>(test_tree) );
     REQUIRE( file.seekg(0).good() );
 
-    state_tree d;
+    state d;
     REQUIRE( file >> with_ref_format<format::BINARY>(d) );
 
     cmp_tree(test_tree, d);
@@ -139,23 +139,23 @@ TEST_CASE("deserialize with wrong signature", "[tree]") {
 
     std::stringstream ss("WRONGSIGNATUREHERE!!!");
 
-    state_tree d;
+    state d;
     REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(d) );
     REQUIRE( t.str().find("invalid file signature") != std::string::npos );
 }
 
 TEST_CASE("deserialize must fail on empty stream", "[tree]") {
-    state_tree result; 
+    state result; 
     std::stringstream ss;
     REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(result));
 }
 
 TEST_CASE("deserialize must clear entries", "[tree]") {
 
-    state_tree result; 
+    state result; 
     std::stringstream ss;
 
-    state_tree t1 = { true, { {"a", state_tree { true }} } };
+    state t1 = { true, { {"a", state { true }} } };
     REQUIRE( ss << with_cref_format<format::BINARY>(t1) );
     REQUIRE( ss >> with_ref_format<format::BINARY>(result) );
     ss.str("");
@@ -165,7 +165,7 @@ TEST_CASE("deserialize must clear entries", "[tree]") {
     REQUIRE(result.get("a") == true);
     REQUIRE(result.get("b") == false);
 
-    state_tree t2 = { false, { {"b", state_tree { true }} } };
+    state t2 = { false, { {"b", state { true }} } };
     REQUIRE( ss << with_cref_format<format::BINARY>(t2) );
     REQUIRE( ss >> with_ref_format<format::BINARY>(result) );
     ss.str("");
@@ -177,7 +177,7 @@ TEST_CASE("deserialize must clear entries", "[tree]") {
 }
 
 TEST_CASE("set", "[tree]") {
-    state_tree tree;
+    state tree;
     CHECK_FALSE( tree.set(false) );
     REQUIRE( tree.set(true) );
     CHECK_FALSE( tree.set(true) );
@@ -185,7 +185,7 @@ TEST_CASE("set", "[tree]") {
 }
 
 TEST_CASE("set must avoid creating entries with default flags only", "[tree]") {
-    state_tree tree;
+    state tree;
     REQUIRE( tree.entries.empty() );
 
     CHECK_FALSE( tree.set(test_index_path, false) );
@@ -193,7 +193,7 @@ TEST_CASE("set must avoid creating entries with default flags only", "[tree]") {
 }
 
 TEST_CASE("set must remove redunant entries", "[tree]") {
-    state_tree tree;
+    state tree;
 
     CHECK( tree.set(test_index_path, true) );
     REQUIRE( !tree.entries.empty() );
@@ -203,7 +203,7 @@ TEST_CASE("set must remove redunant entries", "[tree]") {
 }
 
 TEST_CASE("set must preserve adjanced entries when removing redunant entries", "[tree]") {
-    state_tree tree;
+    state tree;
 
     const path adjanced_path = test_index_path.parent_path() / "x.jpg";
 
@@ -219,7 +219,7 @@ TEST_CASE("set must preserve intermediate non-default nodes", "[tree]") {
     path intermediate_path = path("a") / "b";
     path file_path = intermediate_path / "c" / "file.txt";
 
-    state_tree tree;
+    state tree;
     CHECK( tree.set(intermediate_path, true) );
     CHECK( tree.set(file_path, true) );
     REQUIRE( tree.node(file_path) != nullptr );
@@ -236,7 +236,7 @@ TEST_CASE("set must keep entries with children", "[tree]") {
     const path intermediate_path = "a/b";
     const path nested_path = intermediate_path / "c/test.yaml";
 
-    state_tree tree;
+    state tree;
     CHECK( tree.set(intermediate_path, true) );
     CHECK( tree.set(nested_path, true) );
     REQUIRE( tree.node(nested_path) != nullptr );
@@ -251,7 +251,7 @@ TEST_CASE("remove must remove entries with children", "[tree]") {
     const path intermediate_path = "a/b";
     const path nested_path = intermediate_path / "c/test.yaml";
 
-    state_tree tree;
+    state tree;
     CHECK( tree.set(intermediate_path, true) );
     CHECK( tree.set(nested_path, true) );
     REQUIRE( tree.node(nested_path) != nullptr );
@@ -267,7 +267,7 @@ TEST_CASE("set must keep entries with single children", "[tree]") {
     const path p1 = common_path / "x/y";
     const path p2 = common_path / "z/w";
 
-    state_tree tree;
+    state tree;
     CHECK( tree.set(p1, true) );
     CHECK_FALSE( tree.set(p2, false) );
 

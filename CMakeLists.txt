@@ -29,18 +29,19 @@ add_library(lf_core
     src/tree/order.hpp
     src/tree/print.hpp
     src/tree/binary.hpp
+    src/tree/tracked_tree.hpp
 
     # index
     src/index/sync_mode.hpp 
     src/index/sync_mode.cpp
+    src/index/index.hpp
+    src/index/index.cpp
     src/index/indexer.hpp
     src/index/indexer.cpp
-    src/index/index_tree.hpp
-    src/index/index_tree.cpp
 
     # state
-    src/state/state_tree.hpp
-    src/state/state_tree.cpp
+    src/state/state.hpp
+    src/state/state.cpp
 
     # config
     src/config/config.hpp

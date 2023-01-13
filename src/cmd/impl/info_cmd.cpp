@@ -5,8 +5,8 @@
 
 #include "config/config.hpp"
 
-#include "state/state_tree.hpp"
-#include "index/index_tree.hpp"
+#include "state/state.hpp"
+#include "index/index.hpp"
 
 namespace fs = std::filesystem;
 
@@ -38,10 +38,10 @@ namespace lf {
 
         for (const config::sync_entry* p: v) {
             if (print_state) {
-                print_tree<state_tree>(p->first, p->second.state);
+                print_tree<state>(p->first, p->second.state);
             }
             if (print_index) {
-                print_tree<index_tree>(p->first, p->second.index);
+                print_tree<index>(p->first, p->second.index);
             }
         }
         return 0;

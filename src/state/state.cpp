@@ -1,12 +1,12 @@
-#include "state/state_tree.hpp"
+#include "state/state.hpp"
 
 namespace lf {
 
-    const char* const state_tree::name = "state";
-    const char state_tree::file_signature[4] = "LFS";
-    const uint8_t state_tree::file_version = 0;
+    const char* const state::name = "state";
+    const char state::file_signature[4] = "LFS";
+    const uint8_t state::file_version = 0;
 
-    state_tree::state_tree(data_type data, const map_type& map): tree { .data = data, .entries = map } {}
+    state::state(data_type data, const map_type& map): tree { .data = data, .entries = map } {}
 
     std::ostream& operator<<(std::ostream& s, const with_format<format::TREE, const bool&> data) {
         return s.put(data.value ? '+' : ' ');

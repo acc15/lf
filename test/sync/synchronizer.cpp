@@ -55,8 +55,8 @@ TEST_CASE("local file added", "[synchronizer]") {
     write_text(sync.local / test_deep_path, test_content);
     
     synchronizer s("test", sync);
-    s.index = index_tree(sync_mode::UNSPECIFIED, { 
-        { "a", index_tree(sync_mode::UNSPECIFIED, { { test_name, index_tree(sync_mode::SHALLOW) } }) }
+    s.index = lf::index(sync_mode::UNSPECIFIED, { 
+        { "a", lf::index(sync_mode::UNSPECIFIED, { { test_name, lf::index(sync_mode::SHALLOW) } }) }
     }); 
     s.run();
 
@@ -74,8 +74,8 @@ TEST_CASE("local file deleted", "[synchronizer]") {
     write_text(sync.remote / test_name, test_content);
 
     synchronizer s("test", sync);
-    s.index = index_tree(sync_mode::UNSPECIFIED, { {test_name, index_tree(sync_mode::SHALLOW) } });
-    s.state = state_tree(false, { {test_name, state_tree(true) } });
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
+    s.state = lf::state(false, { {test_name, lf::state(true) } });
     s.run();
 
     REQUIRE( s.index.node(test_name) != nullptr );
@@ -95,7 +95,7 @@ TEST_CASE("remote file deleted", "[synchronizer]") {
     
     synchronizer s("test", sync);
     // index is empty due to file already removed from index (see test above)
-    s.state = state_tree(false, { {test_name, state_tree(true) } });
+    s.state = lf::state(false, { {test_name, lf::state(true) } });
     s.run();
 
     REQUIRE_FALSE( fs::exists(sync.remote / test_name) );
@@ -111,7 +111,7 @@ TEST_CASE("remote added", "[synchronizer]") {
     write_text(sync.remote / test_name, test_content);
 
     synchronizer s("test", sync);
-    s.index = index_tree(sync_mode::UNSPECIFIED, {{ test_name, index_tree(sync_mode::SHALLOW) }});
+    s.index = lf::index(sync_mode::UNSPECIFIED, {{ test_name, lf::index(sync_mode::SHALLOW) }});
     s.run();
 
     REQUIRE( read_text(sync.local / "test.txt") == test_content );
@@ -159,7 +159,7 @@ TEST_CASE("update file", "[synchronizer]") {
     auto change_t = plus50ms_last_write_time(l / test_name, r / test_name);
 
     synchronizer s("test", sync);
-    s.index = index_tree(sync_mode::UNSPECIFIED, { {test_name, index_tree(sync_mode::SHALLOW) } });
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
     s.run();
 
     REQUIRE( read_text(r / test_name) == test_content );
@@ -194,7 +194,7 @@ TEST_CASE("file/dir ovewrite", "[synchronizer]") {
     );
 
     synchronizer s("test", sync);
-    s.index = index_tree(sync_mode::UNSPECIFIED, { {test_name, index_tree(sync_mode::SHALLOW) } });
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
     s.run();
 
     fs::file_type expected_type = file_or_dir ? fs::file_type::regular : fs::file_type::directory;
@@ -219,7 +219,7 @@ TEST_CASE("local shallow dir to remote", "[synchronizer]") {
     write_text(sync.local / "a" / "c.txt", test_content);
 
     synchronizer s("test", sync);
-    s.index = index_tree(sync_mode::UNSPECIFIED, { {"a", index_tree(sync_mode::SHALLOW, { { "a.txt", index_tree(sync_mode::IGNORE) } }) } });
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {"a", lf::index(sync_mode::SHALLOW, { { "a.txt", lf::index(sync_mode::IGNORE) } }) } });
     s.run();
 
     REQUIRE_FALSE( fs::exists(sync.remote / "a" / "b.txt") ); // ignored

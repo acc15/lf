@@ -1,7 +1,5 @@
 #include "sync/synchronizer.hpp"
 #include "io/log.hpp"
-#include "fs/serialization.hpp"
-#include "tree/binary.hpp"
 
 #include <filesystem>
 #include <vector>
@@ -21,7 +19,7 @@ namespace lf {
     }
 
     void synchronizer::run() {
-        queue = { queue_item { .path = fs::path(), .mode = index.data } };
+        queue = { queue_item { .path = fs::path(), .mode = index.get() } };
         while (!queue.empty()) {
             const queue_item& item = queue.back();
             handle(item, path_info(sync.local / item.path), path_info(sync.remote / item.path));
@@ -49,22 +47,20 @@ namespace lf {
             << std::endl;
         
         try {
-            load_file(sync.index, index);
+            index.load(sync.index);
         } catch (const file_not_found_error& e) {
             log.warn() && log() << e.what() << std::endl;
         }
-
         try {
-            load_file(sync.state, state);
+            state.load(sync.state);
         } catch (const file_not_found_error& e) {
             log.debug() && log() << e.what() << std::endl;
         }
-
     }
 
     void synchronizer::save() {
-        save_file(sync.index, index);
-        save_file(sync.state, state);
+        index.save_if_changed(sync.index);
+        state.save_if_changed(sync.state);
     }
 
 }

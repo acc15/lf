@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstring>
-
 #include <string_view>
 #include <filesystem>
 #include <fstream>

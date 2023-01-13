@@ -3,7 +3,6 @@
 #include "fs/path.hpp"
 #include "io/log.hpp"
 #include "config/config.hpp"
-#include "tree/binary.hpp"
 
 namespace fs = std::filesystem;
 
@@ -50,7 +49,7 @@ namespace lf {
     }
 
     void indexer::save_changes() {
-        for (const auto& p: _indexes) {
+        for (auto& p: _indexes) {
             try {
                 p.second.save_if_changed(p.first);
             } catch (const std::runtime_error& e) {
@@ -65,17 +64,16 @@ namespace lf {
     }
 
     void indexer::set_index_mode(const config::sync& sync, const std::filesystem::path& rel_path, sync_mode mode) {
-        index_change& change = load_index(sync.index);
-        change.on(change.state.set(rel_path, mode));
+        load_index(sync.index).set(rel_path, mode);
     }
 
-    indexer::index_change& indexer::load_index(const std::filesystem::path& index_path) {
+    tracked_index& indexer::load_index(const std::filesystem::path& index_path) {
         index_map::iterator it = _indexes.find(index_path);
         if (it != _indexes.end()) {
             return it->second;
         }
 
-        const auto emplace_result = _indexes.emplace(index_path, change_state<index_tree> {});
+        const auto emplace_result = _indexes.emplace(index_path, tracked_index {});
         if (emplace_result.second) {
             try {
                 emplace_result.first->second.load(index_path);
