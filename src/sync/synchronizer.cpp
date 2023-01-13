@@ -15,7 +15,7 @@ namespace lf {
     {
     }
 
-    synchronizer::synchronizer(const std::string& name, const config::sync& sync): name(name), sync(sync) {
+    synchronizer::synchronizer(const std::string& name, const config::sync& sync, bool dry): name(name), sync(sync), dry(dry) {
     }
 
     void synchronizer::run() {
@@ -39,13 +39,6 @@ namespace lf {
     }
 
     void synchronizer::load() {
-        
-        log.info() && log() 
-            << "syncing \"" << name 
-            << "\", local: " << sync.local 
-            << ", remote: " << sync.remote 
-            << std::endl;
-        
         try {
             index.load(sync.index);
         } catch (const file_not_found_error& e) {

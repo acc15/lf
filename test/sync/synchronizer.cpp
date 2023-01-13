@@ -54,7 +54,7 @@ TEST_CASE("local file added", "[synchronizer]") {
     const fs::path test_deep_path = fs::path("a") / test_name; 
     write_text(sync.local / test_deep_path, test_content);
     
-    synchronizer s("test", sync);
+    synchronizer s("test", sync, false);
     s.index = lf::index(sync_mode::UNSPECIFIED, { 
         { "a", lf::index(sync_mode::UNSPECIFIED, { { test_name, lf::index(sync_mode::SHALLOW) } }) }
     }); 
@@ -73,7 +73,7 @@ TEST_CASE("local file deleted", "[synchronizer]") {
 
     write_text(sync.remote / test_name, test_content);
 
-    synchronizer s("test", sync);
+    synchronizer s("test", sync, false);
     s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
     s.state = lf::state(false, { {test_name, lf::state(true) } });
     s.run();
@@ -93,7 +93,7 @@ TEST_CASE("remote file deleted", "[synchronizer]") {
 
     write_text(sync.local / test_name, test_content);
     
-    synchronizer s("test", sync);
+    synchronizer s("test", sync, false);
     // index is empty due to file already removed from index (see test above)
     s.state = lf::state(false, { {test_name, lf::state(true) } });
     s.run();
@@ -110,7 +110,7 @@ TEST_CASE("remote added", "[synchronizer]") {
 
     write_text(sync.remote / test_name, test_content);
 
-    synchronizer s("test", sync);
+    synchronizer s("test", sync, false);
     s.index = lf::index(sync_mode::UNSPECIFIED, {{ test_name, lf::index(sync_mode::SHALLOW) }});
     s.run();
 
@@ -124,7 +124,7 @@ TEST_CASE("index removed", "[synchronizer]") {
     write_text(sync.local / test_name, test_content);
     write_text(sync.remote / test_name, test_content);
 
-    synchronizer s("test", sync);
+    synchronizer s("test", sync, false);
     s.run();
 
     REQUIRE_FALSE( fs::exists(sync.remote / test_name) );
@@ -158,7 +158,7 @@ TEST_CASE("update file", "[synchronizer]") {
 
     auto change_t = plus50ms_last_write_time(l / test_name, r / test_name);
 
-    synchronizer s("test", sync);
+    synchronizer s("test", sync, false);
     s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
     s.run();
 
@@ -193,7 +193,7 @@ TEST_CASE("file/dir ovewrite", "[synchronizer]") {
         (!local_or_remote ? sync.local : sync.remote) / test_name
     );
 
-    synchronizer s("test", sync);
+    synchronizer s("test", sync, false);
     s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
     s.run();
 
@@ -218,7 +218,7 @@ TEST_CASE("local shallow dir to remote", "[synchronizer]") {
     write_text(sync.local / "a" / "b.txt", test_content);
     write_text(sync.local / "a" / "c.txt", test_content);
 
-    synchronizer s("test", sync);
+    synchronizer s("test", sync, false);
     s.index = lf::index(sync_mode::UNSPECIFIED, { {"a", lf::index(sync_mode::SHALLOW, { { "a.txt", lf::index(sync_mode::IGNORE) } }) } });
     s.run();
 

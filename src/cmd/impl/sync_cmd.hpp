@@ -2,6 +2,7 @@
 
 #include <span>
 
+#include "config/config.hpp"
 #include "../cmd.hpp"
 
 namespace lf {
@@ -10,6 +11,9 @@ namespace lf {
     public:
         sync_cmd();
         int run(const opt_map& opts) const override;
+
+    private:
+        bool do_sync(const std::string& name, const config::sync& sync, bool dry) const;
     };
 
 }

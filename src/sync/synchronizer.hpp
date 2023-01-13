@@ -24,11 +24,12 @@ namespace lf {
             sync_mode mode;
         };
 
-        synchronizer(const std::string& name, const config::sync& sync);
+        synchronizer(const std::string& name, const config::sync& sync, bool dry);
 
         const std::string& name;
         const config::sync& sync;
 
+        bool dry;
         tracked_index index;
         tracked_state state;
 

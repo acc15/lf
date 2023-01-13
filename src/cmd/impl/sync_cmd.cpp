@@ -30,19 +30,30 @@ namespace lf {
             return 1;
         }
 
+        bool ok = true;
         for (const config::sync_entry* p: syncs) {
-            // TODO handle dry flag (opt.has("dry"))
-            synchronizer s(p->first, p->second);
-            try {
-                s.load();
-                s.run();
-                s.save();
-            } catch (const std::runtime_error& e) {
-                log.error() && log() << "unable to sync \"" << p->first << "\": " << e.what() << std::endl;
-            }
+            ok &= do_sync(p->first, p->second, opts.has("dry"));
         }
+        return ok ? 0 : 1;
+    }
 
-        return 0;
+    bool sync_cmd::do_sync(const std::string& name, const config::sync& sync, bool dry) const {
+        log.info() && log() 
+            << "syncing \"" << name
+            << "\", local: " << sync.local 
+            << ", remote: " << sync.remote 
+            << std::endl;
+
+        synchronizer s(name, sync, dry);
+        try {
+            s.load();
+            s.run();
+            s.save();
+        } catch (const std::runtime_error& e) {
+            log.error() && log() << "unable to sync \"" << name << "\": " << e.what() << std::endl;
+            return false;
+        }
+        return true;
     }
 
 }
