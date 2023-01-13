@@ -36,17 +36,17 @@ namespace lf {
             return const_cast<tree*>(this)->node(path);
         }
 
+        data_type get(const std::filesystem::path& path) const {
+            const tree* e = node(path);
+            return e != nullptr ? e->data : data_type {};
+        }
+
         bool set(const data_type& other) {
             if (data == other) {
                 return false;
             }
             data = other;
             return true;
-        }
-
-        data_type get(const std::filesystem::path& path) const {
-            const tree* e = node(path);
-            return e != nullptr ? e->data : T();
         }
 
         bool set(const std::filesystem::path& path, const T& new_data) {
@@ -79,7 +79,7 @@ namespace lf {
                 std::string key = el.string();
                 auto eit = e->entries.find(key);
                 if (eit == e->entries.end()) {
-                    return e->entries.empty() ? removal_node->remove(removal_key) : false;
+                    return e->entries.empty() ? removal_node->erase(removal_key) : false;
                 }
                 if (removal_key == nullptr || e->entries.size() > 1 || e->data != data_type {}) {
                     removal_node = e;
@@ -90,16 +90,12 @@ namespace lf {
 
             // e pointing to node specified by path
             return !keep_default_subtree || e->entries.empty() 
-                ? removal_node->remove(removal_key) 
+                ? removal_node->erase(removal_key) 
                 : e->set({});
         }
 
-        bool remove(const std::string* key_ptr) {
-            if (key_ptr == nullptr) {
-                return false;
-            }
-            entries.erase(*key_ptr);
-            return true;
+        bool erase(const std::string* key_ptr) {
+            return key_ptr != nullptr && entries.erase(*key_ptr) != 0;
         }
 
     };
