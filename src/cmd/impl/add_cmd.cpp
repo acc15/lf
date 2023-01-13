@@ -21,13 +21,12 @@ namespace lf {
         config cfg = config::load();
 
         indexer indexer;
+        indexer.process(cfg, opts["shallow"], sync_mode::SHALLOW);
+        indexer.process(cfg, opts["recursive"], sync_mode::RECURSIVE);
+        indexer.process(cfg, opts["ignore"], sync_mode::IGNORE);
+        indexer.save_changes();
         
-        bool success = true;
-        success &= indexer.process(cfg, opts["shallow"], sync_mode::SHALLOW);
-        success &= indexer.process(cfg, opts["recursive"], sync_mode::RECURSIVE);
-        success &= indexer.process(cfg, opts["ignore"], sync_mode::IGNORE);
-        success &= indexer.save_changes();
-        return success ? 0 : 1;
+        return indexer.is_successful() ? 0 : 1;
     }
 
 }

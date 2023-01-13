@@ -16,9 +16,10 @@ namespace lf {
         const config cfg = config::load();
 
         indexer indexer;
-        bool success = indexer.process(cfg, opts[""], sync_mode::UNSPECIFIED);
-        success &= indexer.save_changes();
-        return success ? 0 : 1;
+        indexer.process(cfg, opts[""], sync_mode::UNSPECIFIED);
+        indexer.save_changes();
+
+        return indexer.is_successful() ? 0 : 1;
     }
 
 }

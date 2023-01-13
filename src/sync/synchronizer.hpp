@@ -22,7 +22,6 @@ namespace lf {
         struct queue_item {
             std::filesystem::path path;
             sync_mode mode;
-            index_tree* index;
         };
 
         synchronizer(const std::string& name, const config::sync& sync);
@@ -41,7 +40,7 @@ namespace lf {
 
     private:
 
-        void handle(const queue_item& item);
+        void handle(const queue_item& item, const path_info& l, const path_info& r);
 
     };
 

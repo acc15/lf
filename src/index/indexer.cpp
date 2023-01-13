@@ -3,29 +3,27 @@
 #include "fs/path.hpp"
 #include "io/log.hpp"
 #include "config/config.hpp"
-#include "fs/serialization.hpp"
 #include "tree/binary.hpp"
 
 namespace fs = std::filesystem;
 
 namespace lf {
 
-    bool indexer::process(const config& cfg, const std::vector<std::string_view>& paths, sync_mode mode) {
-        bool success = true;
+    void indexer::process(const config& cfg, const std::vector<std::string_view>& paths, sync_mode mode) {
         for (const std::string_view& p: paths) {
-            success &= process(cfg, p, mode);
+            process(cfg, p, mode);
         }
-        return success;
     }
 
-    bool indexer::process(const config& cfg, std::string_view path_str, sync_mode mode) {
+    void indexer::process(const config& cfg, std::string_view path_str, sync_mode mode) {
 
         fs::path path;
         try {
             path = normalize_path(path_str);
         } catch (const fs::filesystem_error& ex) {
             log.error() && log() << "unable to normalize path \"" << path_str << "\", error: " << ex.what() << std::endl;
-            return false;
+            success = false;
+            return;
         }
 
         fs::file_status status = fs::status(path);
@@ -33,12 +31,14 @@ namespace lf {
             log.error() && log() << "recursive can be used only for existing directories, but " 
                 << path << " doesn't denote a directory" 
                 << std::endl;
-            return false;
+            success = false;
+            return;
         }
         
         if (mode != sync_mode::UNSPECIFIED && status.type() == fs::file_type::not_found) {
             log.error() && log() << "path " << path << " doesn't exists" << std::endl;
-            return false;
+            success = false;
+            return;
         }
 
         config::sync_entry_vec matches = cfg.find_most_specific_local_matches(path);
@@ -46,27 +46,27 @@ namespace lf {
             log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e->first << "\" sync index " << e->second.index << std::endl;
             set_index_mode(e->second, relative_path(path, e->second.local), mode);
         }
-        return true;
+
     }
 
-    bool indexer::save_changes() const {
-        bool success = true;
+    void indexer::save_changes() {
         for (const auto& p: _indexes) {
-            if (p.second.second) {
-                try {
-                    save_file<index_tree>(p.first, p.second.first);
-                } catch (const std::runtime_error& e) {
-                    log.error() && log() << e.what() << std::endl;
-                    success = false;
-                }
+            try {
+                p.second.save_if_changed(p.first);
+            } catch (const std::runtime_error& e) {
+                log.error() && log() << e.what() << std::endl;
+                success = false;
             }
         }
+    }
+
+    bool indexer::is_successful() const {
         return success;
     }
 
     void indexer::set_index_mode(const config::sync& sync, const std::filesystem::path& rel_path, sync_mode mode) {
         index_change& change = load_index(sync.index);
-        change.second |= change.first.set(rel_path, mode);
+        change.on(change.state.set(rel_path, mode));
     }
 
     indexer::index_change& indexer::load_index(const std::filesystem::path& index_path) {
@@ -75,10 +75,10 @@ namespace lf {
             return it->second;
         }
 
-        const auto emplace_result = _indexes.emplace(index_path, std::make_pair(index_tree {}, false));
+        const auto emplace_result = _indexes.emplace(index_path, change_state<index_tree> {});
         if (emplace_result.second) {
             try {
-                load_file<index_tree>(index_path, emplace_result.first->second.first);
+                emplace_result.first->second.load(index_path);
             } catch (const std::runtime_error& e) {
                 log.debug() && log() << e.what() << std::endl;
             }

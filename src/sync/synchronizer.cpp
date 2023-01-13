@@ -10,7 +10,6 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-
     synchronizer::path_info::path_info(const std::filesystem::path& path): 
         path(path), 
         status(fs::status(path)), 
@@ -22,46 +21,22 @@ namespace lf {
     }
 
     void synchronizer::run() {
-        
-        queue = { 
-            queue_item { 
-                .path = fs::path(), 
-                .mode = index.data, 
-                .index = &index 
-            } 
-        };
-        
+        queue = { queue_item { .path = fs::path(), .mode = index.data } };
         while (!queue.empty()) {
             const queue_item& item = queue.back();
-            handle(item);
+            handle(item, path_info(sync.local / item.path), path_info(sync.remote / item.path));
             queue.pop_back();
         }
-
     }
 
-    void synchronizer::handle(const queue_item& item) {
-        const path_info l(sync.local / item.path);
-        const path_info r(sync.remote / item.path);
-
+    void synchronizer::handle(const queue_item& item, const path_info& l, const path_info& r) {
         if (l.type == fs::file_type::not_found && r.type == fs::file_type::not_found) {
-            log.info() && log() << item.path << ": no file or directory exists in local and remote side" << std::endl;
-            return;
-        }
-
-        switch (item.mode) {
-        case sync_mode::IGNORE:
-            if (r.type == fs::file_type::not_found) {
-                log.info() && log() << item.path << ": is ignored, removing from remote side" << std::endl;
-                fs::remove_all(r.path);
-            } else {
-                log.info() && log() << item.path << ": is ignored, skipping" << std::endl;
-            }
+            log.info() && log() << item.path << ": no file or directory exists on local and remote sides" << std::endl;
+            index.remove(item.path);
             state.remove(item.path);
             return;
-
-        
-            
         }
+
 
     }
 
@@ -88,6 +63,7 @@ namespace lf {
     }
 
     void synchronizer::save() {
+        save_file(sync.index, index);
         save_file(sync.state, state);
     }
 
