@@ -54,8 +54,8 @@ namespace lf {
         
         void copy_file_with_timestamp(const queue_item& item, const path_info& src, const path_info& dst) const;
         
-        void add_to_queue(const queue_item& item, const std::filesystem::path* dir_1, const std::filesystem::path* dir_2);
-        void add_dir_names(const std::filesystem::path* dir_path, const queue_item& item, sync_mode_map& dest) const;
+        void queue_dir_entries(const queue_item& item, const std::filesystem::path* dir_1, const std::filesystem::path* dir_2 = nullptr);
+        void add_dir_names(const queue_item& item, const std::filesystem::path* dir_path, sync_mode_map& dest) const;
         void add_state_names(const queue_item& item, sync_mode_map& dest) const;
         void add_index_names(const queue_item& item, sync_mode_map& dest) const;
 

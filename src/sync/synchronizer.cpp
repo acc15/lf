@@ -96,7 +96,7 @@ namespace lf {
 
     void synchronizer::handle_dirs(const queue_item& item, const path_info& src, const path_info& dst) {
         log.info() && log() << item.path << ": both are directories, processing children" << std::endl;
-        add_to_queue(item, &src.path, &dst.path);
+        queue_dir_entries(item, &src.path, &dst.path);
     }
 
     void synchronizer::handle_not_found(const queue_item& item, const path_info& src, const path_info& dst) {
@@ -123,7 +123,7 @@ namespace lf {
             
             log.info() && log() << item.path << ": creating directory in " << dst.name << std::endl;
             fs::create_directory(dst.path, src.path);
-            add_to_queue(item, &src.path, nullptr);
+            queue_dir_entries(item, &src.path);
 
         } else if (item.mode != sync_mode::UNSPECIFIED) {
             
@@ -137,13 +137,13 @@ namespace lf {
         }
     }
 
-    void synchronizer::add_to_queue(const queue_item& item, const std::filesystem::path* dir_1, const std::filesystem::path* dir_2) {
+    void synchronizer::queue_dir_entries(const queue_item& item, const std::filesystem::path* dir_1, const std::filesystem::path* dir_2) {
         
         sync_mode_map map;
 
         add_state_names(item, map);
-        add_dir_names(dir_1, item, map);
-        add_dir_names(dir_2, item, map);
+        add_dir_names(item, dir_1, map);
+        add_dir_names(item, dir_2, map);
         add_index_names(item, map);
         
         for (const auto& child_pair: map) {
@@ -159,7 +159,7 @@ namespace lf {
         state.remove(item.path);
     }
 
-    void synchronizer::add_dir_names(const std::filesystem::path* dir_path, const queue_item& item, sync_mode_map& dest) const {
+    void synchronizer::add_dir_names(const queue_item& item, const std::filesystem::path* dir_path, sync_mode_map& dest) const {
         if (dir_path == nullptr || item.mode == sync_mode::UNSPECIFIED) {
             return;
         }
