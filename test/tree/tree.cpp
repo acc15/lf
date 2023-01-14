@@ -261,6 +261,18 @@ TEST_CASE("remove must remove entries with children", "[tree]") {
 
 }
 
+TEST_CASE("remove must keep parent entries with non-default value", "[tree]") {
+    
+    const path parent = path("a") / "b";
+    const path child = parent / "test.yaml";
+
+    state tree;
+    CHECK( tree.set(parent, true) );
+    CHECK_FALSE( tree.remove(child) );
+    REQUIRE( tree.node(parent) != nullptr );
+
+}
+
 TEST_CASE("set must keep entries with single children", "[tree]") {
 
     const path common_path = "a/b";

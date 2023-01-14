@@ -164,7 +164,7 @@ TEST_CASE("local shallow dir to remote", "[synchronizer]") {
 
 }
 
-TEST_CASE("update shallow dir file to remote", "[synchronizer]") {
+TEST_CASE("update shallow dir file", "[synchronizer]") {
 
     auto sync = make_sync(true);
 
@@ -182,6 +182,35 @@ TEST_CASE("update shallow dir file to remote", "[synchronizer]") {
 
     REQUIRE( s.state.get(test_path) );
     REQUIRE(read_text(sync.remote / test_path) == test_content);
+
+}
+
+TEST_CASE("delete shallow dir file", "[synchronizer]") {
+
+    auto sync = make_sync(true);
+
+    const fs::path a = fs::path("dir") / "a.txt";
+    const fs::path b = fs::path("dir") / "b.txt";
+
+    write_text(sync.local / a, test_content);
+    write_text(sync.remote / a, test_content);
+    write_text(sync.remote / b, test_content);
+
+    synchronizer s("test", sync);
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {"dir", lf::index(sync_mode::SHALLOW)} });
+    s.state = lf::state(false, {{"dir", lf::state(true, {
+        {"a.txt", lf::state(true)},
+        {"b.txt", lf::state(true)}
+    }) }});
+    s.run();
+
+    REQUIRE( fs::exists(sync.remote / a ));
+    REQUIRE_FALSE( fs::exists(sync.remote / b ));
+
+    REQUIRE( s.index.get("dir") == sync_mode::SHALLOW );
+    REQUIRE( s.state.get("dir") );
+    REQUIRE( s.state.get(a) );
+    REQUIRE_FALSE( s.state.get(b) );
 
 }
 

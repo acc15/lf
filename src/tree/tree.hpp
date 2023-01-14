@@ -85,7 +85,7 @@ namespace lf {
                 std::string key = el.string();
                 auto eit = e->entries.find(key);
                 if (eit == e->entries.end()) {
-                    return e->entries.empty() ? removal_node->erase(removal_key) : false;
+                    return e->entries.empty() && e->data == data_type {} ? removal_node->erase(removal_key) : false;
                 }
                 if (removal_key == nullptr || e->entries.size() > 1 || e->data != data_type {}) {
                     removal_node = e;
