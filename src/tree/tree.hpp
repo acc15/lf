@@ -42,22 +42,27 @@ namespace lf {
             return e != nullptr ? e->data : data_type {};
         }
 
-        bool set(const data_type& other) {
-            if (data == other) {
-                return false;
+        bool set(const data_type& other, bool remove_children = false) {
+            bool modified = false;
+            if (data != other) {
+                data = other;
+                modified = true;
             }
-            data = other;
-            return true;
+            if (remove_children && !entries.empty()) {
+                entries.clear();
+                modified = true;
+            }
+            return modified;
         }
 
-        bool set(const std::filesystem::path& path, const T& new_data) {
-            return path.empty() ? set(new_data) : new_data != data_type {}
-                ? create_node(path).set(new_data)
-                : set_default(path, true);
+        bool set(const std::filesystem::path& path, const T& new_data, bool remove_children = false) {
+            return path.empty() ? set(new_data, remove_children) : new_data != data_type {}
+                ? create_node(path).set(new_data, remove_children)
+                : set_default(path, remove_children);
         }
 
         bool remove(const std::filesystem::path& path) {
-            return set_default(path, false);
+            return set_default(path, true);
         }
 
     private:
@@ -69,7 +74,7 @@ namespace lf {
             return *e;
         }
 
-        bool set_default(const std::filesystem::path& path, bool keep_default_subtree) {
+        bool set_default(const std::filesystem::path& path, bool remove_children) {
 
             tree* e = this;
 
@@ -90,7 +95,7 @@ namespace lf {
             }
 
             // e pointing to node specified by path
-            return !keep_default_subtree || e->entries.empty() 
+            return remove_children || e->entries.empty() 
                 ? removal_node->erase(removal_key) 
                 : e->set({});
         }

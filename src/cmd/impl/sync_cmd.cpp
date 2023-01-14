@@ -13,7 +13,6 @@ namespace lf {
         { "s", "sync" }, 
         "synchronizes mirrors", 
         { 
-            opt { "dry", 'd', "just print actions, but don't execute them" },
             opt { "", '\0', "configured names to synchronize", "syncs", 0, opt::UNBOUNDED }
         }
     ) {}
@@ -32,19 +31,19 @@ namespace lf {
 
         bool ok = true;
         for (const config::sync_entry* p: syncs) {
-            ok &= do_sync(p->first, p->second, opts.has("dry"));
+            ok &= do_sync(p->first, p->second);
         }
         return ok ? 0 : 1;
     }
 
-    bool sync_cmd::do_sync(const std::string& name, const config::sync& sync, bool dry) const {
+    bool sync_cmd::do_sync(const std::string& name, const config::sync& sync) const {
         log.info() && log() 
             << "syncing \"" << name
             << "\", local: " << sync.local 
             << ", remote: " << sync.remote 
             << std::endl;
 
-        synchronizer s(name, sync, dry);
+        synchronizer s(name, sync);
         try {
             s.load();
             s.run();

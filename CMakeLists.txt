@@ -48,7 +48,7 @@ add_library(lf_core
     src/config/config.cpp
     src/config/config_parser.hpp
 
-    # utils
+    # util
     src/util/string.hpp
     src/util/string.cpp
     src/util/pick.hpp
@@ -67,6 +67,8 @@ add_library(lf_core
     src/io/format.hpp
     src/io/datetime.cpp
     src/io/datetime.hpp
+    src/io/file_type.cpp
+    src/io/file_type.hpp
     src/io/util.hpp
     src/io/util.cpp
 
@@ -80,8 +82,6 @@ add_library(lf_core
     # fs
     src/fs/path.hpp 
     src/fs/path.cpp
-    src/fs/util.hpp 
-    src/fs/util.cpp
     src/fs/error.hpp
     src/fs/error.cpp
     src/fs/serialization.hpp

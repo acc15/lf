@@ -62,12 +62,12 @@ namespace lf {
             changed |= root.remove(path);
         }
 
-        void set(const data_type& value) {
-            changed |= root.set(value);
+        void set(const data_type& value, bool remove_children = false) {
+            changed |= root.set(value, remove_children);
         }
 
-        void set(const std::filesystem::path& path, const data_type& value) {
-            changed |= root.set(path, value);
+        void set(const std::filesystem::path& path, const data_type& value, bool remove_children = false) {
+            changed |= root.set(path, value, remove_children);
         }
 
     };

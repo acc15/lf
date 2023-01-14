@@ -10,11 +10,8 @@
 namespace fs = std::filesystem;
 using namespace lf;
 
-config::sync make_sync(const std::string& suffix = "") {
-    std::string name = Catch::getResultCapture().getCurrentTestName();
-    if (!suffix.empty()) {
-        name += " " + suffix;
-    }
+config::sync make_sync(bool local_to_remote) {
+    std::string name = Catch::getResultCapture().getCurrentTestName() + " " + (local_to_remote ? "L2R" : "R2L");
 
     fs::path dest_test_dir = fs::temp_directory_path() / "lf_test" / "synchronizer" / name;
 
@@ -33,6 +30,10 @@ config::sync make_sync(const std::string& suffix = "") {
     };
 }
 
+const char* test_direction(bool local) {
+    return local ? "local to remote" : "remote to local";
+}
+
 fs::file_time_type plus50ms_last_write_time(const std::filesystem::path& dst, const std::filesystem::path& src) {
     fs::file_time_type old_t = fs::last_write_time(src); 
     fs::file_time_type new_t = old_t + std::chrono::milliseconds(50);
@@ -47,187 +48,185 @@ fs::file_time_type plus50ms_last_write_time(const std::filesystem::path& dst, co
 const std::string test_name = "test.txt";
 const std::string test_content = "abc\nxyz";
 
-TEST_CASE("local file added", "[synchronizer]") {
-    // must copy to remote and set state
-    auto sync = make_sync();
+TEST_CASE("file added", "[synchronizer]") {
+
+    const bool local = GENERATE(true, false);
+    INFO( test_direction(local) );
+    auto sync = make_sync(local);
 
     const fs::path test_deep_path = fs::path("a") / test_name; 
-    write_text(sync.local / test_deep_path, test_content);
+    write_text((local ? sync.local : sync.remote) / test_deep_path, test_content);
     
-    synchronizer s("test", sync, false);
-    s.index = lf::index(sync_mode::UNSPECIFIED, { 
-        { "a", lf::index(sync_mode::UNSPECIFIED, { { test_name, lf::index(sync_mode::SHALLOW) } }) }
-    }); 
+    synchronizer s("test", sync);
+    s.index = lf::index(sync_mode::UNSPECIFIED, { { "a", lf::index(sync_mode::UNSPECIFIED, { { test_name, lf::index(sync_mode::SHALLOW) } }) } });
     s.run();
 
-    REQUIRE( s.state.node(test_deep_path) != nullptr );
-    REQUIRE( read_text(sync.remote / test_deep_path ) == test_content );
-    REQUIRE( fs::last_write_time(sync.remote / test_deep_path) == fs::last_write_time(sync.local / test_deep_path) );
-    REQUIRE( fs::exists(sync.local / test_deep_path) );
+    REQUIRE( read_text((local ? sync.remote : sync.local) / test_deep_path ) == test_content );
+    
+    REQUIRE_FALSE( s.state.get(test_deep_path.parent_path()) );
+    REQUIRE( s.state.get(test_deep_path) );
 
+    REQUIRE( fs::last_write_time(sync.remote / test_deep_path) == fs::last_write_time(sync.local / test_deep_path) );
 }
 
-TEST_CASE("local file deleted", "[synchronizer]") {
-    // must remove file from remote, remove it from index and reset sync
-    auto sync = make_sync();
+TEST_CASE("file deleted", "[synchronizer]") {
+    
+    const bool local = GENERATE(true, false);
+    INFO( test_direction(local) );
+    auto sync = make_sync(local);
 
-    write_text(sync.remote / test_name, test_content);
-
-    synchronizer s("test", sync, false);
-    s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
+    write_text((local ? sync.local : sync.remote) / test_name, test_content);
+    
+    synchronizer s("test", sync);
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } }); 
     s.state = lf::state(false, { {test_name, lf::state(true) } });
     s.run();
 
-    REQUIRE( s.index.node(test_name) != nullptr );
-
-    // removed from state
+    REQUIRE( s.index.node(test_name) == nullptr );
     REQUIRE( s.state.node(test_name) == nullptr ); 
-
+    REQUIRE_FALSE( s.state.get() );
     REQUIRE_FALSE( fs::exists(sync.remote / test_name) );
     REQUIRE_FALSE( fs::exists(sync.local  / test_name) );
-}
-
-TEST_CASE("remote file deleted", "[synchronizer]") {
-    // must remove file from local and reset state
-    auto sync = make_sync();
-
-    write_text(sync.local / test_name, test_content);
-    
-    synchronizer s("test", sync, false);
-    // index is empty due to file already removed from index (see test above)
-    s.state = lf::state(false, { {test_name, lf::state(true) } });
-    s.run();
-
-    REQUIRE_FALSE( fs::exists(sync.remote / test_name) );
-    REQUIRE_FALSE( fs::exists(sync.local / test_name) );
-    REQUIRE_FALSE( s.state.get(test_name) );
 
 }
 
-TEST_CASE("remote added", "[synchronizer]") {
-    // must copy file to local side and set state
-    auto sync = make_sync();
+TEST_CASE("file updated", "[synchronizer]") {
 
-    write_text(sync.remote / test_name, test_content);
+    bool local = GENERATE(true, false);
+    INFO( test_direction(local) );
+    auto sync = make_sync(local);
 
-    synchronizer s("test", sync, false);
-    s.index = lf::index(sync_mode::UNSPECIFIED, {{ test_name, lf::index(sync_mode::SHALLOW) }});
-    s.run();
+    fs::path l = local ? sync.local : sync.remote;
+    fs::path r = !local ? sync.local : sync.remote;
 
-    REQUIRE( read_text(sync.local / "test.txt") == test_content );
-}
-
-TEST_CASE("index removed", "[synchronizer]") {
-    // must remove from remote side, but keep local and reset state 
-    auto sync = make_sync();
-
-    write_text(sync.local / test_name, test_content);
-    write_text(sync.remote / test_name, test_content);
-
-    synchronizer s("test", sync, false);
-    s.run();
-
-    REQUIRE_FALSE( fs::exists(sync.remote / test_name) );
-    REQUIRE( fs::exists(sync.local / test_name) );
-    REQUIRE( s.state.node(test_name) == nullptr );
-}
-
-TEST_CASE("can update file timestamp", "[synchronizer]") {
-    
-    auto sync = make_sync();
-    write_text(sync.local / test_name, "abc\n");
-    write_text(sync.remote / test_name, "abc\n");
-    plus50ms_last_write_time(sync.local / test_name, sync.remote / test_name);
-
-}
-
-TEST_CASE("update file", "[synchronizer]") {
-
-    bool local_or_remote = GENERATE(true, false);
-
-    std::string name = local_or_remote ? "local to remote" : "remote to local";
-    INFO(name);
-
-    auto sync = make_sync(" " + name);
-
-    fs::path l = local_or_remote ? sync.local : sync.remote;
-    fs::path r = !local_or_remote ? sync.local : sync.remote;
-
-    write_text(l / test_name, "abc\n");
-    write_text(r / test_name, test_content);
+    write_text(l / test_name, test_content);
+    write_text(r / test_name, "abc\n");
 
     auto change_t = plus50ms_last_write_time(l / test_name, r / test_name);
 
-    synchronizer s("test", sync, false);
+    synchronizer s("test", sync);
     s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
+    s.state = lf::state(false, { { test_name, lf::state(true) }});
     s.run();
 
     REQUIRE( read_text(r / test_name) == test_content );
     REQUIRE( read_text(l / test_name) == test_content );
     REQUIRE( fs::last_write_time(r / test_name) == change_t );
     REQUIRE( fs::last_write_time(l / test_name) == change_t );
+    REQUIRE_FALSE( s.state.get() );
     REQUIRE( s.state.get(test_name) == true );
 
 }
 
-TEST_CASE("file/dir ovewrite", "[synchronizer]") {
-    
-    bool local_or_remote = GENERATE(true, false);
-    bool file_or_dir = GENERATE(true, false);
+TEST_CASE("index removed", "[synchronizer]") {
+    auto sync = make_sync(true);
 
-    std::string name = lf::format_stream()
-        << (local_or_remote ? "local" : "remote") << " "
-        << (file_or_dir ? "file" : "dir") << " to "
-        << (!local_or_remote ? "local" : "remote") << " "
-        << (!file_or_dir ? "file" : "dir");
+    write_text(sync.local / test_name, test_content);
+    write_text(sync.remote / test_name, test_content);
 
-    INFO(" " + name);
-
-    auto sync = make_sync(name);
-
-    write_text((local_or_remote ^ file_or_dir ? sync.remote : sync.local) / test_name, test_content);
-    write_text((local_or_remote ^ file_or_dir ? sync.local : sync.remote) / test_name / "x.txt", test_content);
-
-    plus50ms_last_write_time(
-        (local_or_remote ? sync.local : sync.remote) / test_name, 
-        (!local_or_remote ? sync.local : sync.remote) / test_name
-    );
-
-    synchronizer s("test", sync, false);
-    s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
+    synchronizer s("test", sync);
+    s.state = lf::state(false, { { test_name, { true }}});
     s.run();
 
-    fs::file_type expected_type = file_or_dir ? fs::file_type::regular : fs::file_type::directory;
-    fs::path target_path = (local_or_remote ? sync.remote : sync.local) / test_name;
-    REQUIRE( fs::status(target_path).type() == expected_type );
-    
-    fs::path check_path = target_path / test_name;
-    if (!file_or_dir) {
-        check_path /= "x.txt";
-    } 
+    REQUIRE( fs::exists(sync.remote / test_name) );
+    REQUIRE( fs::exists(sync.local / test_name) );
+    REQUIRE( s.state.node(test_name) == nullptr );
+}
 
-    REQUIRE( read_text(check_path) == test_content );
+TEST_CASE("can update file timestamp", "[synchronizer]") {
+    
+    auto sync = make_sync(true);
+    write_text(sync.local / test_name, "abc\n");
+    write_text(sync.remote / test_name, "abc\n");
+    plus50ms_last_write_time(sync.local / test_name, sync.remote / test_name);
 
 }
 
 TEST_CASE("local shallow dir to remote", "[synchronizer]") {
 
-    auto sync = make_sync();
+    auto sync = make_sync(true);
 
     write_text(sync.local / "a" / "a.txt", test_content);
     write_text(sync.local / "a" / "b.txt", test_content);
     write_text(sync.local / "a" / "c.txt", test_content);
 
-    synchronizer s("test", sync, false);
+    synchronizer s("test", sync);
     s.index = lf::index(sync_mode::UNSPECIFIED, { {"a", lf::index(sync_mode::SHALLOW, { { "a.txt", lf::index(sync_mode::IGNORE) } }) } });
     s.run();
 
-    REQUIRE_FALSE( fs::exists(sync.remote / "a" / "b.txt") ); // ignored
+    REQUIRE_FALSE( fs::exists(sync.remote / "a" / "a.txt") ); // ignored
     REQUIRE(read_text(sync.remote / "a" / "b.txt") == test_content );
     REQUIRE(read_text(sync.remote / "a" / "c.txt") == test_content );
 
     REQUIRE_FALSE( s.state.get(fs::path("a") / "a.txt") );
     REQUIRE( s.state.get(fs::path("a") / "b.txt") );
     REQUIRE( s.state.get(fs::path("a") / "c.txt") );
+
+}
+
+TEST_CASE("update shallow dir file to remote", "[synchronizer]") {
+
+    auto sync = make_sync(true);
+
+    const fs::path test_path = fs::path("a") / "a.txt";
+
+    write_text(sync.local / test_path, test_content);
+    write_text(sync.remote / test_path, "abc\n");
+
+    plus50ms_last_write_time(sync.local / test_path, sync.remote / test_path);
+
+    synchronizer s("test", sync);
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {"a", lf::index(sync_mode::SHALLOW) } });
+    s.state = lf::state(false, {{ "a", lf::state(true, {{"a.txt", lf::state(true)}})}});
+    s.run();
+
+    REQUIRE( s.state.get(test_path) );
+    REQUIRE(read_text(sync.remote / test_path) == test_content);
+
+}
+
+TEST_CASE("file to dir", "[synchronizer]") {
+
+    bool local = GENERATE(true, false);
+    INFO( test_direction(local) );
+    auto sync = make_sync(local);
+
+    const fs::path l = local ? sync.local : sync.remote;
+    const fs::path r = local ? sync.remote : sync.local;
+
+    write_text(l / test_name, test_content);
+    write_text(r / test_name / "x.txt", test_content);
+
+    plus50ms_last_write_time(l / test_name, r / test_name);
+
+    synchronizer s("test", sync);
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
+    s.run();
+
+    REQUIRE( fs::status(r / test_name).type() == fs::file_type::regular );
+    REQUIRE( read_text(r / test_name) == test_content );
+
+}
+
+TEST_CASE("dir to file", "[synchronizer]") {
+
+    bool local = GENERATE(true, false);
+    INFO( test_direction(local) );
+    auto sync = make_sync(local);
+
+    const fs::path l = local ? sync.local : sync.remote;
+    const fs::path r = local ? sync.remote : sync.local;
+
+    write_text(l / test_name / "x.txt", test_content);
+    write_text(r / test_name, test_content);
+
+    plus50ms_last_write_time(l / test_name, r / test_name);
+
+    synchronizer s("test", sync);
+    s.index = lf::index(sync_mode::UNSPECIFIED, { {test_name, lf::index(sync_mode::SHALLOW) } });
+    s.run();
+
+    REQUIRE( fs::status(r / test_name).type() == fs::file_type::directory );
+    REQUIRE( read_text(r / test_name / "x.txt") == test_content );
 
 }
