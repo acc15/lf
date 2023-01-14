@@ -2,7 +2,7 @@
 
 #include <string>
 #include <filesystem>
-#include <unordered_map>
+#include <map>
 #include <concepts>
 
 namespace lf {
@@ -10,11 +10,11 @@ namespace lf {
     template<typename T>
     concept tree_data_concept = std::default_initializable<T> && std::equality_comparable<T>;
 
-    template <tree_data_concept T, template<typename...> typename Map = std::unordered_map>
+    template <tree_data_concept T>
     struct tree {
         
         using data_type = T;
-        using map_type = Map<std::string, tree>;
+        using map_type = std::map<std::string, tree>;
         using entry_ptr = typename map_type::const_pointer;
         using node_type = tree;
 
@@ -107,10 +107,7 @@ namespace lf {
     };
 
     template <typename Tree>
-    concept tree_concept = requires (Tree& t) {
-        // using IIFE to describe tree with template-template parameter
-        []<tree_data_concept T, template <typename...> typename Map>(tree<T, Map>&){}(t);
-    };
+    concept tree_concept = std::derived_from<Tree, tree<typename Tree::data_type>>;
 
 }
 

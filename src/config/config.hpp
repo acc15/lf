@@ -23,8 +23,8 @@ namespace lf {
         struct sync {
             std::filesystem::path local;
             std::filesystem::path remote;
-            std::filesystem::path state;
-            std::filesystem::path index;
+            std::filesystem::path state = "lf.state";
+            std::filesystem::path index = "lf.index";
         };
 
         using sync_map = unordered_string_map<sync>;

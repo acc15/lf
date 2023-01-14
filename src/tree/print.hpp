@@ -14,14 +14,13 @@
 
 namespace lf {
 
-    template <tree_concept Tree, typename EntryOrder = void>
+    template <tree_concept Tree>
     struct tree_print {
 
         using tree_type = Tree;
         using map_type = typename tree_type::map_type;
         using entry_ptr = typename tree_type::entry_ptr;
         using queue_type = std::vector<entry_ptr>;
-        using entry_sorter = sorter<EntryOrder>;
 
         static void add_entries(const map_type& entries, queue_type& queue) {
             queue.resize(queue.size() + entries.size());
@@ -32,7 +31,6 @@ namespace lf {
                 *end = &entry;
                 ++end;
             }
-            entry_sorter::sort(begin, end);
         }
 
         static std::ostream& print(std::ostream& s, const tree_type& node) {

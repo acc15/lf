@@ -55,7 +55,7 @@ TEST_CASE("print", "[tree]") {
     std::stringstream ss;
 
     ss << std::boolalpha;
-    tree_print<state, tree_entry_name_order<state>>::print(ss, test_tree);
+    tree_print<state>::print(ss, test_tree);
     
     const std::string str = ss.str();
     REQUIRE(str == 
