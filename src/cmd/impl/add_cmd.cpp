@@ -10,20 +10,19 @@ namespace lf {
             opt { "shallow", 'S', "add paths with SHALLOW mode", "paths", 0, opt::UNBOUNDED },
             opt { "recursive", 'R', "add paths with RECURSIVE mode", "dirpaths", 0, opt::UNBOUNDED },
             opt { "ignore", 'I', "add paths with IGNORE mode", "paths", 0, opt::UNBOUNDED },
-            opt { "", '\0', "same as with --shallow", "paths", 0, opt::UNBOUNDED },
+            opt { "", '\0', "same as --shallow", "paths", 0, opt::UNBOUNDED },
         },
         "shallow"
     ) {
     }
 
-    int add_cmd::run(const opt_map& opts) const {
-
+    int add_cmd::run(const opt_map& params) const {
         config cfg = config::load();
 
         indexer indexer;
-        indexer.process(cfg, opts["shallow"], sync_mode::SHALLOW);
-        indexer.process(cfg, opts["recursive"], sync_mode::RECURSIVE);
-        indexer.process(cfg, opts["ignore"], sync_mode::IGNORE);
+        indexer.process(cfg, params["shallow"], sync_mode::SHALLOW);
+        indexer.process(cfg, params["recursive"], sync_mode::RECURSIVE);
+        indexer.process(cfg, params["ignore"], sync_mode::IGNORE);
         indexer.save_changes();
         
         return indexer.is_successful() ? 0 : 1;

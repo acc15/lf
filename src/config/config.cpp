@@ -95,7 +95,7 @@ namespace lf {
     }
 
     std::filesystem::path config::get_default_path() {
-        const fs::path rel_path = "lf/lf.conf";
+        const fs::path rel_path = fs::path("lf") / "lf.conf";
 #if __linux__
         const char* home = std::getenv("HOME");
         if (home != nullptr) {

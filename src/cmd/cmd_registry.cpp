@@ -61,10 +61,10 @@ namespace lf {
         for (const cmd* cmd: r.list) {
             s << *cmd << std::endl;
         }
-        s  
-            << "Environment variables: " << std::endl << std::endl
-            << config::env_name << " - custom config file path, defaults to " << config::get_default_path() << std::endl
-            << log::env_name << " - logging level (" << join("|", log::level_names) << "), defaults to " << log::level_names[log::default_level] << std::endl;
+        
+        s   << "Environment variables: " << std::endl << std::endl
+            << config::env_name << " - custom config path, default: " << config::get_default_path().string() << std::endl
+            << log::env_name << " - logging level (" << join("|", log::level_names) << "), default: " << log::level_names[log::default_level] << std::endl;
 
         return s;
     }
