@@ -17,10 +17,10 @@ namespace lf {
         }
     ) {}
 
-    int sync_cmd::run(const opt_map& opts) const {
+    int sync_cmd::run(const opt_map& params) const {
         const config cfg = config::load();
 
-        const config::sync_entry_vec syncs = cfg.find_name_matches(opts[""]);
+        const config::sync_entry_vec syncs = cfg.find_name_matches(params[""]);
         if (syncs.empty()) {
             log.error() && log() 
                 << "no one sync found by supplied names, declared sync names: " 

@@ -19,12 +19,12 @@ namespace lf {
     ) {
     }
     
-    int info_cmd::run(const opt_map& opts) const {
+    int info_cmd::run(const opt_map& params) const {
 
         const config cfg = config::load();
 
-        bool print_index = opts.has("index");
-        bool print_state = opts.has("state");
+        bool print_index = params.has("index");
+        bool print_state = params.has("state");
         if (!print_index && !print_state) {
             print_index = true;
             print_state = true;

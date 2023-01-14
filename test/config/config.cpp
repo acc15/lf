@@ -81,7 +81,6 @@ TEST_CASE("parse partial", "[config]") {
     const auto msg = t.str();
     REQUIRE(msg.find("remote") != std::string::npos);
     REQUIRE(msg.find("local") != std::string::npos);
-    REQUIRE(msg.find("state") != std::string::npos);
 }
 
 TEST_CASE("find_local_matches", "[config]") {

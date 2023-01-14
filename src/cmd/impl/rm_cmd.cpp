@@ -12,11 +12,11 @@ namespace lf {
     ) {
     }
 
-    int rm_cmd::run(const opt_map& opts) const {
+    int rm_cmd::run(const opt_map& params) const {
         const config cfg = config::load();
 
         indexer indexer;
-        indexer.process(cfg, opts[""], sync_mode::UNSPECIFIED);
+        indexer.process(cfg, params[""], sync_mode::UNSPECIFIED);
         indexer.save_changes();
 
         return indexer.is_successful() ? 0 : 1;

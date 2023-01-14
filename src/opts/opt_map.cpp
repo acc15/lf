@@ -2,6 +2,8 @@
 
 namespace lf {
 
+    const opt_map::vec_type opt_map::empty_vec = {};
+
     opt_map::opt_map(map_type&& map): _map(map) {
     }
 

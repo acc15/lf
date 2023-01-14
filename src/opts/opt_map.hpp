@@ -17,7 +17,7 @@ namespace lf {
         const vec_type& operator[](std::string_view name) const;
 
     private:
-        static constexpr vec_type empty_vec = {};
+        static const vec_type empty_vec;
         map_type _map;
     };
 
