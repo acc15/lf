@@ -147,8 +147,13 @@ namespace lf {
         add_dir_names(item, dir_1, map);
         add_dir_names(item, dir_2, map);
         add_index_names(item, map);
-        for (auto it = map.rbegin(); it != map.rend(); it++) {
-            queue.emplace_back(it->second);
+
+        queue.resize(queue.size() + map.size());
+
+        auto q_it = queue.rbegin();
+        for (auto entry: map) {
+            *q_it = std::move(entry.second); 
+            ++q_it;
         }
 
         state.set(item.path, item.mode != sync_mode::UNSPECIFIED);

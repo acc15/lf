@@ -3,7 +3,6 @@
 
 #include <string>
 
-#include "io/format_stream.hpp"
 #include "sync/synchronizer.hpp"
 #include "test_util.hpp"
 
