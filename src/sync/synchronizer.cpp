@@ -2,6 +2,7 @@
 #include "io/log.hpp"
 #include "io/datetime.hpp"
 #include "io/file_type.hpp"
+#include "fs/time.hpp"
 
 #include <filesystem>
 #include <vector>
@@ -68,13 +69,15 @@ namespace lf {
             return;
         }
 
-        const fs::file_time_type local_time = fs::last_write_time(local.path);
-        const fs::file_time_type remote_time = fs::last_write_time(remote.path);
+        const fs::file_time_type local_time = trunc_last_write_time(local.path);
+        const fs::file_time_type remote_time = trunc_last_write_time(remote.path);
         if (local_time == remote_time) {
             handle_same_time(item, local, remote, local_time);
         } else if (local_time > remote_time) {
+            out << "using local because " << format_date_time(local_time) << " > " << format_date_time(remote_time) << ", ";
             handle_other(item, local, remote);
         } else {
+            out << "using remote because " << format_date_time(local_time) << " < " << format_date_time(remote_time) << ", ";
             handle_other(item, remote, local);
         }
 

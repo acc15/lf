@@ -88,6 +88,8 @@ add_library(lf_core
     # fs
     src/fs/path.hpp 
     src/fs/path.cpp
+    src/fs/time.hpp 
+    src/fs/time.cpp
     src/fs/error.hpp
     src/fs/error.cpp
     src/fs/serialization.hpp
@@ -137,6 +139,7 @@ add_executable(lf_test
     test/config/config_parser.cpp
     test/config/config.cpp
     test/fs/path.cpp
+    test/fs/time.cpp
     test/fs/serialization.cpp
     test/util/string.cpp
     test/util/string_map.cpp
