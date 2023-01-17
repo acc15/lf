@@ -15,8 +15,15 @@ namespace lf {
         using ntfs_period = std::ratio_divide<std::micro, std::deca>;
 
         constexpr intmax_t num = std::ratio_divide<ntfs_period, fs_period>::num;
+
+#if defined(__linux__)
+        static_assert(num == 100, "illegal ntfs/fs timepoint numerator");
+#elif defined(_WIN32)
+        static_assert(num == 1, "illegal ntfs/fs timepoint numerator");
+#endif
+
         if constexpr (num > 1) {
-            return fs_timepoint(fs_duration(integral_floor<fs_rep, num>(t.time_since_epoch().count())));
+            return fs_timepoint(fs_duration(integral_floor<fs_rep>(t.time_since_epoch().count(), num)));
         } else {
             return t;
         }

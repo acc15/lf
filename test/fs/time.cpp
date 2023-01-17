@@ -34,7 +34,7 @@ std::map<fs_rep, fs_rep> linux_ntfs_expectations = {
 TEST_CASE("integral_floor", "[time]") {
     for (const auto& e: linux_ntfs_expectations) {
         fs_rep set = e.first;
-        fs_rep actual = lf::integral_floor<fs_rep, 100>(set);
+        fs_rep actual = lf::integral_floor<fs_rep>(set, 100);
         fs_rep expect = e.second;
         REQUIRE( actual == expect );
     }
@@ -49,7 +49,7 @@ TEST_CASE("write_ntfs_timestamp", "[.time]") {
 
     fs_time t_base = fs::last_write_time( test_ntfs_path );
     fs::last_write_time( test_ntfs_path, t_base );
-    for (const auto& e: ntfs_expectations) {
+    for (const auto& e: linux_ntfs_expectations) {
         fs_time set_tp = fs_tp(e.first);
         fs::last_write_time(test_ntfs_path, set_tp);
         fs_time cur_tp = fs::last_write_time(test_ntfs_path); 
