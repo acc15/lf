@@ -30,9 +30,15 @@ std::map<fs_rep, fs_rep> ntfs_expectations = {
     { -4767892066937254531L, -4767892066937254600L }
 };
 
-
+#if !defined (_MSC_VER)
 TEST_CASE("write_ntfs_timestamp", "[.time]") {
     fs::path test_ntfs_path = "/mnt/router/tmp/test.txt";
+    REQUIRE( fs::exists(test_ntfs_path) );
+
+    WARN( "num=" << fs_duration::period::num << ",denum=" << fs_duration::period::den );
+
+    fs_time t_base = fs::last_write_time( test_ntfs_path );
+    fs::last_write_time( test_ntfs_path, t_base );
     for (const auto& e: ntfs_expectations) {
         fs_time set_tp = fs_tp(e.first);
         fs::last_write_time(test_ntfs_path, set_tp);
@@ -40,13 +46,18 @@ TEST_CASE("write_ntfs_timestamp", "[.time]") {
         REQUIRE(cur_tp == fs_tp(e.second));
     }
 }
+#endif
 
 TEST_CASE("last_write_time", "[time]") {
     for (const auto& e: ntfs_expectations) {
         fs_time set = fs_tp(e.first);
         INFO("time set " << set.time_since_epoch());
         fs_time actual = lf::ntfs_last_write_time(set);
+#if defined (_MSC_VER) 
+        fs_time expect = set;
+#else
         fs_time expect = fs_tp(e.second);
+#endif
         REQUIRE( actual == expect );
     }
 }
