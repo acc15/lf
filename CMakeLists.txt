@@ -30,7 +30,6 @@ add_library(lf_core
 
     # tree
     src/tree/tree.hpp
-    src/tree/order.hpp
     src/tree/print.hpp
     src/tree/binary.hpp
     src/tree/tracked_tree.hpp
@@ -58,7 +57,6 @@ add_library(lf_core
     src/util/pick.hpp
     src/util/console.hpp
     src/util/console.cpp
-    src/util/sort.hpp
 
     # io
     src/io/log.hpp
