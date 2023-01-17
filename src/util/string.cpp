@@ -62,4 +62,12 @@ namespace lf {
 		std::transform(str.begin(), str.end(), str.begin(), static_cast<char (*)(char)>(&upper));
 	}
 
+	std::string lpad(std::string_view str, std::string::size_type len, char pad) {
+		std::string result = static_cast<std::string>(str);
+		if (result.size() < len) {
+			result.insert(0, len - result.size(), pad);
+		}
+		return result;
+	}
+
 }

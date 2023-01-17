@@ -1,5 +1,7 @@
-#include "io/datetime.hpp"
+#include "io/time.hpp"
 #include "io/format_stream.hpp"
+#include "fs/time.hpp"
+#include "util/string.hpp"
 
 #include <exception>
 #include <iomanip>
@@ -8,15 +10,7 @@
 
 namespace lf {
 
-    std::chrono::system_clock::time_point file_clock_to_system(const std::chrono::file_clock::time_point& v) {
-        // TODO: std::chrono::clock_cast not implemented in GNU C++ library (however it provides file_clock::to_sys)
-        // After implementation of clock_cast in GNU lib - this #ifdef should be replaced with clock_cast
-#ifdef __GNUG__
-        return std::chrono::file_clock::to_sys(v);
-#else
-        return std::chrono::clock_cast<std::chrono::system_clock>(v);
-#endif
-    }
+    const std::string_view ms_format_letter = "%L";
 
     void time_to_tm(bool utc, const std::time_t& t, std::tm& tm) {
 #ifdef _WIN32
@@ -33,10 +27,30 @@ namespace lf {
     }
 
     std::ostream& operator<<(std::ostream& s, const format_date_time_s<std::chrono::system_clock::time_point>& fmt) {
-        std::time_t t = std::chrono::system_clock::to_time_t(fmt.tp);
+        using namespace std::chrono;
+        using str = std::string;
+        
+        str format = static_cast<str>(fmt.format);
+
+        str::size_type ms_index = format.find(ms_format_letter);
+        if (ms_index != str::npos) {
+            
+            system_clock::duration d = fmt.tp.time_since_epoch();
+            d -= duration_cast<seconds>(d);
+
+            milliseconds::rep ms = duration_cast<milliseconds>(d).count();
+            std::string ms_str = lpad(std::to_string(ms), 3, '0');
+            do {
+                format.replace(ms_index, ms_format_letter.size(), ms_str);
+                ms_index += ms_str.size();
+                ms_index = format.find(ms_format_letter, ms_index);
+            } while (ms_index != str::npos);
+        }
+        
+        std::time_t t = system_clock::to_time_t(fmt.tp);
         std::tm tm;
         time_to_tm(fmt.utc, t, tm);
-        return s << std::put_time(&tm, fmt.format.c_str());
+        return s << std::put_time(&tm, format.c_str());
     }
 
     std::ostream& operator<<(std::ostream& s, const format_date_time_s<std::chrono::file_clock::time_point>& fmt) {

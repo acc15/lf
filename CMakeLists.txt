@@ -69,8 +69,8 @@ add_library(lf_core
     src/io/format_stream.cpp
     src/io/joiner.hpp
     src/io/format.hpp
-    src/io/datetime.cpp
-    src/io/datetime.hpp
+    src/io/time.cpp
+    src/io/time.hpp
     src/io/file_type.cpp
     src/io/file_type.hpp
     src/io/util.hpp
@@ -131,7 +131,7 @@ add_executable(lf_test
     test/io/log_tester.hpp
     test/io/log_tester.cpp
     test/io/log.cpp
-    test/io/datetime.cpp
+    test/io/time.cpp
     test/io/ios_flags.cpp
 
     test/config/config_parser.cpp

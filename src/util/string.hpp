@@ -20,4 +20,6 @@ namespace lf {
 	void lower(std::string& str);
 	void upper(std::string& str);
 
+	std::string lpad(std::string_view str, std::string::size_type len, char pad);
+
 }
