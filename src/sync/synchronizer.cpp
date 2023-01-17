@@ -19,7 +19,7 @@ namespace lf {
     {
     }
 
-    synchronizer::synchronizer(const std::string& name, const config::sync& sync): name(name), sync(sync), out(log()) {
+    synchronizer::synchronizer(const std::string& name, const config::sync& sync): name(name), sync(sync) {
     }
 
     void synchronizer::run() {
@@ -32,9 +32,10 @@ namespace lf {
             const path_info li = { "local", item.path.empty() ? sync.local : sync.local / item.path };
             const path_info ri = { "remote", item.path.empty() ? sync.remote : sync.remote / item.path };
             
-            out << (item.path.empty() ? "<root>" : item.path.string()) << ": ";
+            out = &log();
+            *out << (item.path.empty() ? "<root>" : item.path.string()) << ": ";
             handle(item, li, ri);
-            out << std::endl;
+            *out << std::endl;
 
         }
     }
@@ -42,14 +43,14 @@ namespace lf {
     void synchronizer::handle(const queue_item& item, const path_info& local, const path_info& remote) {
         
         if (local.type == fs::file_type::not_found && remote.type == fs::file_type::not_found) {
-            out << "no file or directory exists on local and remote sides";
+            *out << "no file or directory exists on local and remote sides";
             index.remove(item.path);
             state.remove(item.path);
             return;
         }
 
         if (item.mode == sync_mode::IGNORE) {
-            out << "ignored, skipping...";
+            *out << "ignored, skipping...";
             state.remove(item.path);
             return;
         }
@@ -69,15 +70,15 @@ namespace lf {
             return;
         }
 
-        const fs::file_time_type local_time = trunc_last_write_time(local.path);
-        const fs::file_time_type remote_time = trunc_last_write_time(remote.path);
+        const fs::file_time_type local_time = ntfs_last_write_time(local.path);
+        const fs::file_time_type remote_time = ntfs_last_write_time(remote.path);
         if (local_time == remote_time) {
             handle_same_time(item, local, remote, local_time);
         } else if (local_time > remote_time) {
-            out << "using local because " << format_date_time(local_time) << " > " << format_date_time(remote_time) << ", ";
+            *out << "using local because " << format_date_time(local_time) << " > " << format_date_time(remote_time) << ", ";
             handle_other(item, local, remote);
         } else {
-            out << "using remote because " << format_date_time(local_time) << " < " << format_date_time(remote_time) << ", ";
+            *out << "using remote because " << format_date_time(local_time) << " < " << format_date_time(remote_time) << ", ";
             handle_other(item, remote, local);
         }
 
@@ -90,24 +91,24 @@ namespace lf {
         }
 
         if (local.type == remote.type) {
-            out << "synced, both entries has same modification time (" << format_date_time(time) << ") and same type: " << local.type;
+            *out << "synced, both entries has same modification time (" << format_date_time(time) << ") and same type: " << local.type;
             state.set(item.path, true, true);
             return;
         }
 
-        out << "CONFLICT, both entries has same modification time (" << format_date_time(time) 
+        *out << "CONFLICT, both entries has same modification time (" << format_date_time(time) 
             << "), but different types, local is " << local.type << ", remote is " << remote.type;
         state.remove(item.path);
     }
 
     void synchronizer::handle_dirs(const queue_item& item, const path_info& src, const path_info& dst) {
-        out << (item.finalize ? "finalizing directory" : "syncing directories");
+        *out << (item.finalize ? "finalizing directory" : "syncing directories");
         queue_dir_entries(item, &src.path, &dst.path);
     }
 
     void synchronizer::handle_not_found(const queue_item& item, const path_info& src, const path_info& dst) {
         if (state.get(item.path)) {
-            out << "was deleted in " << dst.name << ", deleting in " << src.name;
+            *out << "was deleted in " << dst.name << ", deleting in " << src.name;
             fs::remove_all(src.path);
             state.remove(item.path);
             index.remove(item.path);
@@ -118,7 +119,7 @@ namespace lf {
 
     void synchronizer::handle_other(const queue_item& item, const path_info& src, const path_info& dst) {
         if (src.type == fs::file_type::directory || (dst.type == fs::file_type::directory && item.mode != sync_mode::UNSPECIFIED)) {
-            out << "deleting " << dst.name << " " << dst.type << ", ";
+            *out << "deleting " << dst.name << " " << dst.type << ", ";
             fs::remove_all(dst.path);
         }
         handle_new(item, src, dst);
@@ -127,7 +128,7 @@ namespace lf {
     void synchronizer::handle_new(const queue_item& item, const path_info& src, const path_info& dst) {
         if (src.type == fs::file_type::directory) {
             
-            out << "creating directory in " << dst.name;
+            *out << "creating directory in " << dst.name;
             fs::create_directory(dst.path, src.path);
             queue_dir_entries(item, &src.path);
 
@@ -164,9 +165,9 @@ namespace lf {
 
     void synchronizer::handle_skip(const queue_item& item) {
         if (item.finalize) {
-            out << "finalized";
+            *out << "finalized";
         } else {
-            out << "skipping as its not a directory and sync mode is unspecified";
+            *out << "skipping as its not a directory and sync mode is unspecified";
         }
         state.remove(item.path);
     }
@@ -222,7 +223,7 @@ namespace lf {
     }
 
     void synchronizer::copy_file_with_timestamp(const path_info& src, const path_info& dst) const {
-        out << "copying file from " << src.name << " to " << dst.name;
+        *out << "copying file from " << src.name << " to " << dst.name;
         fs::copy_file(src.path, dst.path, fs::copy_options::overwrite_existing);
         fs::file_time_type src_time = fs::last_write_time(src.path);
         fs::last_write_time(dst.path, src_time);
