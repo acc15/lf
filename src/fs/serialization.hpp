@@ -9,6 +9,7 @@
 #include "fs/path.hpp"
 #include "fs/error.hpp"
 #include "io/log.hpp"
+#include "io/ios_flags.hpp"
 #include "io/format_stream.hpp"
 #include "io/format.hpp"
 
@@ -29,7 +30,8 @@ namespace lf {
 	template <serializable T>
 	void load_file(const std::filesystem::path& path, T& result) {
         const std::ios_base::openmode flags = std::ios_base::in | get_serializable_openmode<T>();
-        log.debug() && log() << "loading " << T::name << " file from " << path << " with flags " << flags << "..." << std::endl;
+        log.debug() && log() << "loading " << T::name << " file from " << path 
+            << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << std::endl;
         
         std::ifstream file(path, flags);
         if (!file) {
@@ -62,7 +64,8 @@ namespace lf {
 	template <serializable T>
 	void save_file(const std::filesystem::path& path, const T& ref) {
         const std::ios_base::openmode flags = std::ios_base::out | std::ios_base::trunc | get_serializable_openmode<T>(); 
-		log.debug() && log() << "saving " << T::name << " to " << path << " with flags " << flags << "..." << std::endl;
+		log.debug() && log() << "saving " << T::name << " to " << path 
+            << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << std::endl;
 
         create_parent_dirs(path);
 

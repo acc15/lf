@@ -6,6 +6,10 @@ project(lf LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if (UNIX)
+    set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
+endif()
+
 set(executable_src)
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -61,6 +65,8 @@ add_library(lf_core
     src/io/log.cpp
     src/io/null_stream.hpp
     src/io/null_stream.cpp
+    src/io/ios_flags.hpp
+    src/io/ios_flags.cpp
     src/io/format_stream.hpp
     src/io/format_stream.cpp
     src/io/joiner.hpp
@@ -82,6 +88,8 @@ add_library(lf_core
     # fs
     src/fs/path.hpp 
     src/fs/path.cpp
+    src/fs/time.hpp 
+    src/fs/time.cpp
     src/fs/error.hpp
     src/fs/error.cpp
     src/fs/serialization.hpp
@@ -126,10 +134,14 @@ add_executable(lf_test
     test/io/log_tester.cpp
     test/io/log.cpp
     test/io/datetime.cpp
+    test/io/ios_flags.cpp
 
     test/config/config_parser.cpp
     test/config/config.cpp
     test/fs/path.cpp
+
+    test/fs/time.cpp
+
     test/fs/serialization.cpp
     test/util/string.cpp
     test/util/string_map.cpp
@@ -140,5 +152,4 @@ add_executable(lf_test
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
 
-# install(TARGETS lf
-#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS lf)

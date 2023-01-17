@@ -1,4 +1,4 @@
-#include "../cmd.hpp"
+#include "cmd/cmd.hpp"
 
 namespace lf {
 

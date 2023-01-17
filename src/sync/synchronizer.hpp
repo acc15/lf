@@ -3,6 +3,7 @@
 #include "index/index.hpp"
 #include "state/state.hpp"
 #include "config/config.hpp"
+#include "io/null_stream.hpp"
 
 #include <vector>
 #include <map>
@@ -42,7 +43,7 @@ namespace lf {
 
         const std::string& name;
         const config::sync& sync;
-        std::ostream& out;
+        std::ostream* out = &nullout;
 
         std::vector<queue_item> queue;
 
