@@ -10,12 +10,13 @@ namespace fs = std::filesystem;
 using fs_time = fs::file_time_type;
 using fs_duration = fs_time::duration;
 using fs_rep = fs_duration::rep;
+using fs_period = fs_duration::period;
 
 fs_time fs_tp(const fs_rep& r) {
     return fs_time(fs_duration(r));
 }
 
-std::map<fs_rep, fs_rep> ntfs_expectations = {
+std::map<fs_rep, fs_rep> linux_ntfs_expectations = {
     { 200L, 200L },
     { 199L, 100L },
     { 100L, 100L },
@@ -30,7 +31,16 @@ std::map<fs_rep, fs_rep> ntfs_expectations = {
     { -4767892066937254531L, -4767892066937254600L }
 };
 
-#if !defined (_MSC_VER)
+TEST_CASE("integral_floor", "[time]") {
+    for (const auto& e: linux_ntfs_expectations) {
+        fs_rep set = e.first;
+        fs_rep actual = lf::integral_floor<fs_rep, 100>(set);
+        fs_rep expect = e.second;
+        REQUIRE( actual == expect );
+    }
+}
+
+#if defined (__linux__)
 TEST_CASE("write_ntfs_timestamp", "[.time]") {
     fs::path test_ntfs_path = "/mnt/router/tmp/test.txt";
     REQUIRE( fs::exists(test_ntfs_path) );
@@ -47,17 +57,3 @@ TEST_CASE("write_ntfs_timestamp", "[.time]") {
     }
 }
 #endif
-
-TEST_CASE("last_write_time", "[time]") {
-    for (const auto& e: ntfs_expectations) {
-        fs_time set = fs_tp(e.first);
-        INFO("time set " << set.time_since_epoch());
-        fs_time actual = lf::ntfs_last_write_time(set);
-#if defined (_MSC_VER) 
-        fs_time expect = set;
-#else
-        fs_time expect = fs_tp(e.second);
-#endif
-        REQUIRE( actual == expect );
-    }
-}

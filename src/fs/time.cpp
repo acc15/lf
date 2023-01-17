@@ -7,18 +7,20 @@ namespace lf {
     }
 
     std::filesystem::file_time_type ntfs_last_write_time(std::filesystem::file_time_type t) {
-#if defined _MSC_VER
-        // MSVC already uses file_time_type which is fully compatible with NTFS timestampts
-        return t;
-#else
+
         using fs_timepoint = std::filesystem::file_time_type; 
         using fs_duration = fs_timepoint::duration;
+        using fs_period = fs_duration::period;
         using fs_rep = fs_duration::rep;
+        using ntfs_period = std::ratio_divide<std::micro, std::deca>;
 
-        fs_rep d = t.time_since_epoch().count();
-        fs_duration nd = fs_duration((d < 0 ? d - 99L : d) / 100 * 100);
-        return fs_timepoint(nd);
-#endif
+        constexpr intmax_t num = std::ratio_divide<ntfs_period, fs_period>::num;
+        if constexpr (num > 1) {
+            return fs_timepoint(fs_duration(integral_floor<fs_rep, num>(t.time_since_epoch().count())));
+        } else {
+            return t;
+        }
+
     }
 
 }
