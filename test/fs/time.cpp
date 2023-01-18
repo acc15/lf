@@ -31,16 +31,17 @@ std::map<fs_rep, fs_rep> linux_ntfs_expectations = {
     { -4767892066937254531L, -4767892066937254600L }
 };
 
-TEST_CASE("integral_floor", "[time]") {
+#if defined (__linux__)
+
+TEST_CASE("ntfs_last_write_time", "[time]") {
     for (const auto& e: linux_ntfs_expectations) {
-        fs_rep set = e.first;
-        fs_rep actual = lf::integral_floor<fs_rep>(set, 100);
-        fs_rep expect = e.second;
+        fs_time set = fs_tp(e.first);
+        fs_time actual = lf::ntfs_last_write_time(set);
+        fs_time expect = fs_tp(e.second);
         REQUIRE( actual == expect );
     }
 }
 
-#if defined (__linux__)
 TEST_CASE("write_ntfs_timestamp", "[.time]") {
     fs::path test_ntfs_path = "/mnt/router/tmp/test.txt";
     REQUIRE( fs::exists(test_ntfs_path) );

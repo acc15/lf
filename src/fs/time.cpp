@@ -20,19 +20,22 @@ namespace lf {
 
         using fs_timepoint = std::filesystem::file_time_type; 
         using fs_duration = fs_timepoint::duration;
-        using fs_period = fs_duration::period; // fs timepoint duration period - OS dependent (1nano - linux, 100nanos - windows)
-        using ntfs_period = std::ratio_divide<std::micro, std::deca>; // NTFS timestamp precision - 100 nanoseconds (0.1 micro)
+        using fs_period = fs_duration::period;
+
+        using ntfs_period = std::ratio_multiply<std::nano, std::hecto>;
+        using ntfs_duration = std::chrono::duration<fs_duration::rep, ntfs_period>;
 
         constexpr intmax_t num = std::ratio_divide<ntfs_period, fs_period>::num;
 
 #if defined(__linux__)
-        static_assert(num == 100, "illegal ntfs/fs timepoint numerator");
+        static_assert(num == 100, "wrong ntfs/fs timepoint numerator");
 #elif defined(_WIN32)
-        static_assert(num == 1, "illegal ntfs/fs timepoint numerator");
+        static_assert(num == 1, "wrong ntfs/fs timepoint numerator");
 #endif
-
         if constexpr (num > 1) {
-            return fs_timepoint(fs_duration(integral_floor<fs_duration::rep>(t.time_since_epoch().count(), num)));
+            const ntfs_duration nd = std::chrono::floor<ntfs_duration>(t.time_since_epoch());
+            const fs_duration fd = std::chrono::duration_cast<fs_duration>(nd);
+            return fs_timepoint(fd);
         } else {
             return t;
         }
