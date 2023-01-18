@@ -53,20 +53,21 @@ namespace lf {
     std::ostream& operator<<(std::ostream& s, const format_date_time_s<std::chrono::system_clock::time_point>& fmt) {
         using namespace std::chrono;
         using str = std::string;
+        using sz = str::size_type;
         
         str format = static_cast<str>(fmt.format);
 
         // %N03 - millis, %N33 - microseconds, %N63 - nanos
         // %N09 - whole nanos (9 digits)
 
-        str::size_type spec_index = next_nano_spec(format, 0);
+        sz spec_index = next_nano_spec(format, 0);
         if (spec_index != str::npos) { 
             system_clock::duration d = fmt.tp.time_since_epoch();
             nanoseconds::rep ns = duration_cast<nanoseconds>(d - duration_cast<seconds>(d)).count();
-            std::string ns_str = lpad(std::to_string(ns), 9, '0');
+            str ns_str = lpad(std::to_string(ns), 9, '0');
             do {
-                std::string::size_type start = format[spec_index + 2] - '0';
-                std::string::size_type count = format[spec_index + 3] - '0';
+                const sz start = format[spec_index + 2] - '0';
+                const sz count = format[spec_index + 3] - '0';
                 format.replace(spec_index, 4, ns_str.substr(start, count));
                 spec_index = next_nano_spec(format, spec_index + count);
             } while (spec_index != str::npos);
