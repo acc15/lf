@@ -42,11 +42,10 @@ namespace lf {
                 match_len = 0;
                 continue;
             }
-
-            ++match_len;
-            if (match_len == 4) {
-                return pos - (match_len - 1);
+            if (match_len == 3) {
+                return pos - match_len;
             }
+            ++match_len;
         }
         return std::string::npos;
     } 
