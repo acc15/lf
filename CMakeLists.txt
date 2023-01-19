@@ -133,6 +133,7 @@ add_executable(lf_test
     test/io/log.cpp
     test/io/time.cpp
     test/io/ios_flags.cpp
+    test/io/nlog.cpp
 
     test/config/config_parser.cpp
     test/config/config.cpp

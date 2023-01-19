@@ -42,13 +42,13 @@ namespace lf {
         if (level < min_level) {
             return false;
         }
-        next_level = level;
+        cur_level = level;
         return true;    
     }
 
     std::ostream& log::operator()() {
-        std::ostream& target = stream != nullptr ? *stream : default_stream(next_level);
-        next_level = reset_level;
+        std::ostream& target = stream != nullptr ? *stream : default_stream(cur_level);
+        cur_level = default_level;
         return target;
     }
 

@@ -20,8 +20,7 @@ namespace lf {
         std::ostream& operator()();
 
         level min_level = get_default_min_level();
-        level reset_level = default_level;
-        level next_level = reset_level;
+        level cur_level = default_level;
         std::ostream* stream = nullptr;
 
         static const char* const env_name;
