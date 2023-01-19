@@ -1,5 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include <thread>
+
 #include <chrono>
 #include <ostream>
 #include <sstream>
@@ -10,6 +12,7 @@
 
 #include "io/null_stream.hpp"
 #include "io/time.hpp"
+#include "util/pick.hpp"
 
 namespace lf {
 
@@ -24,6 +27,7 @@ namespace lf {
         static const end_t end;
 
         enum level { TRACE, DEBUG, INFO, WARN, ERROR, MUTE };
+        static const char* level_names[MUTE + 1];
 
         struct message {
             enum level level;
@@ -38,6 +42,12 @@ namespace lf {
         public:
             stream(nlog& ref, const message& msg);
             void send();
+        };
+
+        class formatter {
+        public:
+            virtual ~formatter() = default;
+            virtual std::string format(const message& msg) const = 0;
         };
 
         class sink {
@@ -59,10 +69,12 @@ namespace lf {
         stream operator()();
         void send(const message& msg);
 
-        std::vector<std::unique_ptr<sink>> sink;
+        std::unique_ptr<formatter> format;
+        std::vector<std::unique_ptr<sink>> sinks;
 
     };
 
+    std::ostream& operator<<(std::ostream& s, const nlog::level& l);
     std::ostream& operator<<(std::ostream& s, const nlog::end_t&);
 
     class nlog nlog;
@@ -79,6 +91,10 @@ namespace lf {
         buf.str("");
     }
 
+    std::ostream& operator<<(std::ostream& s, const nlog::level& l) {
+        return s << pick_indexed_with_last_default(l, nlog::level_names);
+    }
+
     std::ostream& operator<<(std::ostream& s, const nlog::end_t&) {
         nlog::stream* lp = dynamic_cast<nlog::stream*>(&s);
         if (lp != nullptr) {
@@ -88,6 +104,8 @@ namespace lf {
     }
 
     const nlog::end_t nlog::end;
+    const char* nlog::level_names[] = { "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "UNKNOWN" };
+
     thread_local nlog::level nlog::cur_level = nlog::INFO;
 
     bool nlog::trace() { return with(nlog::TRACE); }
@@ -109,19 +127,17 @@ namespace lf {
         return nlog::stream(*this, nlog::message { .level = msg_level, .timestamp = std::chrono::system_clock::now() });
     }
 
-    void nlog::send(message& msg) {
-
-        for (auto& s: sink) {
-            s->write(msg);
+    void nlog::send(const message& msg) {
+        message fmt = msg;
+        if (format) {
+            fmt.text = format->format(fmt);
+        }
+        for (auto& s: sinks) {
+            s->write(fmt);
         }
     }
 
-    class log_formatter {
-    public:
-        virtual std::string format(const nlog::message& msg) const = 0;
-    };
-
-    class simple_log_formatter: public log_formatter {
+    class simple_log_formatter: public nlog::formatter {
     public:
         std::string format(const nlog::message& msg) const override;
     };
@@ -132,6 +148,27 @@ namespace lf {
         return s.str();
     }
 
+    class log_formatting_sink: public nlog::sink {
+        std::unique_ptr<nlog::formatter> formatter;
+        std::unique_ptr<nlog::sink> sink;
+    public:
+        log_formatting_sink(std::unique_ptr<nlog::formatter> formatter, std::unique_ptr<nlog::sink> sink);
+        ~log_formatting_sink() override = default;
+        void write(const nlog::message& msg) override;
+    };
+
+    log_formatting_sink::log_formatting_sink(std::unique_ptr<nlog::formatter> formatter, std::unique_ptr<nlog::sink> sink): 
+        formatter(std::move(formatter)), 
+        sink(std::move(sink)) 
+    {
+    }
+
+    void log_formatting_sink::write(const nlog::message& msg) {
+        nlog::message fmt = msg;
+        fmt.text = formatter->format(fmt);
+        sink->write(fmt);
+    }
+
     class log_stream_sink: public nlog::sink {
         std::ostream& stream;
     public:
@@ -140,7 +177,11 @@ namespace lf {
         void write(const nlog::message& msg) override;
     };
 
-    log_stream_sink::log_stream_sink(std::ostream& stream): stream(stream) {}
+    log_stream_sink::log_stream_sink(std::ostream& stream): 
+        stream(stream) 
+    {
+    }
+
     void log_stream_sink::write(const nlog::message& msg) {
         stream << msg.text;
     }
@@ -151,12 +192,20 @@ TEST_CASE("nlog", "[nlog]") {
     
     using lf::nlog;
 
-    nlog.sink.push_back(std::make_unique<lf::log_stream_sink>(std::cout));
+    nlog.format = std::make_unique<lf::simple_log_formatter>();
+    nlog.sinks.push_back(std::make_unique<lf::log_stream_sink>(std::cout));
+
 
     if (nlog.info()) {
         nlog::stream s = nlog();
-        s << "test" << std::endl << "msg" << nlog::end << "another info" << nlog::end;
+        s << "test" << std::endl << "msg" << nlog::end;
+        s << "another info" << nlog::end;
     }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+    nlog.warn() && nlog() << "warn msg" << nlog::end;
+    nlog.error() && nlog() << "error msg" << nlog::end;
 
 
 }
