@@ -16,10 +16,6 @@
 
 namespace lf {
 
-    class log_stream;
-    class log_sink;
-    struct log_message;
-
     class nlog {
     public:
 
