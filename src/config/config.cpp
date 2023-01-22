@@ -2,9 +2,10 @@
 #include <cstring>
 #include <string>
 #include <fstream>
+#include <algorithm>
 
 #include "fs/serialization.hpp"
-#include "io/log.hpp"
+#include "log/log.hpp"
 
 #include "config/config.hpp"
 #include "config/config_parser.hpp"
@@ -15,7 +16,7 @@ namespace lf {
 
     bool check_config_path_specified(const std::string& name, const std::filesystem::path& p, const char* key) {
         if (p.empty()) {
-            log.error() && log() << "sync \"" << name << "\" " << key << " path isn't specified" << std::endl;
+            log.error() && log() << "sync \"" << name << "\" " << key << " path isn't specified" << log::end;
             return false;
         }
         return true;
@@ -26,7 +27,7 @@ namespace lf {
             return false;
         }
         if (!p.is_absolute()) {
-            log.error() && log() << "sync \"" << name << "\" " << key << " path must be absolute" << std::endl;
+            log.error() && log() << "sync \"" << name << "\" " << key << " path must be absolute" << log::end;
             return false;
         }
         return true;
@@ -38,12 +39,12 @@ namespace lf {
         
         parse_config(s, [&cfg](const config_entry& e) {
             if (e.section.empty()) {
-                log.warn() && log() << "empty section at line " << e.line << std::endl;
+                log.warn() && log() << "empty section at line " << e.line << log::end;
                 return;
             }
 
             if (e.value.empty()) {
-                log.warn() && log() << "empty value for key \"" << e.key << "\" at line " << e.line << std::endl;
+                log.warn() && log() << "empty value for key \"" << e.key << "\" at line " << e.line << log::end;
                 return;
             }
 
@@ -57,7 +58,7 @@ namespace lf {
             } else if (e.key == "state") {
                 sync.state = e.value;
             } else {
-                log.warn() && log() << "invalid key \"" << e.key << "\" at line " << e.line << std::endl;
+                log.warn() && log() << "invalid key \"" << e.key << "\" at line " << e.line << log::end;
             }
         });
 
@@ -159,7 +160,7 @@ namespace lf {
     config::sync_entry_vec config::find_most_specific_local_matches(const std::filesystem::path& p) const {
         sync_entry_match_map m = find_local_matches(p);
         if (m.empty()) {
-            log.error() && log() << "no configured syncs found for path " << p << std::endl;
+            log.error() && log() << "no configured syncs found for path " << p << log::end;
             return config::sync_entry_vec();
         }
         return m.rbegin()->second;

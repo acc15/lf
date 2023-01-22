@@ -1,6 +1,6 @@
 #pragma once
 
-#include "io/log/log_message.hpp"
+#include "log/log_message.hpp"
 
 namespace lf {
 

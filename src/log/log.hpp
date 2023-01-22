@@ -1,7 +1,7 @@
 #pragma once
 
-#include "io/log/sink/composite_log_sink.hpp"
-#include "io/log/log_stream.hpp"
+#include "log/sink/composite_log_sink.hpp"
+#include "log/log_stream.hpp"
 
 namespace lf {
 

@@ -1,5 +1,5 @@
 #include "sync/synchronizer.hpp"
-#include "io/log.hpp"
+#include "log/log.hpp"
 #include "io/time.hpp"
 #include "io/file_type.hpp"
 #include "fs/time.hpp"
@@ -32,10 +32,12 @@ namespace lf {
             const path_info li = { "local", item.path.empty() ? sync.local : sync.local / item.path };
             const path_info ri = { "remote", item.path.empty() ? sync.remote : sync.remote / item.path };
             
-            out = &log();
+            log_stream s = log();
+            out = &s;
+
             *out << (item.path.empty() ? "<root>" : item.path.string()) << ": ";
             handle(item, li, ri);
-            *out << std::endl;
+            *out << log::end;
 
         }
     }
@@ -233,12 +235,12 @@ namespace lf {
         try {
             index.load(sync.index);
         } catch (const file_not_found_error& e) {
-            log.warn() && log() << e.what() << std::endl;
+            log.warn() && log() << e.what() << log::end;
         }
         try {
             state.load(sync.state);
         } catch (const file_not_found_error& e) {
-            log.debug() && log() << e.what() << std::endl;
+            log.debug() && log() << e.what() << log::end;
         }
     }
 

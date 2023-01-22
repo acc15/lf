@@ -1,6 +1,6 @@
 #pragma once
 
-#include "io/log.hpp"
+#include "log/log.hpp"
 #include "fs/serialization.hpp"
 #include "tree/binary.hpp"
 
@@ -38,7 +38,7 @@ namespace lf {
                 save_file(path, root);
                 changed = false;
             } else {
-                log.debug() && log() << "skipped save of " << tree_type::name << " to " << path << " as it wasn't modified" << std::endl;
+                log.debug() && log() << "skipped save of " << tree_type::name << " to " << path << " as it wasn't modified" << log::end;
             }
         }
 

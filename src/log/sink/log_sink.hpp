@@ -1,8 +1,8 @@
 #pragma once
 
-#include "io/log/log_message.hpp"
-#include "io/log/formatter/log_formatter.hpp"
-#include "io/log/filter/log_filter.hpp"
+#include "log/log_message.hpp"
+#include "log/formatter/log_formatter.hpp"
+#include "log/filter/log_filter.hpp"
 
 #include <memory>
 

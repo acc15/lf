@@ -71,7 +71,7 @@ TEST_CASE("parse_config", "[config_parser]") {
 }
 
 TEST_CASE("empty key", "[config_parser]") {
-    lf::log_tester t;
+    lf::log_tester t(lf::INFO);
     test_parse_config("=");
     REQUIRE_THAT(t.str(), Catch::Matchers::ContainsSubstring("empty key"));
 }

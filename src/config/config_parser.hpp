@@ -5,7 +5,7 @@
 #include <string_view>
 
 #include "util/string.hpp"
-#include "io/log.hpp"
+#include "log/log.hpp"
 #include "io/util.hpp"
 
 namespace lf {
@@ -40,13 +40,13 @@ namespace lf {
 
             std::string_view::size_type eq_pos = sv.find('=');
             if (eq_pos == std::string_view::npos) {
-                log.error() && log() << "invalid input line at " << entry.line << ": " << line << std::endl;
+                log.error() && log() << "invalid input line at " << entry.line << ": " << line << log::end;
                 continue;
             }
 
             entry.key = rtrim(sv.substr(0, eq_pos));
             if (entry.key.empty()) {
-                log.error() && log() << "empty key at " << entry.line << ": " << line << std::endl;
+                log.error() && log() << "empty key at " << entry.line << ": " << line << log::end;
                 continue;
             }
 

@@ -1,6 +1,6 @@
 #include "opts/opts.hpp"
 
-#include "io/log.hpp"
+#include "log/log.hpp"
 
 namespace lf {
 
@@ -10,7 +10,7 @@ namespace lf {
                 return &o;
             }
         }
-        log.warn() && log() << "unknown option: " << name << std::endl;
+        log.warn() && log() << "unknown option: " << name << log::end;
         return nullptr;
     }
 
@@ -22,7 +22,7 @@ namespace lf {
                 }
             }
         }
-        log.warn() && log() << "unknown option alias: " << alias << std::endl;
+        log.warn() && log() << "unknown option alias: " << alias << log::end;
         return nullptr;
     }
 

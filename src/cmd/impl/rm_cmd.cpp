@@ -1,7 +1,5 @@
 #include "cmd/impl/rm_cmd.hpp"
 #include "index/indexer.hpp"
-#include "io/log.hpp"
-#include "util/string.hpp"
 
 namespace lf {
 

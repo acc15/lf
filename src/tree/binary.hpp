@@ -2,7 +2,7 @@
 
 #include "tree/tree.hpp"
 #include "io/format.hpp"
-#include "io/log.hpp"
+#include "log/log.hpp"
 
 #include <cstring>
 #include <algorithm>
@@ -34,17 +34,17 @@ namespace lf {
         static std::ostream& write(std::ostream& s, const tree_type& tree) {
             
             if (!(s << tree_type::file_signature)) {
-                log.error() && log() << "unable to write file signature: " << strerror(errno) << std::endl;
+                log.error() && log() << "unable to write file signature: " << strerror(errno) << log::end;
                 return s;
             }
 
             if (!(s << tree_type::file_version)) {
-                log.error() && log() << "unable to write file version: " << strerror(errno) << std::endl;
+                log.error() && log() << "unable to write file version: " << strerror(errno) << log::end;
                 return s;
             }
 
             if (!(s << with_ref_format<format::BINARY>(tree.data))) {
-                log.error() && log() << "unable to write root data: " << strerror(errno) << std::endl;
+                log.error() && log() << "unable to write root data: " << strerror(errno) << log::end;
                 return s;
             }
 
@@ -56,32 +56,32 @@ namespace lf {
                 queue.pop_back();
 
                 if (e == nullptr) {
-                    log.trace() && log() << "entry ended, writing zero char" << std::endl;
+                    log.trace() && log() << "entry ended, writing zero char" << log::end;
                     s << '\0';
                     continue;
                 }
 
-                log.trace() && log() << "writing entry " << e->first << "..." << std::endl;
+                log.trace() && log() << "writing entry " << e->first << "..." << log::end;
                 if (!(s << e->first << '\0')) {
-                    log.error() && log() << "unable to write entry " << e->first << " name: " << strerror(errno) << std::endl;
+                    log.error() && log() << "unable to write entry " << e->first << " name: " << strerror(errno) << log::end;
                     break;
                 }
 
                 if (!(s << with_ref_format<format::BINARY>(e->second.data))) {
-                    log.error() && log() << "unable to write entry " << e->first << " data: " << strerror(errno) << std::endl;
+                    log.error() && log() << "unable to write entry " << e->first << " data: " << strerror(errno) << log::end;
                     break;
                 }
 
                 if (e->second.entries.empty()) {
                     
                     if (std::all_of(queue.begin(), queue.end(), [](auto p) { return p == nullptr; })) {
-                        log.trace() && log() << "all other entries are zeroes... ending tree file" << std::endl;
+                        log.trace() && log() << "all other entries are zeroes... ending tree file" << log::end;
                         break;
                     }
 
-                    log.trace() && log() << "entry " << e->first << " is empty, writing zero char" << std::endl;
+                    log.trace() && log() << "entry " << e->first << " is empty, writing zero char" << log::end;
                     if (!(s << '\0')) {
-                        log.error() && log() << "unable to write entry " << e->first << " finising zero char: " << strerror(errno) << std::endl;
+                        log.error() && log() << "unable to write entry " << e->first << " finising zero char: " << strerror(errno) << log::end;
                         break;
                     }
 
@@ -104,29 +104,29 @@ namespace lf {
             uint8_t version;
 
             if (!(s >> signature)) {
-                log.error() && log() << "unable to read file signature: " << strerror(errno) << std::endl;
+                log.error() && log() << "unable to read file signature: " << strerror(errno) << log::end;
                 return s;
             }
             
             if (std::strcmp(signature, tree_type::file_signature) != 0) {
-                log.error() && log() << "invalid file signature: " << signature << std::endl;
+                log.error() && log() << "invalid file signature: " << signature << log::end;
                 s.setstate(std::istream::failbit);
                 return s;
             }
 
             if (!(s >> version)) {
-                log.error() && log() << "unable to read file version: " << strerror(errno) << std::endl;
+                log.error() && log() << "unable to read file version: " << strerror(errno) << log::end;
                 return s;
             }
 
             if (version != tree_type::file_version) {
-                log.error() && log() << "invalid file version: " << static_cast<unsigned int>(version) << std::endl;
+                log.error() && log() << "invalid file version: " << static_cast<unsigned int>(version) << log::end;
                 s.setstate(std::istream::failbit);
                 return s;
             }
 
             if (!(s >> with_ref_format<format::BINARY>(tree.data))) {
-                log.error() && log() << "unable to read root data: " << strerror(errno) << std::endl;
+                log.error() && log() << "unable to read root data: " << strerror(errno) << log::end;
                 return s;
             }
 
@@ -148,13 +148,13 @@ namespace lf {
                 
                 std::string name;
                 if (!getline(s, name, '\0')) {
-                    log.error() && log() << "unable to read entry name: " << strerror(errno) << std::endl;
+                    log.error() && log() << "unable to read entry name: " << strerror(errno) << log::end;
                     break;
                 }
 
                 nested_tree& entry = (*stack.back())[name];
                 if (!(s >> with_ref_format<format::BINARY>(entry.data))) {
-                    log.error() && log() << "unable to read entry " << name << " data: " << strerror(errno) << std::endl;
+                    log.error() && log() << "unable to read entry " << name << " data: " << strerror(errno) << log::end;
                     break;
                 }
 

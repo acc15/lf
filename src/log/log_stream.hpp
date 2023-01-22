@@ -1,6 +1,6 @@
 #pragma once
 
-#include "io/log/sink/log_sink.hpp"
+#include "log/sink/log_sink.hpp"
 
 namespace lf {
 

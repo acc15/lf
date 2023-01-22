@@ -65,13 +65,13 @@ TEST_CASE("parse", "[config]") {
 }
 
 TEST_CASE("empty section", "[config]") {
-    log_tester t;
+    log_tester t(INFO);
     test_parse("state=test.abc");
     REQUIRE_THAT(t.str(), Catch::Matchers::ContainsSubstring("empty section"));
 }
 
 TEST_CASE("parse partial", "[config]") {
-    log_tester t;
+    log_tester t(INFO);
     auto p = test_parse(
         "[home]\n"
         "index=test.index\n"

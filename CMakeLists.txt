@@ -58,9 +58,37 @@ add_library(lf_core
     src/util/console.hpp
     src/util/console.cpp
 
+    # log filter
+    src/log/filter/log_filter.hpp
+    src/log/filter/log_filter.cpp
+    src/log/filter/log_level_filter.hpp
+    src/log/filter/log_level_filter.cpp
+    
+    # log formatter
+    src/log/formatter/log_formatter.hpp
+    src/log/formatter/simple_log_formatter.hpp
+    src/log/formatter/simple_log_formatter.cpp
+
+    # log sink
+    src/log/sink/log_sink.hpp
+    src/log/sink/log_sink.cpp
+    src/log/sink/composite_log_sink.hpp
+    src/log/sink/composite_log_sink.cpp
+    src/log/sink/stream_log_sink.hpp
+    src/log/sink/stream_log_sink.cpp
+
+    # log
+    src/log/log_level.hpp
+    src/log/log_level.cpp
+    src/log/log_message.hpp
+    src/log/log_stream.hpp
+    src/log/log_stream.cpp
+    src/log/log.hpp
+    src/log/log.cpp
+    src/log/config.hpp
+    src/log/config.cpp
+
     # io
-    src/io/log.hpp
-    src/io/log.cpp
     src/io/null_stream.hpp
     src/io/null_stream.cpp
     src/io/ios_flags.hpp
@@ -130,10 +158,8 @@ add_executable(lf_test
     test/cmd/cmd.cpp
     test/io/log_tester.hpp
     test/io/log_tester.cpp
-    test/io/log.cpp
     test/io/time.cpp
     test/io/ios_flags.cpp
-    test/io/nlog.cpp
 
     test/config/config_parser.cpp
     test/config/config.cpp

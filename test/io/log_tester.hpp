@@ -3,19 +3,19 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include "io/log.hpp"
+
+#include "log/log_level.hpp"
 
 namespace lf {
 
     struct log_tester {
-        log_tester(log::level level = log::default_level);
+        log_tester(log_level level);
         ~log_tester();
         
         std::string str() const;
         bool contains(std::string_view v) const;
 
         std::stringstream out;
-        log::level original_min_level;
     };
 
 }

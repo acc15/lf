@@ -1,4 +1,4 @@
-#include "io/log/formatter/simple_log_formatter.hpp"
+#include "log/formatter/simple_log_formatter.hpp"
 
 #include "io/time.hpp"
 

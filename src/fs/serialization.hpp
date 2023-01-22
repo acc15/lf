@@ -8,7 +8,7 @@
 
 #include "fs/path.hpp"
 #include "fs/error.hpp"
-#include "io/log.hpp"
+#include "log/log.hpp"
 #include "io/ios_flags.hpp"
 #include "io/format_stream.hpp"
 #include "io/format.hpp"
@@ -31,7 +31,7 @@ namespace lf {
 	void load_file(const std::filesystem::path& path, T& result) {
         const std::ios_base::openmode flags = std::ios_base::in | get_serializable_openmode<T>();
         log.debug() && log() << "loading " << T::name << " file from " << path 
-            << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << std::endl;
+            << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << log::end;
         
         std::ifstream file(path, flags);
         if (!file) {
@@ -48,10 +48,10 @@ namespace lf {
         }
 
         if (!file.eof()) {
-            log.trace() && log() << T::name << " file " << path << "wasn't fully read (no eofbit)" << std::endl;
+            log.trace() && log() << T::name << " file " << path << "wasn't fully read (no eofbit)" << log::end;
         }
 
-        log.debug() && log() << T::name << " file has been successfully loaded from " << path << std::endl;
+        log.debug() && log() << T::name << " file has been successfully loaded from " << path << log::end;
 	}
 
 	template <serializable T>
@@ -65,7 +65,7 @@ namespace lf {
 	void save_file(const std::filesystem::path& path, const T& ref) {
         const std::ios_base::openmode flags = std::ios_base::out | std::ios_base::trunc | get_serializable_openmode<T>(); 
 		log.debug() && log() << "saving " << T::name << " to " << path 
-            << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << std::endl;
+            << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << log::end;
 
         create_parent_dirs(path);
 
@@ -83,7 +83,7 @@ namespace lf {
             );
         }
 
-        log.debug() && log() << T::name << " has been successfully saved to " << path << std::endl;
+        log.debug() && log() << T::name << " has been successfully saved to " << path << log::end;
 	}
 
 }

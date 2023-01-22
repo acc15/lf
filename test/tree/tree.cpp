@@ -135,7 +135,7 @@ TEST_CASE("serialization", "[tree]") {
 }
 
 TEST_CASE("deserialize with wrong signature", "[tree]") {
-    log_tester t;
+    log_tester t(INFO);
 
     std::stringstream ss("WRONGSIGNATUREHERE!!!");
 

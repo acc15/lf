@@ -2,7 +2,7 @@
 
 #include "cmd/impl/sync_cmd.hpp"
 #include "config/config.hpp"
-#include "io/log.hpp"
+#include "log/log.hpp"
 #include "io/joiner.hpp"
 
 #include "sync/synchronizer.hpp"
@@ -25,7 +25,7 @@ namespace lf {
             log.error() && log() 
                 << "no one sync found by supplied names, declared sync names: " 
                 << join(", ", cfg.syncs, [](const auto& e) { return e.first; }) 
-                << std::endl;
+                << log::end;
             return 1;
         }
 
@@ -41,7 +41,7 @@ namespace lf {
             << "syncing \"" << name
             << "\", local: " << sync.local 
             << ", remote: " << sync.remote 
-            << std::endl;
+            << log::end;
 
         synchronizer s(name, sync);
         try {
@@ -49,7 +49,7 @@ namespace lf {
             s.run();
             s.save();
         } catch (const std::runtime_error& e) {
-            log.error() && log() << "unable to sync \"" << name << "\": " << e.what() << std::endl;
+            log.error() && log() << "unable to sync \"" << name << "\": " << e.what() << log::end;
             return false;
         }
         return true;

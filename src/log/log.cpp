@@ -1,8 +1,10 @@
-#include "io/log/log.hpp"
+#include "log/log.hpp"
 
 namespace lf {
 
     thread_local log_level log::cur_level = log_level::INFO;
+
+    const log::end_t log::end;
 
     bool log::trace() { return with(TRACE); }
     bool log::debug() { return with(DEBUG); }
@@ -18,6 +20,12 @@ namespace lf {
         return true;
     }
 
+    log_stream log::operator()() {
+        log_message msg = { .level = cur_level, .timestamp = std::chrono::system_clock::now() };
+        cur_level = INFO;
+        return log_stream(*this, msg);
+    }
+
     std::ostream& operator<<(std::ostream& s, const log::end_t&) {
         log_stream* lp = dynamic_cast<log_stream*>(&s);
         if (lp != nullptr) {
@@ -25,6 +33,8 @@ namespace lf {
         }
         return s;
     }
+
+
 
     class log log;
 

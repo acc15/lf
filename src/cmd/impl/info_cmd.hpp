@@ -20,7 +20,7 @@ namespace lf {
                 const Tree t = load_file<Tree>(p);
                 std::cout << Tree::name << " of \"" << sync << "\" sync: " << std::endl << t;
             } catch (const std::runtime_error& e) {
-                log.debug() && log() << e.what() << std::endl;
+                log.debug() && log() << e.what() << log::end;
             }
         }
     };

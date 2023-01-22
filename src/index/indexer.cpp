@@ -1,7 +1,7 @@
 #include "index/indexer.hpp"
 
 #include "fs/path.hpp"
-#include "io/log.hpp"
+#include "log/log.hpp"
 #include "config/config.hpp"
 
 namespace fs = std::filesystem;
@@ -20,7 +20,7 @@ namespace lf {
         try {
             path = normalize_path(path_str);
         } catch (const fs::filesystem_error& ex) {
-            log.error() && log() << "unable to normalize path \"" << path_str << "\", error: " << ex.what() << std::endl;
+            log.error() && log() << "unable to normalize path \"" << path_str << "\", error: " << ex.what() << log::end;
             success = false;
             return;
         }
@@ -29,20 +29,20 @@ namespace lf {
         if (mode == sync_mode::RECURSIVE && status.type() != fs::file_type::directory) {
             log.error() && log() << "recursive can be used only for existing directories, but " 
                 << path << " doesn't denote a directory" 
-                << std::endl;
+                << log::end;
             success = false;
             return;
         }
         
         if (mode != sync_mode::UNSPECIFIED && status.type() == fs::file_type::not_found) {
-            log.error() && log() << "path " << path << " doesn't exists" << std::endl;
+            log.error() && log() << "path " << path << " doesn't exists" << log::end;
             success = false;
             return;
         }
 
         config::sync_entry_vec matches = cfg.find_most_specific_local_matches(path);
         for (const auto* e: matches) {
-            log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e->first << "\" sync index " << e->second.index << std::endl;
+            log.info() && log() << "set " << path << " mode to " << mode << " in \"" << e->first << "\" sync index " << e->second.index << log::end;
             set_index_mode(e->second, relative_path(path, e->second.local), mode);
         }
 
@@ -53,7 +53,7 @@ namespace lf {
             try {
                 p.second.save_if_changed(p.first);
             } catch (const std::runtime_error& e) {
-                log.error() && log() << e.what() << std::endl;
+                log.error() && log() << e.what() << log::end;
                 success = false;
             }
         }
@@ -78,7 +78,7 @@ namespace lf {
             try {
                 emplace_result.first->second.load(index_path);
             } catch (const std::runtime_error& e) {
-                log.debug() && log() << e.what() << std::endl;
+                log.debug() && log() << e.what() << log::end;
             }
         }
         return emplace_result.first->second;
