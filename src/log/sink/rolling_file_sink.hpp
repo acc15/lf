@@ -18,6 +18,8 @@ namespace lf {
     public:
         rolling_file_sink(const std::filesystem::path& path, std::size_t max_file_size, std::size_t max_file_count);
 
+        void rollover();
+
     };
 
 }
