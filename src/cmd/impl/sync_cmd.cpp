@@ -43,7 +43,7 @@ namespace lf {
             << ", remote: " << sync.remote 
             << log::end;
 
-        synchronizer s(name, sync);
+        synchronizer s(sync);
         try {
             s.load();
             s.run();

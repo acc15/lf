@@ -7,6 +7,8 @@
 #include "log/formatter/simple_log_formatter.hpp"
 #include "log/sink/stream_log_sink.hpp"
 
+#include "util/pick.hpp"
+
 namespace lf {
 
     const char* log_level_env_name = "LF_LEVEL";
@@ -14,11 +16,9 @@ namespace lf {
 
     log_level get_log_level_env() {
         const char* level_env = getenv(log_level_env_name);
-        if (level_env == nullptr) {
-            return log::default_level;
-        }
-        // TODO parse log level
-        return INFO;
+        return level_env == nullptr 
+            ? log::default_level 
+            : parse_enum(level_env, log::default_level, log_level_names);
     }
 
     std::filesystem::path get_log_file_env() {

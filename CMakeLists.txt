@@ -76,6 +76,8 @@ add_library(lf_core
     src/log/sink/composite_log_sink.cpp
     src/log/sink/stream_log_sink.hpp
     src/log/sink/stream_log_sink.cpp
+    src/log/sink/rolling_file_sink.hpp
+    src/log/sink/rolling_file_sink.cpp
 
     # log
     src/log/log_level.hpp
@@ -123,6 +125,11 @@ add_library(lf_core
     # sync
     src/sync/synchronizer.cpp
     src/sync/synchronizer.hpp
+    src/sync/entry_synchronizer.cpp
+    src/sync/entry_synchronizer.hpp
+    src/sync/path_info.hpp
+    src/sync/path_info.cpp
+    src/sync/sync_item.hpp
 
     # cmd
     src/cmd/cmd.hpp 

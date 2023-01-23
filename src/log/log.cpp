@@ -2,6 +2,8 @@
 
 namespace lf {
 
+    const log_level log::default_level = INFO;
+
     thread_local log_level log::cur_level = log::default_level;
 
     const log::end_t log::end;
