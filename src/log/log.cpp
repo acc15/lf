@@ -2,7 +2,7 @@
 
 namespace lf {
 
-    thread_local log_level log::cur_level = log_level::INFO;
+    thread_local log_level log::cur_level = log::default_level;
 
     const log::end_t log::end;
 
@@ -22,7 +22,7 @@ namespace lf {
 
     log_stream log::operator()() {
         log_message msg = { .level = cur_level, .timestamp = std::chrono::system_clock::now() };
-        cur_level = INFO;
+        cur_level = default_level;
         return log_stream(*this, msg);
     }
 
@@ -33,8 +33,6 @@ namespace lf {
         }
         return s;
     }
-
-
 
     class log log;
 

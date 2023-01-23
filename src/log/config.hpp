@@ -7,7 +7,6 @@
 
 namespace lf {
 
-    extern const log_level log_level_default;
     extern const char* log_level_env_name;
     extern const char* log_file_env_name;
 

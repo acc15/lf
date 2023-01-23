@@ -4,7 +4,7 @@
     },
     "cmake.debugConfig": {
         "console": "integratedTerminal",
-        "args": ["nlog"]
+        "args": []
     },
     "cmake.environment": {
         "LF_LEVEL": "INFO"

@@ -9,14 +9,13 @@
 
 namespace lf {
 
-    const log_level log_level_default = log_level::INFO;
     const char* log_level_env_name = "LF_LEVEL";
     const char* log_file_env_name = "LF_LOG";
 
     log_level get_log_level_env() {
         const char* level_env = getenv(log_level_env_name);
         if (level_env == nullptr) {
-            return log_level_default;
+            return log::default_level;
         }
         // TODO parse log level
         return INFO;

@@ -14,7 +14,7 @@ namespace lf {
     };
 
     std::ostream& operator<<(std::ostream& s, const log_level& l) {
-        return s << pick_indexed_with_last_default(l, log_level_names);
+        return s << pick_indexed(l, log_level_names);
     }
 
 }

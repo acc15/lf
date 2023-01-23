@@ -22,4 +22,8 @@ namespace lf {
 
 	std::string lpad(std::string_view str, std::string::size_type len, char pad);
 
+	bool ci_char_eq(char a, char b);
+	bool ci_str_eq(std::string_view a, std::string_view b);
+
+
 }

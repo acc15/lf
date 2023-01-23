@@ -7,6 +7,8 @@ namespace lf {
 
     class log: public composite_log_sink {
     public:
+        static const log_level default_level = INFO;
+
         struct end_t {};
         static const end_t end;
 

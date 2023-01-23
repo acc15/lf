@@ -44,3 +44,11 @@ TEST_CASE("upper inplace", "[string]") {
 	upper(str);
 	REQUIRE( str == "юTRACEд" );
 }
+
+TEST_CASE("ci_str_eq", "[string]") {
+	REQUIRE( ci_str_eq("aBc", "ABC") );
+	REQUIRE( ci_str_eq("ABC", "abc") );
+	REQUIRE_FALSE( ci_str_eq("aBc", "cde") );
+	REQUIRE_FALSE( ci_str_eq("aBc", "a") );
+	REQUIRE_FALSE( ci_str_eq("aBc", "ab") );
+}
