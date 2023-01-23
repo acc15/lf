@@ -68,7 +68,7 @@ namespace lf {
 
     void entry_synchronizer::sync_dirs() {
         out << (item.finalize ? "finalizing directory" : "syncing directories");
-        queue_dir_entries(&local.path, &remote.path);
+        queue_dir_entries({ &local.path, &remote.path });
     }
 
     void entry_synchronizer::sync_not_found(const path_info& src, const path_info& dst) {
@@ -94,7 +94,7 @@ namespace lf {
         if (src.type == fs::file_type::directory) {
             out << "creating directory in " << dst.name;
             fs::create_directory(dst.path, src.path);
-            queue_dir_entries(&src.path);
+            queue_dir_entries({ &src.path });
         } else if (item.mode != sync_mode::UNSPECIFIED) {
             copy_file_with_timestamp(src, dst);
             sync.state.set(item.path, true, true);
@@ -103,12 +103,13 @@ namespace lf {
         }
     }
 
-    void entry_synchronizer::queue_dir_entries(const std::filesystem::path* dir_1, const std::filesystem::path* dir_2) {
+    void entry_synchronizer::queue_dir_entries(const std::initializer_list<const fs::path*>& dirs) {
         queue_map map;
 
         add_state_names(map);
-        add_dir_names(dir_1, map);
-        add_dir_names(dir_2, map);
+        for (const fs::path* dir: dirs) {
+            add_dir_names(*dir, map);
+        }
         add_index_names(map);
 
         sync.queue.resize(sync.queue.size() + map.size());
@@ -127,11 +128,11 @@ namespace lf {
         sync.state.remove(item.path);
     }
 
-    void entry_synchronizer::add_dir_names(const std::filesystem::path* dir_path, queue_map& dest) const {
-        if (dir_path == nullptr || item.mode == sync_mode::UNSPECIFIED) {
+    void entry_synchronizer::add_dir_names(const std::filesystem::path& dir_path, queue_map& dest) const {
+        if (item.mode == sync_mode::UNSPECIFIED) {
             return;
         }
-        for (auto p: fs::directory_iterator(*dir_path)) {
+        for (auto p: fs::directory_iterator(dir_path)) {
             if (p.is_directory() && item.mode != sync_mode::RECURSIVE) {
                 continue;
             }
