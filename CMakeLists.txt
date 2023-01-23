@@ -161,6 +161,8 @@ add_executable(lf_test
 
     test/tree/tree.cpp
     test/opts/opts.cpp
+
+    test/log/sink/rolling_file_sink.cpp
     
     test/cmd/cmd.cpp
     test/io/log_tester.hpp

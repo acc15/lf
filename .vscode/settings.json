@@ -3,8 +3,7 @@
         "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
     },
     "cmake.debugConfig": {
-        "console": "integratedTerminal",
-        "args": []
+        "args": ["'[rolling_file_sink]'"]
     },
     "cmake.environment": {
         "LF_LEVEL": "INFO"
