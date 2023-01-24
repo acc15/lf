@@ -76,6 +76,8 @@ add_library(lf_core
     src/log/sink/composite_log_sink.cpp
     src/log/sink/stream_log_sink.hpp
     src/log/sink/stream_log_sink.cpp
+    src/log/sink/rolling_file_info.hpp
+    src/log/sink/rolling_file_info.cpp
     src/log/sink/rolling_file_sink.hpp
     src/log/sink/rolling_file_sink.cpp
 
@@ -162,6 +164,7 @@ add_executable(lf_test
     test/tree/tree.cpp
     test/opts/opts.cpp
 
+    test/log/sink/rolling_file_info.cpp
     test/log/sink/rolling_file_sink.cpp
     
     test/cmd/cmd.cpp

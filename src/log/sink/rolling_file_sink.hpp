@@ -1,9 +1,11 @@
 #pragma once
 
 #include "log/sink/log_sink.hpp"
+#include "log/sink/rolling_file_info.hpp"
+
 #include <filesystem>
 #include <fstream>
-#include <vector>
+#include <set>
 #include <string_view>
 
 namespace lf {
@@ -16,22 +18,17 @@ namespace lf {
         std::fstream file;
         bool add_date;
 
-    public:
+        using info_set = std::set<rolling_file_info>;
 
-        struct rolling_file_info {
-            std::filesystem::file_time_type time;
-            std::string name;
-            unsigned int seq;
-        };
+        info_set get_archive_files() const;
 
-    private:
-        
-        std::vector<rolling_file_info> get_archive_files() const;
-        std::filesystem::path next_archive_path(const std::vector<rolling_file_info>& archive_files) const;
+        std::string get_archive_suffix() const;
+        std::filesystem::path next_archive_path(const info_set& archive_files) const;
+
         void write_archive(const std::filesystem::path& archive_path) const;
-        void delete_redundant_files(std::vector<rolling_file_info>& vec) const;
-        std::string filename_prefix() const;
+        void delete_old_files(info_set& archive_files) const;
         void rollover();
+
 
     protected:
         void write(const log_message& message) override;
