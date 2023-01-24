@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "fs/path.hpp"
+#include "fs/util.hpp"
 
 namespace fs = std::filesystem;
 
@@ -28,6 +28,12 @@ namespace lf {
         if (path.has_parent_path()) {
             fs::create_directories(path.parent_path());
         }
+    }
+
+    void copy_file_with_timestamp(const fs::path& src, const fs::path& dst) {
+        fs::copy_file(src, dst, fs::copy_options::overwrite_existing);
+        fs::file_time_type src_time = fs::last_write_time(src);
+        fs::last_write_time(dst, src_time);
     }
 
 }

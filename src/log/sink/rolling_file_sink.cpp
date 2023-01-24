@@ -24,28 +24,26 @@ namespace lf {
     }
 
     void rolling_file_sink::rollover() {
-
-        if (!file.is_open()) {
-            file.open(path, std::ios_base::in | std::ios_base::out | std::ios_base::app);
+        if (max_file_size == 0 || !fs::exists(path) || fs::file_size(path) < max_file_size) {
+            if (!file.is_open()) {
+                fs::create_directories(path.parent_path());
+                file.open(path, std::ios_base::app);
+            }
+            return;
         }
 
-        if (max_file_size == 0 || !fs::exists(path) || fs::file_size(path) < max_file_size) {
-            return;
+        if (file.is_open()) {
+            file.close();
         }
 
         if (max_file_count > 0) {
             info_set archive_files = get_archive_files();
             fs::path archive_path = next_archive_path(archive_files);
             delete_old_files(archive_files);
-
-            file.seekg(0);
-            write_archive(archive_path);
+            fs::rename(path, archive_path);
         }
 
-        // truncating and seeking to begin
-        fs::resize_file(path, 0);
-        file.clear();
-        file.seekp(0);
+        file.open(path, std::ios_base::trunc);
 
     }
 

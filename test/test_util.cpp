@@ -1,5 +1,5 @@
 #include "test_util.hpp"
-#include "fs/path.hpp"
+#include "fs/util.hpp"
 
 #include <fstream>
 #include <sstream>

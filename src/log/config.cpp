@@ -9,6 +9,8 @@
 
 #include "util/pick.hpp"
 
+namespace fs = std::filesystem;
+
 namespace lf {
 
     const char* log_level_env_name = "LF_LEVEL";
@@ -21,13 +23,35 @@ namespace lf {
             : parse_enum(level_env, log::default_level, log_level_names);
     }
 
-    std::filesystem::path get_log_file_env() {
+    fs::path get_log_file_env() {
         const char* path_env = getenv(log_file_env_name);
-        return path_env != nullptr ? std::filesystem::path(path_env) : get_log_file_default();
+        return path_env != nullptr ? fs::path(path_env) : get_log_file_default();
     }
 
-    std::filesystem::path get_log_file_default() {
-        return std::filesystem::path();
+    fs::path get_log_file_default() {
+        const fs::path rel_path = fs::path("lf") / "lf.log";
+#if __linux__
+        const char* home = std::getenv("HOME");
+        if (home != nullptr) {
+            return fs::path(home) / ".cache" / rel_path;
+        }
+        return fs::path("/var/log") / rel_path;
+#elif _WIN32
+        const char* local_app_data = std::getenv("LOCALAPPDATA");
+        if (local_app_data != nullptr) {
+            return fs::path(local_app_data) / rel_path;
+        }
+        const char* program_data = std::getenv("PROGRAMDATA");
+        if (program_data != nullptr) {
+            return fs::path(program_data) / rel_path;
+        }
+        return fs::path("C:\\ProgramData") / rel_path;
+#elif __APPLE__
+        const char* home = std::getenv("HOME");
+        return fs::path(home != nullptr ? home : "/") / "Library" / "Logs" / rel_path;
+#else
+#       error Unknown platform!
+#endif
     }
 
     void log_init() {

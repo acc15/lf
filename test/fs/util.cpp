@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "fs/path.hpp"
+#include "fs/util.hpp"
 
 #include "test_util.hpp"
 

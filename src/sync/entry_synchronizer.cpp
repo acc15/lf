@@ -4,6 +4,7 @@
 #include "io/time.hpp"
 #include "io/file_type.hpp"
 #include "fs/time.hpp"
+#include "fs/util.hpp"
 
 namespace fs = std::filesystem;
 
@@ -172,6 +173,7 @@ namespace lf {
 
     void entry_synchronizer::copy_file_with_timestamp(const path_info& src, const path_info& dst) const {
         out << "copying file from " << src.name << " to " << dst.name;
+        lf::copy_file_with_timestamp(src.path, dst.path);
         fs::copy_file(src.path, dst.path, fs::copy_options::overwrite_existing);
         fs::file_time_type src_time = fs::last_write_time(src.path);
         fs::last_write_time(dst.path, src_time);

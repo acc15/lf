@@ -1,6 +1,6 @@
 #include "index/indexer.hpp"
 
-#include "fs/path.hpp"
+#include "fs/util.hpp"
 #include "log/log.hpp"
 #include "config/config.hpp"
 

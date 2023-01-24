@@ -6,7 +6,7 @@
 #include <concepts>
 #include <exception>
 
-#include "fs/path.hpp"
+#include "fs/util.hpp"
 #include "fs/error.hpp"
 #include "log/log.hpp"
 #include "io/ios_flags.hpp"

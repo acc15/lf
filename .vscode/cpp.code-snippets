@@ -36,6 +36,8 @@
 			"",
 			"#include \"${RELATIVE_FILEPATH/test\\/(.*)\\.cpp/$1.hpp/}\"",
 			"",
+			"using namespace lf;",
+			"",
 			"TEST_CASE(\"${1:test}\", \"[${TM_FILENAME_BASE}]\") {",
 			"    $0",
 			"}"
