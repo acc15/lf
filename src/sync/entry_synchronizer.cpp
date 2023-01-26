@@ -50,27 +50,25 @@ namespace lf {
     }
 
     void entry_synchronizer::sync_with_timestamps() {
-        const fs::file_time_type local_time = ntfs_last_write_time(local.path);
-        const fs::file_time_type remote_time = ntfs_last_write_time(remote.path);
-        if (local_time == remote_time) {
-            sync_same_time(local_time);
-        } else if (local_time > remote_time) {
-            out << "using local because " << format_date_time(local_time) << " > " << format_date_time(remote_time) << ", ";
+        local.time = ntfs_last_write_time(local.path);
+        remote.time = ntfs_last_write_time(remote.path);
+        if (local.time == remote.time) {
+            sync_same_time();
+        } else if (local.time > remote.time) {
             sync_other(local, remote);
         } else {
-            out << "using remote because " << format_date_time(local_time) << " < " << format_date_time(remote_time) << ", ";
             sync_other(remote, local);
         }
     }
 
-    void entry_synchronizer::sync_same_time(const fs::file_time_type& time) {
+    void entry_synchronizer::sync_same_time() {
         if (item.mode == sync_mode::UNSPECIFIED) {
             sync_skip();
         } else if (local.type == remote.type) {
-            out << "synced, both entries has same modification time (" << format_date_time(time) << ") and same type: " << local.type;
+            out << "synced, both entries has same modification time (" << format_date_time(local.time) << ") and same type: " << local.type;
             sync.state.set(item.path, true, true);
         } else {
-            out << "CONFLICT, both entries has same modification time (" << format_date_time(time) 
+            out << "CONFLICT, both entries has same modification time (" << format_date_time(local.time) 
                 << "), but different types, local is " << local.type << ", remote is " << remote.type;
             sync.state.remove(item.path);
         }
@@ -103,6 +101,7 @@ namespace lf {
     }
 
     void entry_synchronizer::sync_other(const path_info& src, const path_info& dst) {
+        out << "using " << src.name << "because " << format_date_time(src.time) << " > " << format_date_time(dst.time) << ", ";
         if (src.type == fs::file_type::directory || (dst.type == fs::file_type::directory && item.mode != sync_mode::UNSPECIFIED)) {
             out << "deleting " << dst.name << " " << dst.type << ", ";
             fs::remove_all(dst.path);

@@ -7,7 +7,8 @@ namespace lf {
         name(local ? "local" : "remote"),
         path(path), 
         status(std::filesystem::status(path)), 
-        type(status.type())  
+        type(status.type()),
+        time{}
     {
     }
 

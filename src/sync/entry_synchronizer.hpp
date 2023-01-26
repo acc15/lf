@@ -12,9 +12,9 @@ namespace lf {
 
         std::ostream& out;
         synchronizer& sync;
-        const sync_item item;
-        const path_info local;
-        const path_info remote;
+        sync_item item;
+        path_info local;
+        path_info remote;
 
     public:
 
@@ -31,12 +31,13 @@ namespace lf {
         void sync_dirs();
         void sync_not_found(const path_info& src, const path_info& dst);
         void sync_other(const path_info& src, const path_info& dst);
+
         void sync_del(const path_info& src, const path_info& dst);
         void sync_new(const path_info& src, const path_info& dst);
         void sync_new_dir(const path_info& src, const path_info& dst);
 
         void sync_skip();
-        void sync_same_time(const std::filesystem::file_time_type& time);
+        void sync_same_time();
         
         void add_dir_entries(const path_info& i, queue_map& dest) const;
         void add_state_names(queue_map& dest) const;
