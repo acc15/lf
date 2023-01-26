@@ -55,7 +55,7 @@ TEST_CASE("file added", "[synchronizer]") {
     write_text((local ? sync.local : sync.remote) / test_deep_path, test_content);
     
     synchronizer s(sync);
-    s.index = lf::index(sync_mode::UNSPECIFIED, { { "a", lf::index(sync_mode::UNSPECIFIED, { { test_name, lf::index(sync_mode::SHALLOW) } }) } });
+    s.index.set(test_deep_path, sync_mode::SHALLOW);
     s.run();
 
     REQUIRE( read_text((local ? sync.remote : sync.local) / test_deep_path ) == test_content );
@@ -264,10 +264,12 @@ TEST_CASE("avoid creating UNSPECIFIED directories", "[synchronizer]") {
     const fs::path l = sync.local;
     const fs::path r = sync.remote;
 
-    const fs::path dir = fs::path("a") / "b";
-    const fs::path path = dir / test_name;
+    const fs::path keep_dir = "a";
+    const fs::path cleanup_dir = keep_dir / "b";
+    const fs::path path = cleanup_dir / test_name;
 
     // file present in remote, but dir "test" removed in local
+    fs::create_directory(l / keep_dir);
     write_text(r / path, test_content);
 
     synchronizer s(sync);
@@ -279,8 +281,8 @@ TEST_CASE("avoid creating UNSPECIFIED directories", "[synchronizer]") {
 
     REQUIRE_FALSE( fs::exists(r / path) ); // file deleted in remote
     REQUIRE_FALSE( fs::exists(l / path) ); // file still absent in local
-    REQUIRE( fs::is_empty(l) ); // local dir is empty
-    REQUIRE( fs::is_empty(r) ); // remote dir is empty because UNSPECIFIED empty directory was deleted
+    REQUIRE( fs::is_empty(l) );
+    REQUIRE( fs::is_empty(r) );
 
 }
 

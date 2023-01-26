@@ -35,12 +35,14 @@ namespace lf {
         void sync_skip();
         void sync_same_time(const std::filesystem::file_time_type& time);
         
-        void queue_dir_entries(const std::initializer_list<const std::filesystem::path*>& dirs);
-        void add_dir_names(const std::filesystem::path& dir_path, queue_map& dest) const;
+        void add_dir_entries(const path_info& i, queue_map& dest) const;
         void add_state_names(queue_map& dest) const;
         void add_index_names(queue_map& dest) const;
 
         void copy_file_with_timestamp(const path_info& src, const path_info& dst) const;
+
+        bool create_dir_if_not_exists(const path_info& p) const;
+        bool delete_dir_if_empty(const path_info& p) const;
         
     };
 

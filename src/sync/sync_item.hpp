@@ -8,7 +8,7 @@ namespace lf {
     enum class sync_method {
         SYNC,
         FINALIZE,
-        POST_FINALIZE
+        POST_CLEANUP
     };
 
     struct sync_item {
