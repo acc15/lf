@@ -21,6 +21,10 @@ namespace lf {
         data_type data = {};
         map_type entries = {};
 
+        bool empty() const {
+            return entries.empty();
+        }
+
         tree* node(const std::filesystem::path& path) {
             tree* e = this;
             for (const auto& el: path) {

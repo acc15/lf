@@ -30,6 +30,7 @@ namespace lf {
         void sync_not_found(const path_info& src, const path_info& dst);
         void sync_other(const path_info& src, const path_info& dst);
         void sync_new(const path_info& src, const path_info& dst);
+        void sync_new_dir(const path_info& src, const path_info& dst);
 
         void sync_skip();
         void sync_same_time(const std::filesystem::file_time_type& time);

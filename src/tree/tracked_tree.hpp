@@ -24,6 +24,10 @@ namespace lf {
             return *this;
         }
 
+        bool empty() const {
+            return root.empty();
+        }
+
         bool is_changed() const {
             return changed;
         }

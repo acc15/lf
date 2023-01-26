@@ -32,7 +32,6 @@ std::map<fs_rep, fs_rep> linux_ntfs_expectations = {
 };
 
 #if defined (__linux__)
-
 TEST_CASE("ntfs_last_write_time", "[time]") {
     for (const auto& e: linux_ntfs_expectations) {
         fs_time set = fs_tp(e.first);

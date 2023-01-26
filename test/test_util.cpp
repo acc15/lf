@@ -4,22 +4,33 @@
 #include <fstream>
 #include <sstream>
 
+namespace fs = std::filesystem;
+
 namespace lf {
 
-    const std::filesystem::path test_dir_path = std::filesystem::path(__FILE__).parent_path();
+    const fs::path test_dir_path = fs::path(__FILE__).parent_path();
     
 #ifdef _WIN32
-    const std::filesystem::path test_root_path = "C:\\";
+    const fs::path test_root_path = "C:\\";
 #else
-    const std::filesystem::path test_root_path = "/";
+    const fs::path test_root_path = "/";
 #endif
+
+    fs::path create_temp_test_dir(const fs::path& test_path) {
+        fs::path p = fs::temp_directory_path() / "lf_test" / test_path;
+        fs::create_directories(p);
+        for (auto child: fs::directory_iterator(p)) {
+            fs::remove_all(child);
+        }
+        return p;
+    }
 
     std::string test_root_str(std::string_view p) {
         return (test_root_path / p).string();
     }
 
     void write_text(const std::filesystem::path& path, const std::string& text) {
-        create_parent_dirs(path);
+        fs::create_directories(path.parent_path());
         std::ofstream s(path);
         s << text;
     }

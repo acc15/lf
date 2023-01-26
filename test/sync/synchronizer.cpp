@@ -11,10 +11,8 @@ using namespace lf;
 
 config::sync make_sync(bool local_to_remote) {
     std::string name = Catch::getResultCapture().getCurrentTestName() + " " + (local_to_remote ? "L2R" : "R2L");
+    fs::path dest_test_dir = create_temp_test_dir(fs::path("synchronizer") / name);
 
-    fs::path dest_test_dir = fs::temp_directory_path() / "lf_test" / "synchronizer" / name;
-
-    fs::remove_all(dest_test_dir);
     fs::path local = dest_test_dir / "local";
     fs::path remote = dest_test_dir / "remote";
 
@@ -258,3 +256,31 @@ TEST_CASE("dir to file", "[synchronizer]") {
     REQUIRE( read_text(r / test_name / "x.txt") == test_content );
 
 }
+
+TEST_CASE("avoid creating UNSPECIFIED directories", "[synchronizer]") {
+    
+    auto sync = make_sync(true);
+
+    const fs::path l = sync.local;
+    const fs::path r = sync.remote;
+
+    const fs::path dir = fs::path("a") / "b";
+    const fs::path path = dir / test_name;
+
+    // file present in remote, but dir "test" removed in local
+    write_text(r / path, test_content);
+
+    synchronizer s(sync);
+    s.state.set(path, true);
+    s.run();
+
+    REQUIRE( s.state.empty() );
+    REQUIRE( s.index.empty() );
+
+    REQUIRE_FALSE( fs::exists(r / path) ); // file deleted in remote
+    REQUIRE_FALSE( fs::exists(l / path) ); // file still absent in local
+    REQUIRE( fs::is_empty(l) ); // local dir is empty
+    REQUIRE( fs::is_empty(r) ); // remote dir is empty because UNSPECIFIED empty directory was deleted
+
+}
+

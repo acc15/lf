@@ -2,12 +2,14 @@
 
 namespace lf {
 
-    path_info::path_info(std::string_view name, const std::filesystem::path& sync_path, const std::filesystem::path& rel_path):
-        name(name),
-        path(rel_path.empty() ? sync_path : sync_path / rel_path), 
+    path_info::path_info(bool local, const std::filesystem::path& path):
+        local(local),
+        name(local ? "local" : "remote"),
+        path(path), 
         status(std::filesystem::status(path)), 
         type(status.type())  
     {
     }
+
 
 }

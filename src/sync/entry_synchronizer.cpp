@@ -14,8 +14,8 @@ namespace lf {
         out(out),
         sync(sync),
         item(std::move(sync.queue.back())),
-        local("local", sync.config.local, item.path),
-        remote("remote", sync.config.remote, item.path)
+        local(true, join_path(sync.config.local, item.path)),
+        remote(false, join_path(sync.config.remote, item.path))
     {
         sync.queue.pop_back();
     }
@@ -68,7 +68,7 @@ namespace lf {
     }
 
     void entry_synchronizer::sync_dirs() {
-        out << (item.finalize ? "finalizing directory" : "syncing directories");
+        out << (item.method == sync_method::SYNC ? "syncing directory" : "finalizing directory");
         queue_dir_entries({ &local.path, &remote.path });
     }
 
@@ -93,15 +93,33 @@ namespace lf {
 
     void entry_synchronizer::sync_new(const path_info& src, const path_info& dst) {
         if (src.type == fs::file_type::directory) {
-            out << "creating directory in " << dst.name;
-            fs::create_directory(dst.path, src.path);
-            queue_dir_entries({ &src.path });
+            sync_new_dir(src, dst);
         } else if (item.mode != sync_mode::UNSPECIFIED) {
             copy_file_with_timestamp(src, dst);
             sync.state.set(item.path, true, true);
         } else {
             sync_skip();
         }
+    }
+
+    void entry_synchronizer::sync_new_dir(const path_info& src, const path_info& dst) {
+        if (item.mode != sync_mode::UNSPECIFIED) {
+            out << "creating directory in " << dst.name;
+            fs::create_directories(dst.path);
+        } else if (item.method != sync_method::SYNC && fs::is_empty(src.path)) {
+            out << "deleting empty directory in " << src.name;
+            fs::remove(src.path);
+            return;
+        } else if (item.method == sync_method::POST_FINALIZE) {
+            out << src.name << "directory finalized";
+            return;
+        } else if (item.method == sync_method::FINALIZE) {
+            out << "finalizing " << src.name << " directory";
+            sync.queue.push_back(sync_item { item.path, item.mode, sync_method::POST_FINALIZE });
+        } else {
+            out << "syncing " << src.name << " to " << dst.name << " directory";
+        }
+        queue_dir_entries({ &src.path });
     }
 
     void entry_synchronizer::queue_dir_entries(const std::initializer_list<const fs::path*>& dirs) {
@@ -125,7 +143,7 @@ namespace lf {
     }
 
     void entry_synchronizer::sync_skip() {
-        out << (item.finalize ? "finalized" : "skipping as its not a directory and sync mode is unspecified");
+        out << (item.method == sync_method::SYNC ? "skipping as its not a directory and sync mode is unspecified" : "finalized");
         sync.state.remove(item.path);
     }
 
@@ -142,7 +160,7 @@ namespace lf {
             const fs::path child_filename = child_path.filename();
             const std::string child_name = child_filename.string();
             
-            dest[child_name] = { item.path / child_filename, item.mode, false };
+            dest[child_name] = { item.path / child_filename, item.mode, sync_method::SYNC };
         }
     }
 
@@ -153,7 +171,7 @@ namespace lf {
         }
         const sync_mode state_mode = item.mode == sync_mode::RECURSIVE ? sync_mode::RECURSIVE : sync_mode::UNSPECIFIED;
         for (const auto& state_pair: state_node->entries) {
-            dest[state_pair.first] = { item.path / state_pair.first, state_mode, true };
+            dest[state_pair.first] = { item.path / state_pair.first, state_mode, sync_method::FINALIZE };
         }
     }
 
@@ -166,17 +184,22 @@ namespace lf {
             dest[index_pair.first] = { 
                 item.path / index_pair.first, 
                 item.mode == sync_mode::RECURSIVE ? sync_mode::RECURSIVE : index_pair.second.data, 
-                false
+                sync_method::SYNC
             };
         }
     }
 
     void entry_synchronizer::copy_file_with_timestamp(const path_info& src, const path_info& dst) const {
+        if (dst.path.has_parent_path()) {
+            const fs::path dst_dir = dst.path.parent_path();
+            if (!fs::exists(dst.path.parent_path())) {
+                out << "creating " << dst.name << " directory " << dst_dir << ", ";
+                fs::create_directories(dst_dir);
+            }
+        }
+
         out << "copying file from " << src.name << " to " << dst.name;
         lf::copy_file_with_timestamp(src.path, dst.path);
-        fs::copy_file(src.path, dst.path, fs::copy_options::overwrite_existing);
-        fs::file_time_type src_time = fs::last_write_time(src.path);
-        fs::last_write_time(dst.path, src_time);
     }
 
 }

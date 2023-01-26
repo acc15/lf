@@ -24,10 +24,12 @@ namespace lf {
         return rel_path;
     }
 
-    void create_parent_dirs(const fs::path& path) {
-        if (path.has_parent_path()) {
-            fs::create_directories(path.parent_path());
-        }
+    fs::path join_path(const fs::path& path, const fs::path& rel) {
+        return rel.empty() ? path : path / rel;
+    }
+
+    bool create_parent_dirs(const fs::path& path) {
+        return path.has_parent_path() ? fs::create_directories(path.parent_path()) : false;
     }
 
     void copy_file_with_timestamp(const fs::path& src, const fs::path& dst) {

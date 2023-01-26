@@ -5,10 +5,16 @@
 
 namespace lf {
 
+    enum class sync_method {
+        SYNC,
+        FINALIZE,
+        POST_FINALIZE
+    };
+
     struct sync_item {
         std::filesystem::path path;
         sync_mode mode;
-        bool finalize;
+        sync_method method;
     };
 
 }
