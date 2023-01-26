@@ -6,9 +6,8 @@
 
 #include <cstring>
 #include <algorithm>
-#include <iostream>
+#include <ostream>
 #include <vector>
-#include <concepts>
 
 namespace lf {
 

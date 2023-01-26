@@ -3,12 +3,8 @@
 #include "tree/tree.hpp"
 #include "io/format.hpp"
 
-#include <string>
 #include <vector>
 #include <ostream>
-#include <utility>
-#include <concepts>
-#include <algorithm>
 
 namespace lf {
 

@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <fstream>
 #include <set>
-#include <string_view>
 
 namespace lf {
 
@@ -38,7 +37,6 @@ namespace lf {
             std::size_t max_file_count, 
             bool add_date = true
         );
-
 
     };
 

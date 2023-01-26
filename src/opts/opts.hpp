@@ -4,7 +4,6 @@
 #include <vector>
 #include <ostream>
 #include <string_view>
-#include <unordered_map>
 
 #include "opts/opt.hpp"
 #include "opts/opt_map.hpp"

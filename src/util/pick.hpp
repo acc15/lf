@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <algorithm>
 #include <string_view>
 #include <charconv>

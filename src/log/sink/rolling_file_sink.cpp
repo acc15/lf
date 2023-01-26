@@ -1,5 +1,4 @@
 #include "log/sink/rolling_file_sink.hpp"
-#include "io/format_stream.hpp"
 #include "io/time.hpp"
 
 #include <algorithm>
