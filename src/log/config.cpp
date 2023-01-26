@@ -60,7 +60,7 @@ namespace lf {
         log.formatter = std::make_unique<simple_log_formatter>();
         log.sinks.clear();
         log.sinks.push_back(std::make_unique<stream_log_sink>(std::cout));
-        log.sinks.push_back(std::make_unique<rolling_file_sink>(get_log_file_env(), 100 * 1024 * 1024, 10));
+        log.sinks.push_back(std::make_unique<rolling_file_sink>(get_log_file_env(), 10 * 1024 * 1024, 9));
     }
 
 }

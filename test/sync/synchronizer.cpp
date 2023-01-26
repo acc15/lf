@@ -279,9 +279,8 @@ TEST_CASE("avoid creating UNSPECIFIED directories", "[synchronizer]") {
     REQUIRE( s.state.empty() );
     REQUIRE( s.index.empty() );
 
-    REQUIRE_FALSE( fs::exists(r / path) ); // file deleted in remote
-    REQUIRE_FALSE( fs::exists(l / path) ); // file still absent in local
-    REQUIRE( fs::is_empty(l) );
+    // both dirs is empty
+    REQUIRE( fs::is_empty(l) ); 
     REQUIRE( fs::is_empty(r) );
 
 }
