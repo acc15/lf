@@ -19,7 +19,7 @@ namespace lf {
         );
 
         virtual ~cmd() = default;
-        virtual int run(const opt_map& opts) const = 0;
+        virtual bool run(const opt_map& opts) const = 0;
 
         std::vector<std::string_view> names;
         std::string_view description;

@@ -49,7 +49,7 @@ namespace lf {
 
         const cmd& cmd = *it->second;
         const opt_map opts = cmd.opts.parse(args.subspan(1));
-        return cmd.run(opts);
+        return cmd.run(opts) ? 0 : 1;
     }
 
     std::ostream& operator<<(std::ostream& s, const cmd_registry& r) {

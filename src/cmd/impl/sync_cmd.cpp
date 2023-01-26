@@ -17,7 +17,7 @@ namespace lf {
         }
     ) {}
 
-    int sync_cmd::run(const opt_map& params) const {
+    bool sync_cmd::run(const opt_map& params) const {
         const config cfg = config::load();
 
         const config::sync_entry_vec syncs = cfg.find_name_matches(params[""]);
@@ -33,7 +33,7 @@ namespace lf {
         for (const config::sync_entry* p: syncs) {
             ok &= do_sync(p->first, p->second);
         }
-        return ok ? 0 : 1;
+        return ok;
     }
 
     bool sync_cmd::do_sync(const std::string& name, const config::sync& sync) const {

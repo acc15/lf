@@ -19,7 +19,7 @@ namespace lf {
     ) {
     }
     
-    int info_cmd::run(const opt_map& params) const {
+    bool info_cmd::run(const opt_map& params) const {
 
         const config cfg = config::load();
 
@@ -33,7 +33,7 @@ namespace lf {
         const fs::path path = std::filesystem::current_path();
         const config::sync_entry_vec v = cfg.find_most_specific_local_matches(path);
         if (v.empty()) {
-            return 1;
+            return false;
         }
 
         for (const config::sync_entry* p: v) {
@@ -44,7 +44,7 @@ namespace lf {
                 print_tree<index>(p->first, p->second.index);
             }
         }
-        return 0;
+        return true;
     }
 
 }

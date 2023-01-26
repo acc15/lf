@@ -9,8 +9,8 @@ using namespace lf;
 class test_cmd: public cmd {
 public:
     test_cmd(): cmd({ "a", "b", "c"}, "description", { {opt { "opt", 'o', "option description" }} }) {}
-    int run(const opt_map&) const override {
-        return 0;
+    bool run(const opt_map&) const override {
+        return true;
     }
 };
 

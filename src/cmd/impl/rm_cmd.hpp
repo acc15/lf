@@ -6,6 +6,6 @@ namespace lf {
     class rm_cmd: public cmd {
     public:
         rm_cmd();
-        int run(const opt_map& params) const override;
+        bool run(const opt_map& params) const override;
     };
 }
