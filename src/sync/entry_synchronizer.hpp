@@ -25,10 +25,13 @@ namespace lf {
     private:
         using queue_map = std::map<std::string, sync_item>;
 
+        void cleanup() const;
+
         void sync_with_timestamps();
         void sync_dirs();
         void sync_not_found(const path_info& src, const path_info& dst);
         void sync_other(const path_info& src, const path_info& dst);
+        void sync_del(const path_info& src, const path_info& dst);
         void sync_new(const path_info& src, const path_info& dst);
         void sync_new_dir(const path_info& src, const path_info& dst);
 
@@ -38,11 +41,12 @@ namespace lf {
         void add_dir_entries(const path_info& i, queue_map& dest) const;
         void add_state_names(queue_map& dest) const;
         void add_index_names(queue_map& dest) const;
+        void add_queue_map_item(queue_map& dest, const std::string& name, sync_mode mode) const;
 
         void copy_file_with_timestamp(const path_info& src, const path_info& dst) const;
 
         bool create_dir_if_not_exists(const path_info& p) const;
-        bool delete_dir_if_empty(const path_info& p) const;
+        bool delete_if_empty(const path_info& p) const;
         
     };
 

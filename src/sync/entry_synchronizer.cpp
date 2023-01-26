@@ -21,7 +21,9 @@ namespace lf {
 
     void entry_synchronizer::run() {
         out << (item.path.empty() ? "<root>" : item.path.string()) << ": ";
-        if (item.mode == sync_mode::IGNORE) {
+        if (item.cleanup) {
+            cleanup();
+        } else if (item.mode == sync_mode::IGNORE) {
             out << "ignored, skipping...";
             sync.state.remove(item.path);
         } else if (local.type == fs::file_type::not_found && remote.type == fs::file_type::not_found) {
@@ -37,6 +39,14 @@ namespace lf {
         } else {
             sync_with_timestamps();
         }
+    }
+
+    void entry_synchronizer::cleanup() const {
+        if (delete_if_empty(local)) {
+            sync.state.remove(item.path);
+        }
+        delete_if_empty(remote);
+        out << "post-cleanup finished";
     }
 
     void entry_synchronizer::sync_with_timestamps() {
@@ -68,21 +78,17 @@ namespace lf {
 
     void entry_synchronizer::sync_not_found(const path_info& src, const path_info& dst) {
         if (sync.state.get(item.path)) {
-            out << "was deleted in " << dst.name << ", deleting in " << src.name;
-            fs::remove_all(src.path);
-            sync.state.remove(item.path);
-            sync.index.remove(item.path);
+            sync_del(src, dst);
         } else {
             sync_new(src, dst);
         }
     }
 
-    void entry_synchronizer::sync_other(const path_info& src, const path_info& dst) {
-        if (src.type == fs::file_type::directory || (dst.type == fs::file_type::directory && item.mode != sync_mode::UNSPECIFIED)) {
-            out << "deleting " << dst.name << " " << dst.type << ", ";
-            fs::remove_all(dst.path);
-        }
-        sync_new(src, dst);
+    void entry_synchronizer::sync_del(const path_info& src, const path_info& dst) {
+        out << "was deleted in " << dst.name << ", deleting in " << src.name;
+        fs::remove_all(src.path);
+        sync.state.remove(item.path);
+        sync.index.remove(item.path);
     }
 
     void entry_synchronizer::sync_new(const path_info& src, const path_info& dst) {
@@ -96,6 +102,14 @@ namespace lf {
         }
     }
 
+    void entry_synchronizer::sync_other(const path_info& src, const path_info& dst) {
+        if (src.type == fs::file_type::directory || (dst.type == fs::file_type::directory && item.mode != sync_mode::UNSPECIFIED)) {
+            out << "deleting " << dst.name << " " << dst.type << ", ";
+            fs::remove_all(dst.path);
+        }
+        sync_new(src, dst);
+    }
+
     bool entry_synchronizer::create_dir_if_not_exists(const path_info& p) const {
         if (p.type != fs::file_type::not_found) {
             return false;
@@ -104,44 +118,26 @@ namespace lf {
         return fs::create_directories(p.path);
     }
 
-    bool entry_synchronizer::delete_dir_if_empty(const path_info& p) const {
-        if (p.type != fs::file_type::directory) {
+    bool entry_synchronizer::delete_if_empty(const path_info& p) const {
+        if (p.type == fs::file_type::not_found) {
             return true;
         }
         if (!fs::is_empty(p.path)) {
             return false;
         }
-        out << "deleting empty " << p.name << " directory, ";
+        out << "deleting empty " << p.name << " " << p.type << ", ";
         fs::remove(p.path);
         return true;
     }
 
     void entry_synchronizer::sync_dirs() {
         if (item.path.empty() || item.mode != sync_mode::UNSPECIFIED) {
-            
             create_dir_if_not_exists(local);
             create_dir_if_not_exists(remote);
             out << "syncing directory";
-        
         } else {
-            
-            bool l_del = delete_dir_if_empty(local);
-            bool r_del = delete_dir_if_empty(remote);
-            
-            if (item.method == sync_method::POST_CLEANUP) {
-                out << "post-cleanup finished";
-                return;
-            }
-            
-            if (l_del && r_del) {
-                out << "directory finished";
-                sync.state.remove(item.path);
-                return;
-            }
-
-            out << (item.method == sync_method::FINALIZE ? "finalizing directory" : "processing directory");
-            sync.queue.push_back(sync_item { item.path, item.mode, sync_method::POST_CLEANUP });
-
+            sync.queue.push_back(sync_item { item.path, item.mode, true });
+            out << "processing directory";
         }
         
         queue_map map;
@@ -163,7 +159,7 @@ namespace lf {
     }
 
     void entry_synchronizer::sync_skip() {
-        out << (item.method == sync_method::SYNC ? "skipping as its not a directory and sync mode is unspecified" : "finalized");
+        out << "skipping as its not a directory and sync mode is unspecified";
         sync.state.remove(item.path);
     }
 
@@ -175,12 +171,7 @@ namespace lf {
             if (p.is_directory() && item.mode != sync_mode::RECURSIVE) {
                 continue;
             }
-            
-            const fs::path child_path = p.path();
-            const fs::path child_filename = child_path.filename();
-            const std::string child_name = child_filename.string();
-            
-            dest[child_name] = { item.path / child_filename, item.mode, sync_method::SYNC };
+            add_queue_map_item(dest, p.path().filename().string(), item.mode);
         }
     }
 
@@ -189,9 +180,8 @@ namespace lf {
         if (state_node == nullptr) {
             return;
         }
-        const sync_mode state_mode = item.mode == sync_mode::RECURSIVE ? sync_mode::RECURSIVE : sync_mode::UNSPECIFIED;
         for (const auto& state_pair: state_node->entries) {
-            dest[state_pair.first] = { item.path / state_pair.first, state_mode, sync_method::FINALIZE };
+            add_queue_map_item(dest, state_pair.first, sync_mode::UNSPECIFIED);
         }
     }
 
@@ -201,23 +191,18 @@ namespace lf {
             return;
         }
         for (const auto& index_pair: index_node->entries) {
-            dest[index_pair.first] = { 
-                item.path / index_pair.first, 
-                item.mode == sync_mode::RECURSIVE ? sync_mode::RECURSIVE : index_pair.second.data, 
-                sync_method::SYNC
-            };
+            add_queue_map_item(dest, index_pair.first, index_pair.second.data);
         }
     }
 
-    void entry_synchronizer::copy_file_with_timestamp(const path_info& src, const path_info& dst) const {
-        if (dst.path.has_parent_path()) {
-            const fs::path dst_dir = dst.path.parent_path();
-            if (!fs::exists(dst_dir)) {
-                out << "creating " << dst.name << " directory " << item.path.parent_path().string() << ", ";
-                fs::create_directories(dst_dir);
-            }
-        }
+    void entry_synchronizer::add_queue_map_item(queue_map& dest, const std::string& name, sync_mode mode) const {
+        dest[name] = { item.path / name, item.mode == sync_mode::RECURSIVE ? item.mode : mode, false };
+    }
 
+    void entry_synchronizer::copy_file_with_timestamp(const path_info& src, const path_info& dst) const {
+        if (create_parent_dirs(dst.path)) {
+            out << "created " << dst.name << " parent directories, ";
+        }
         out << "copying file from " << src.name << " to " << dst.name;
         lf::copy_file_with_timestamp(src.path, dst.path);
     }

@@ -13,7 +13,7 @@ namespace lf {
     }
 
     void synchronizer::run() {
-        queue = { sync_item { fs::path(), index.get(), sync_method::SYNC } };
+        queue = { sync_item { fs::path(), index.get(), false } };
         while (!queue.empty()) {
             log_stream out = log();
             entry_synchronizer(*this, out).run();
