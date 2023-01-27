@@ -101,7 +101,7 @@ namespace lf {
     }
 
     void entry_synchronizer::sync_other(const path_info& src, const path_info& dst) {
-        out << "using " << src.name << "because " << format_date_time(src.time) << " > " << format_date_time(dst.time) << ", ";
+        out << "using " << src.name << " because " << format_date_time(src.time) << " > " << format_date_time(dst.time) << ", ";
         if (src.type == fs::file_type::directory || (dst.type == fs::file_type::directory && item.mode != sync_mode::UNSPECIFIED)) {
             out << "deleting " << dst.name << " " << dst.type << ", ";
             fs::remove_all(dst.path);
