@@ -15,9 +15,11 @@ namespace lf {
     void synchronizer::run() {
         queue = { sync_item { fs::path(), index.get(), false } };
         while (!queue.empty()) {
-            log_stream out = log();
-            entry_synchronizer(*this, out).run();
-            out << log::end;
+            entry_synchronizer s(*this);
+            s.run();
+
+            const fs::path& p = s.path();
+            log.with(s.level()) && log() << (p.empty() ? "<root>" : p.string()) << ": " << s.message() << log::end;
         }
     }
 
