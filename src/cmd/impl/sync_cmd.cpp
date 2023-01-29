@@ -46,7 +46,7 @@ namespace lf {
         try {
 
             index index;
-            load_file(sync.index, index);
+            load_file(sync.index, index, true);
 
             tracked_state state;
             state.load(sync.state, true);
