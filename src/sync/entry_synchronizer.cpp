@@ -43,7 +43,7 @@ namespace lf {
     }
 
     void entry_synchronizer::cleanup() {
-        log(TRACE) << "cleanup";
+        log(TRACE) << "cleanup directory";
         s.state.remove(item.path, true);
         if (!item.path.empty()) {
             delete_empty_dir(local);
