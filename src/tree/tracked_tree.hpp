@@ -32,9 +32,9 @@ namespace lf {
             return changed;
         }
 
-        void load(const path& path) {
+        void load(const path& path, bool optional = false) {
             changed = false;
-            load_file(path, root);
+            load_file(path, root, optional);
         }
 
         void save_if_changed(const path& path) {

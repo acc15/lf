@@ -96,14 +96,16 @@ namespace lf {
     }
 
     std::filesystem::path config::get_default_path() {
-        const fs::path rel_path = fs::path("lf") / "lf.conf";
+        
 #if __linux__
+        const fs::path rel_path = fs::path("lf") / "lf.conf";
         const char* home = std::getenv("HOME");
         if (home != nullptr) {
             return fs::path(home) / ".config" / rel_path;
         }
         return fs::path("/etc") / rel_path;
 #elif _WIN32
+        const fs::path rel_path = fs::path("lf") / "conf" / "lf.conf";
         const char* local_app_data = std::getenv("LOCALAPPDATA");
         if (local_app_data != nullptr) {
             return fs::path(local_app_data) / rel_path;
@@ -115,7 +117,7 @@ namespace lf {
         return fs::path("C:\\ProgramData") / rel_path;
 #elif __APPLE__
         const char* home = std::getenv("HOME");
-        return fs::path(home != nullptr ? home : "/") / "Library" / "Preferences" / rel_path;
+        return fs::path(home != nullptr ? home : "/") / "Library" / "Preferences" / "lf" / "lf.conf";
 #else
 #       error Unknown platform!
 #endif

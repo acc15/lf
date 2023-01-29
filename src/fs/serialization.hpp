@@ -28,14 +28,15 @@ namespace lf {
     }
 
 	template <serializable T>
-	void load_file(const std::filesystem::path& path, T& result) {
+	void load_file(const std::filesystem::path& path, T& result, bool optional = false) {
         const std::ios_base::openmode flags = std::ios_base::in | get_serializable_openmode<T>();
         log.debug() && log() << "loading " << T::name << " file from " << path 
             << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << log::end;
         
         std::ifstream file(path, flags);
         if (!file) {
-            throw_fs_error(format_stream() << "unable to open " << T::name << " file for reading", path);
+            throw_fs_error(format_stream() << "unable to open " << T::name << " file for reading", path, optional);
+            return;
         }
 
         file >> with_ref_format<T::format>(result);
@@ -55,9 +56,9 @@ namespace lf {
 	}
 
 	template <serializable T>
-	T load_file(const std::filesystem::path& path) {
+	T load_file(const std::filesystem::path& path, bool optional = false) {
         T result;
-        load_file(path, result);
+        load_file(path, result, optional);
         return result;
 	}
 
@@ -71,7 +72,7 @@ namespace lf {
 
         std::ofstream file(path, flags);
         if (!file) {
-            throw_fs_error(format_stream() << "unable to open " << T::name << " file for writing", path);
+            throw_fs_error(format_stream() << "unable to open " << T::name << " file for writing", path, false);
         }
 
         file << with_cref_format<T::format>(ref);

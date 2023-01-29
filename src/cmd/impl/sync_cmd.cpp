@@ -49,7 +49,7 @@ namespace lf {
             load_file(sync.index, index);
 
             tracked_state state;
-            state.load(sync.state);
+            state.load(sync.state, true);
 
             synchronizer s(sync, index, state);
             s.run();

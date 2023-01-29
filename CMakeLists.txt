@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (UNIX)
     set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
+elseif(WIN32)
+    file(TO_CMAKE_PATH "$ENV{LOCALAPPDATA}\\lf" CMAKE_INSTALL_PREFIX)
 endif()
 
 set(executable_src)

@@ -30,14 +30,15 @@ namespace lf {
     }
 
     fs::path get_log_file_default() {
-        const fs::path rel_path = fs::path("lf") / "lf.log";
 #if __linux__
+        const fs::path rel_path = fs::path("lf") / "lf.log";
         const char* home = std::getenv("HOME");
         if (home != nullptr) {
             return fs::path(home) / ".cache" / rel_path;
         }
         return fs::path("/var/log") / rel_path;
 #elif _WIN32
+        const fs::path rel_path = fs::path("lf") / "log" / "lf.log";
         const char* local_app_data = std::getenv("LOCALAPPDATA");
         if (local_app_data != nullptr) {
             return fs::path(local_app_data) / rel_path;
@@ -48,6 +49,7 @@ namespace lf {
         }
         return fs::path("C:\\ProgramData") / rel_path;
 #elif __APPLE__
+        const fs::path rel_path = fs::path("lf") / "lf.log";
         const char* home = std::getenv("HOME");
         return fs::path(home != nullptr ? home : "/") / "Library" / "Logs" / rel_path;
 #else
