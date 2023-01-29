@@ -30,7 +30,7 @@ TEST_CASE("create_dir_if_not_exists", "[entry_synchronizer]") {
     REQUIRE( fs::status(root_path / dir_path).type() == fs::file_type::directory );
 
     std::ostringstream ss;
-    ss << "deleted local regular file " << file_path << ", created local directory " << dir_path;
+    ss << "deleted local file " << file_path << ", created local directory " << dir_path;
     REQUIRE( es.message() == ss.str() );
 
 }

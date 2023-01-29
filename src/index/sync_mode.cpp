@@ -4,18 +4,16 @@
 namespace lf {
     
     const char* sync_mode_names[] = { 
-        "UNSPECIFIED", 
+        "IGNORE", 
         "SHALLOW", 
         "RECURSIVE", 
-        "IGNORE", 
         "(invalid sync mode)" 
     };
 
     const char* sync_mode_signs[] = { 
-        " ", 
+        "-", 
         "+", 
         "*", 
-        "-", 
         "#" 
     };
 

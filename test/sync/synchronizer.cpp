@@ -11,13 +11,13 @@ namespace fs = std::filesystem;
 using namespace lf;
 
 config::sync make_sync(std::optional<bool> local_to_remote = std::nullopt) {
-    std::string name = Catch::getResultCapture().getCurrentTestName();
+
+    fs::path test_path = fs::path("synchronizer") / Catch::getResultCapture().getCurrentTestName();
     if (local_to_remote.has_value()) {
-        name += " ";
-        name += (local_to_remote ? "L2R" : "R2L");
+        test_path /= (local_to_remote ? "l2r" : "r2l");
     }
 
-    fs::path dest_test_dir = create_temp_test_dir(fs::path("synchronizer") / name);
+    fs::path dest_test_dir = create_temp_test_dir(test_path);
 
     fs::path local = dest_test_dir / "local";
     fs::path remote = dest_test_dir / "remote";
@@ -349,18 +349,6 @@ TEST_CASE("avoid creating UNSPECIFIED directories", "[synchronizer]") {
     // both dirs is empty
     REQUIRE( fs::is_empty(l) ); 
     REQUIRE( fs::is_empty(r) );
-
-}
-
-TEST_CASE("path::iterator", "[synchronizer]") {
-
-    fs::path p = fs::path("a") / "b" / "c";
-
-    fs::path::iterator it = p.end();
-    --it;
-
-    fs::path pp = *it;
-    REQUIRE( pp == p.parent_path() );
 
 }
 

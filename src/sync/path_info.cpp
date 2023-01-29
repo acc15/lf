@@ -1,6 +1,7 @@
 #include "sync/path_info.hpp"
 
 #include "fs/util.hpp"
+#include "fs/time.hpp"
 
 namespace lf {
 
@@ -24,5 +25,8 @@ namespace lf {
         return path_info(local, root, item.parent_path());
     }
 
+    void path_info::init_time() {
+        time = ntfs_last_write_time(path);
+    }
 
 }

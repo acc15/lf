@@ -62,8 +62,8 @@ namespace lf {
             return root.get(path);
         }
 
-        void remove(const std::filesystem::path& path) {
-            changed |= root.remove(path);
+        void remove(const std::filesystem::path& path, bool empty_only = false) {
+            changed |= root.remove(path, empty_only);
         }
 
         void set(const data_type& value, bool remove_children = false) {

@@ -64,52 +64,46 @@ namespace lf {
         }
 
         bool set(const std::filesystem::path& path, const T& new_data, bool remove_children = false) {
-            return path.empty() ? set(new_data, remove_children) : new_data != data_type {}
-                ? create_node(path).set(new_data, remove_children)
-                : set_default(path, remove_children);
-        }
-
-        bool remove(const std::filesystem::path& path) {
-            return set_default(path, true);
-        }
-
-    private:
-        tree& create_node(const std::filesystem::path& path) {
-            tree* e = this;
-            for (const auto& el: path) {
-                e = &e->entries[el.string()];
-            }
-            return *e;
-        }
-
-        bool set_default(const std::filesystem::path& path, bool remove_children) {
-
-            tree* e = this;
-
-            tree* removal_node = e;
-            const std::string* removal_key = nullptr;
-
-            for (const auto& el: path) {
-                std::string key = el.string();
-                auto eit = e->entries.find(key);
-                if (eit == e->entries.end()) {
-                    return e->entries.empty() && e->data == data_type {} ? removal_node->erase(removal_key) : false;
-                }
-                if (removal_key == nullptr || e->entries.size() > 1 || e->data != data_type {}) {
-                    removal_node = e;
-                    removal_key =  &eit->first;
-                }
-                e = &eit->second;
+            if (path.empty()) {
+                return set(new_data, remove_children);
             }
 
-            // e pointing to node specified by path
-            return remove_children || e->entries.empty() 
-                ? removal_node->erase(removal_key) 
-                : e->set({});
+            bool modified = false;
+            tree* n = this;
+            for (const std::filesystem::path& el: path) {
+                const std::pair<typename map_type::iterator, bool> r = n->entries.emplace(std::move(el.string()), tree {});
+                if (r.second) {
+                    modified = true;
+                }
+                n = &r.first->second;
+            }
+            modified |= n->set(new_data, remove_children);
+            return modified;
         }
 
-        bool erase(const std::string* key_ptr) {
-            return key_ptr != nullptr && entries.erase(*key_ptr) != 0;
+        bool remove(const std::filesystem::path& path, bool empty_only = false) {
+            if (path.empty()) {
+                return set(data_type {}, !empty_only);
+            }
+
+            tree* node = this;
+            tree* removal_node = nullptr;
+            typename map_type::iterator remove_iter;
+            for (const std::filesystem::path& el: path) {
+                remove_iter = node->entries.find(el.string());
+                if (remove_iter == node->entries.end()) {
+                    return false;
+                }
+                removal_node = node;
+                node = &remove_iter->second;
+            }
+
+            if (empty_only && !node->entries.empty()) {
+                return node->set(data_type {}, false);
+            }
+
+            removal_node->entries.erase(remove_iter);
+            return true;
         }
 
     };

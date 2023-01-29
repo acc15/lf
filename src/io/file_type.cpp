@@ -7,13 +7,13 @@ namespace lf {
     const std::unordered_map<std::filesystem::file_type, const char*> file_type_names = {
         { file_type::none, "none" },
         { file_type::unknown, "unknown" },
-        { file_type::block, "block file" },
-        { file_type::character, "character file" },
+        { file_type::block, "block" },
+        { file_type::character, "character" },
         { file_type::symlink, "symlink" },
         { file_type::directory, "directory" },
-        { file_type::regular, "regular file" },
-        { file_type::fifo, "pipe file" },
-        { file_type::socket, "socket file" },
+        { file_type::regular, "file" },
+        { file_type::fifo, "pipe" },
+        { file_type::socket, "socket" },
         { file_type::not_found, "not found" }
     };
 

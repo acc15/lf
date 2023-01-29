@@ -7,10 +7,9 @@
 namespace lf {
     
     enum class sync_mode {
-        UNSPECIFIED,
+        IGNORE,
         SHALLOW,
-        RECURSIVE,
-        IGNORE
+        RECURSIVE
     };
 
     std::ostream& operator<<(std::ostream& s, const sync_mode& mode);

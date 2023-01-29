@@ -10,7 +10,6 @@ namespace lf {
             opt { "shallow", 'S', "add paths with SHALLOW mode", "paths", 0, opt::UNBOUNDED },
             opt { "recursive", 'R', "add paths with RECURSIVE mode", "dirpaths", 0, opt::UNBOUNDED },
             opt { "ignore", 'I', "add paths with IGNORE mode", "paths", 0, opt::UNBOUNDED },
-            opt { "unspecified", 'U', "add paths with UNSPECIFIED mode (same as rm command, but not recursive)", "paths", 0, opt::UNBOUNDED },
             opt { "", '\0', "same as --shallow", "paths", 0, opt::UNBOUNDED },
         },
         "shallow"
@@ -24,7 +23,6 @@ namespace lf {
         indexer.process(cfg, params["shallow"], sync_mode::SHALLOW);
         indexer.process(cfg, params["recursive"], sync_mode::RECURSIVE);
         indexer.process(cfg, params["ignore"], sync_mode::IGNORE);
-        indexer.process(cfg, params["unspecified"], sync_mode::UNSPECIFIED);
         indexer.save_changes();
         
         return indexer.is_successful();

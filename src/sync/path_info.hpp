@@ -19,6 +19,8 @@ namespace lf {
         bool has_parent() const;
         path_info parent() const;
 
+        void init_time();
+
     };
 
 }

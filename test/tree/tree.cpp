@@ -5,6 +5,7 @@
 #include <map>
 
 #include "state/state.hpp"
+#include "index/index.hpp"
 
 #include "tree/print.hpp"
 #include "tree/binary.hpp"
@@ -184,22 +185,24 @@ TEST_CASE("set", "[tree]") {
     REQUIRE( tree.set(false) );
 }
 
-TEST_CASE("set must avoid creating entries with default flags only", "[tree]") {
+TEST_CASE("set must create node with default", "[tree]") {
     state tree;
     REQUIRE( tree.entries.empty() );
 
-    CHECK_FALSE( tree.set(test_index_path, false) );
-    REQUIRE( tree.entries.empty() );
+    CHECK( tree.set(test_index_path, false) );
+    REQUIRE( tree.node(test_index_path) != nullptr );
+    REQUIRE( tree.node(test_index_path)->data == false );
 }
 
-TEST_CASE("set must remove redunant entries", "[tree]") {
+TEST_CASE("set must keep node with default", "[tree]") {
     state tree;
 
     CHECK( tree.set(test_index_path, true) );
-    REQUIRE( !tree.entries.empty() );
+    REQUIRE( tree.get(test_index_path) == true );
     
     CHECK( tree.set(test_index_path, false) );
-    REQUIRE( tree.entries.empty() );
+    REQUIRE_FALSE( tree.get(test_index_path) );
+    REQUIRE( tree.node(test_index_path) != nullptr );
 }
 
 TEST_CASE("set must preserve adjanced entries when removing redunant entries", "[tree]") {
@@ -213,23 +216,6 @@ TEST_CASE("set must preserve adjanced entries when removing redunant entries", "
     
     CHECK( tree.set(test_index_path, false) );
     REQUIRE( tree.node(adjanced_path) != nullptr );
-}
-
-TEST_CASE("set must preserve intermediate non-default nodes", "[tree]") {
-    path intermediate_path = path("a") / "b";
-    path file_path = intermediate_path / "c" / "file.txt";
-
-    state tree;
-    CHECK( tree.set(intermediate_path, true) );
-    CHECK( tree.set(file_path, true) );
-    REQUIRE( tree.node(file_path) != nullptr );
-
-    CHECK( tree.set(file_path, false) );
-    REQUIRE( tree.node(file_path) == nullptr );
-
-    auto intermediate_entry = tree.node(intermediate_path);
-    REQUIRE( intermediate_entry != nullptr );
-    REQUIRE( intermediate_entry->entries.empty() );
 }
 
 TEST_CASE("set must keep entries with children", "[tree]") {
@@ -246,7 +232,7 @@ TEST_CASE("set must keep entries with children", "[tree]") {
     REQUIRE( tree.node(nested_path) != nullptr );
 }
 
-TEST_CASE("remove must remove entries with children", "[tree]") {
+TEST_CASE("remove", "[tree]") {
     
     const path intermediate_path = "a/b";
     const path nested_path = intermediate_path / "c/test.yaml";
@@ -257,32 +243,63 @@ TEST_CASE("remove must remove entries with children", "[tree]") {
     REQUIRE( tree.node(nested_path) != nullptr );
 
     CHECK( tree.remove(intermediate_path) );
-    REQUIRE( tree.entries.empty() );
+    REQUIRE( tree.node(intermediate_path) == nullptr );
+    REQUIRE( tree.node(nested_path) == nullptr );
 
 }
 
-TEST_CASE("remove must keep parent entries with non-default value", "[tree]") {
+TEST_CASE("set must return false when not modified", "[tree]") {
+
+    const path path = "a/b/c";
     
-    const path parent = path("a") / "b";
-    const path child = parent / "test.yaml";
-
     state tree;
-    CHECK( tree.set(parent, true) );
-    CHECK_FALSE( tree.remove(child) );
-    REQUIRE( tree.node(parent) != nullptr );
+    REQUIRE( tree.set(path, true) );
+    REQUIRE_FALSE( tree.set(path, true) );
+    REQUIRE( tree.set(path.parent_path(), true) );
+    REQUIRE_FALSE( tree.set(path.parent_path(), true) );
 
 }
 
-TEST_CASE("set must keep entries with single children", "[tree]") {
-
-    const path common_path = "a/b";
-    const path p1 = common_path / "x/y";
-    const path p2 = common_path / "z/w";
+TEST_CASE("remove if empty", "[tree]") {
+    const path path = "a/b/c";
 
     state tree;
-    CHECK( tree.set(p1, true) );
-    CHECK_FALSE( tree.set(p2, false) );
+    CHECK( tree.set(path, true) );
+    CHECK_FALSE( tree.remove(path.parent_path(), true) );
+    REQUIRE( tree.node(path) != nullptr );
+}
 
-    REQUIRE( tree.node(p1) != nullptr );
+TEST_CASE("remove if empty must set default value", "[tree]") {
+    const path path = "a/b/c";
+
+    state tree;
+    CHECK( tree.set(path, true) );
+    CHECK( tree.set(path.parent_path(), true) );
+    CHECK( tree.remove(path.parent_path(), true) );
+    REQUIRE( tree.node(path) != nullptr );
+    REQUIRE( tree.node(path.parent_path()) != nullptr );
+    REQUIRE_FALSE( tree.node(path.parent_path())->data );
+
+}
+
+TEST_CASE("must keep unspecified inside recursive and shallow", "[tree]") {
+
+    const path common = "a/b";
+    const path p1 = common / "c";
+    const path p2 = common / "d";
+
+    lf::index index;
+    CHECK( index.set(common, sync_mode::RECURSIVE) );
+    CHECK( index.set(p1, sync_mode::SHALLOW) );
+    CHECK( index.set(p2, sync_mode::IGNORE) );
+
+    REQUIRE( index.node(common) != nullptr );
+    REQUIRE( index.node(common)->data == sync_mode::RECURSIVE );
+
+    REQUIRE( index.node(p1) != nullptr );
+    REQUIRE( index.node(p1)->data == sync_mode::SHALLOW );
+    
+    REQUIRE( index.node(p2) != nullptr );
+    REQUIRE( index.node(p2)->data == sync_mode::IGNORE );
 
 }

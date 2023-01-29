@@ -19,13 +19,15 @@ namespace lf {
     void synchronizer::run() {
         queue = { sync_item { fs::path(), index.data, false } };
         while (!queue.empty()) {
-            entry_synchronizer s(*this, queue.back());
+            const sync_item item = std::move(queue.back());
             queue.pop_back();
-            
+
+            entry_synchronizer s(*this, item);
             s.run();
 
-            const fs::path& p = s.path();
-            log.with(s.level()) && log() << (p.empty() ? "<root>" : p.string()) << ": " << s.message() << log::end;
+            log.with(s.level()) && log() 
+                << (item.path.empty() ? "<root>" : item.path.string()) << ": " << s.message() 
+                << log::end;
         }
     }
 

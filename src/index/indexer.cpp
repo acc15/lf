@@ -25,11 +25,6 @@ namespace lf {
             return;
         }
 
-        if (mode.has_value() && !validate(mode.value(), path)) {
-            success = false;
-            return;
-        }
-
         config::sync_entry_vec matches = cfg.find_most_specific_local_matches(path);
         for (const auto* e: matches) {
             
@@ -47,22 +42,6 @@ namespace lf {
             }
         }
 
-    }
-
-    bool indexer::validate(sync_mode mode, const std::filesystem::path& path) const {
-        fs::file_status status = fs::status(path);
-        if (mode == sync_mode::RECURSIVE && status.type() != fs::file_type::directory) {
-            log.error() && log() << "recursive can be used only for existing directories, but " 
-                << path << " doesn't denote a directory" 
-                << log::end;
-            return false;
-        }
-            
-        if (mode != sync_mode::UNSPECIFIED && status.type() == fs::file_type::not_found) {
-            log.error() && log() << "path " << path << " doesn't exists" << log::end;
-            return false;
-        }
-        return true;
     }
 
     void indexer::save_changes() {
@@ -86,15 +65,15 @@ namespace lf {
             return it->second;
         }
 
-        const auto emplace_result = _indexes.emplace(index_path, tracked_index {});
-        if (emplace_result.second) {
+        const auto r = _indexes.emplace(index_path, tracked_index {});
+        if (r.second) {
             try {
-                emplace_result.first->second.load(index_path);
+                r.first->second.load(index_path);
             } catch (const std::runtime_error& e) {
                 log.debug() && log() << e.what() << log::end;
             }
         }
-        return emplace_result.first->second;
+        return r.first->second;
     }
 
 }
