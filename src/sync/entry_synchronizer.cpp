@@ -56,15 +56,15 @@ namespace lf {
             process_dir();
             return;
         }
-        if (remote.type != not_found) {
-            log(INFO) << "deleting remote " << remote.type;
-            fs::remove(remote.path);
-        }
         if (local.type == directory) {
             process_dir();
         } else {
             log(DEBUG) << "ignored";
             s.state.remove(item.path);
+        }
+        if (remote.type != not_found) {
+            log(INFO) << "deleting remote " << remote.type;
+            fs::remove(remote.path);
         }
     }
 
@@ -78,7 +78,6 @@ namespace lf {
         }
 
         log(TRACE) << "processing directory";
-        s.state.set(item.path, false);
         s.queue.push_back(sync_item { item.path, item.mode, true });
         queue(map);
 
