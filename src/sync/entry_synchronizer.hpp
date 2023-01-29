@@ -21,7 +21,7 @@ namespace lf {
 
     public:
 
-        entry_synchronizer(synchronizer& sync);
+        entry_synchronizer(synchronizer& sync, sync_item& item);
 
         void run();
 
@@ -29,12 +29,15 @@ namespace lf {
         std::string message() const;
         log_level level() const;
 
+        bool create_dir_if_not_exists(const path_info& p);
+
     private:
         using queue_map = std::map<std::string, sync_item>;
 
         void cleanup();
         void sync_with_timestamps();
         void sync_dirs();
+        void sync_unspecified();
         void sync_not_found(const path_info& src, const path_info& dst);
         void sync_other(const path_info& src, const path_info& dst);
 
@@ -52,8 +55,9 @@ namespace lf {
 
         void copy_file_with_timestamp(const path_info& src, const path_info& dst);
 
-        bool create_dir_if_not_exists(const path_info& p);
+
         bool delete_if_empty(const path_info& p);
+        bool delete_if_exists(const path_info& p);
         
         std::ostream& log(log_level level);
 

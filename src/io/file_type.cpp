@@ -13,7 +13,8 @@ namespace lf {
         { file_type::directory, "directory" },
         { file_type::regular, "regular file" },
         { file_type::fifo, "pipe file" },
-        { file_type::socket, "socket file" }
+        { file_type::socket, "socket file" },
+        { file_type::not_found, "not found" }
     };
 
     std::ostream& operator<<(std::ostream& s, const file_type& t) {

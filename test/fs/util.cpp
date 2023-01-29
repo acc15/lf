@@ -29,10 +29,7 @@ TEST_CASE("create_parent_dirs", "[path]") {
 
 TEST_CASE("join_path", "[path]") {
 
-    fs::path p1 = "abc";
-    fs::path empty;
-
-    REQUIRE_FALSE( (p1 / empty) == p1 );
-    REQUIRE( join_path(p1, empty) == p1 );
+    REQUIRE( join_path("abc", fs::path()) == fs::path("abc") );
+    REQUIRE( join_path("abc", "xyz") == fs::path("abc") / "xyz" );
 
 }

@@ -11,15 +11,14 @@ namespace lf {
         
     class synchronizer {
     public:
-        synchronizer(const config::sync& sync);
+        synchronizer(const config::sync& sync, const lf::index& index, tracked_state& state);
 
         void run();
-        void load();
-        void save();
 
-        tracked_index index;
-        tracked_state state;
         const lf::config::sync& config;
+        const lf::index& index;
+        tracked_state& state;
+ 
         std::vector<sync_item> queue;
 
     };

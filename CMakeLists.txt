@@ -184,6 +184,7 @@ add_executable(lf_test
     test/util/string_map.cpp
 
     test/sync/synchronizer.cpp
+    test/sync/entry_synchronizer.cpp
  )
 
 target_include_directories(lf_test PRIVATE test)

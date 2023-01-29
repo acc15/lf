@@ -43,11 +43,19 @@ namespace lf {
             << ", remote: " << sync.remote 
             << log::end;
 
-        synchronizer s(sync);
         try {
-            s.load();
+
+            index index;
+            load_file(sync.index, index);
+
+            tracked_state state;
+            state.load(sync.state);
+
+            synchronizer s(sync, index, state);
             s.run();
-            s.save();
+
+            state.save_if_changed(sync.state);
+
         } catch (const std::runtime_error& e) {
             log.error() && log() << "unable to sync \"" << name << "\": " << e.what() << log::end;
             return false;

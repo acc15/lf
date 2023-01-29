@@ -9,14 +9,13 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    entry_synchronizer::entry_synchronizer(synchronizer& sync):
+    entry_synchronizer::entry_synchronizer(synchronizer& sync, sync_item& item):
         sync(sync),
-        item(std::move(sync.queue.back())),
-        local(true, join_path(sync.config.local, item.path)),
-        remote(false, join_path(sync.config.remote, item.path)),
+        item(std::move(item)),
+        local(true, sync.config.local, item.path),
+        remote(false, sync.config.remote, item.path),
         max_level(TRACE)
     {
-        sync.queue.pop_back();
     }
 
     const std::filesystem::path& entry_synchronizer::path() const {
@@ -35,11 +34,10 @@ namespace lf {
         if (item.cleanup) {
             cleanup();
         } else if (item.mode == sync_mode::IGNORE) {
-            log(DEBUG) << "ignored, skipping...";
-            sync.state.remove(item.path);
+            log(DEBUG) << "ignored";
+            delete_if_exists(remote);
         } else if (local.type == fs::file_type::not_found && remote.type == fs::file_type::not_found) {
-            log(DEBUG) << "no file or directory exists on local and remote sides";
-            sync.index.remove(item.path);
+            log(INFO) << "no file or directory exists on both sides";
             sync.state.remove(item.path);
         } else if (remote.type == fs::file_type::not_found) {
             sync_not_found(local, remote);
@@ -47,6 +45,8 @@ namespace lf {
             sync_not_found(remote, local);
         } else if (local.type == fs::file_type::directory && remote.type == fs::file_type::directory) {
             sync_dirs();
+        } else if (item.mode == sync_mode::UNSPECIFIED) {
+            sync_unspecified();
         } else {
             sync_with_timestamps();
         }
@@ -93,11 +93,27 @@ namespace lf {
         }
     }
 
+    void entry_synchronizer::sync_unspecified() {
+        sync.state.remove(item.path);
+
+        if (remote.type == fs::file_type::directory) {
+            delete_if_exists(local);
+            sync_dirs();
+            return;
+        }
+
+        delete_if_exists(remote);
+        if (local.type == fs::file_type::directory) {
+            sync_dirs();
+        } else {
+            sync_skip();
+        }
+    }
+
     void entry_synchronizer::sync_del(const path_info& src, const path_info& dst) {
         log(INFO) << "was deleted in " << dst.name << ", deleting in " << src.name;
         fs::remove_all(src.path);
         sync.state.remove(item.path);
-        sync.index.remove(item.path);
     }
 
     void entry_synchronizer::sync_new(const path_info& src, const path_info& dst) {
@@ -113,7 +129,7 @@ namespace lf {
 
     void entry_synchronizer::sync_other(const path_info& src, const path_info& dst) {
         log(DEBUG) << "using " << src.name << " because " << format_date_time(src.time) << " > " << format_date_time(dst.time);
-        if (src.type == fs::file_type::directory || (dst.type == fs::file_type::directory && item.mode != sync_mode::UNSPECIFIED)) {
+        if (src.type == fs::file_type::directory || dst.type == fs::file_type::directory) {
             log(INFO) << "deleting " << dst.name << " " << dst.type;
             fs::remove_all(dst.path);
         }
@@ -121,11 +137,32 @@ namespace lf {
     }
 
     bool entry_synchronizer::create_dir_if_not_exists(const path_info& p) {
-        if (p.type != fs::file_type::not_found) {
+        if (p.type == fs::file_type::directory) {
             return false;
         }
-        log(INFO) << "creating " << p.name << " directory";
-        return fs::create_directories(p.path);
+
+        const fs::path::iterator b = p.item.begin();
+        const fs::path::iterator e = p.item.end();
+        fs::path::iterator it = e;
+
+        path_info cur = p;
+        for (; cur.type != fs::file_type::directory && it != b; --it, cur = cur.parent()) {
+            if (cur.type != fs::file_type::not_found) {
+                log(INFO) << "deleted " << cur.name << " " << cur.type << " " << cur.item;
+                fs::remove(cur.path);
+            }
+        }
+
+        fs::path path = cur.path;
+        for (; it != e; ++it) {
+            path /= *it;
+            if (!fs::create_directory(path)) {
+                throw fs::filesystem_error("unable to create directory", path, std::error_code {});
+            }
+        }
+
+        log(INFO) << "created " << p.name << " directory " << p.item;
+        return true;
     }
 
     bool entry_synchronizer::delete_if_empty(const path_info& p) {
@@ -138,6 +175,15 @@ namespace lf {
         log(INFO) << "deleting empty " << p.name << " " << p.type;
         fs::remove(p.path);
         return true;
+    }
+
+    bool entry_synchronizer::delete_if_exists(const path_info& p) {
+        if (p.type == fs::file_type::not_found) {
+            return false;
+        }
+
+        log(INFO) << "deleting from " << p.name;
+        return fs::remove_all(p.path) > 0;
     }
 
     void entry_synchronizer::sync_dirs() {
@@ -210,8 +256,8 @@ namespace lf {
     }
 
     void entry_synchronizer::copy_file_with_timestamp(const path_info& src, const path_info& dst) {
-        if (create_parent_dirs(dst.path)) {
-            log(INFO) << "created " << dst.name << " parent directories";
+        if (create_dir_if_not_exists(dst.parent())) {
+            log(INFO) << "created " << dst.name << " parent directory";
         }
         log(INFO) << "copying file from " << src.name << " to " << dst.name;
         lf::copy_file_with_timestamp(src.path, dst.path);

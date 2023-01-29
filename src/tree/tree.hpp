@@ -41,6 +41,10 @@ namespace lf {
             return const_cast<tree*>(this)->node(path);
         }
 
+        data_type get() const {
+            return data;
+        }
+
         data_type get(const std::filesystem::path& path) const {
             const tree* e = node(path);
             return e != nullptr ? e->data : data_type {};
