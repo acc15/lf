@@ -28,7 +28,8 @@ namespace lf {
         str.remove_suffix(seq_str.length());
 
         std::size_t seq;
-        auto pr = std::from_chars(seq_str.begin(), seq_str.end(), seq);
+        
+        auto pr = std::from_chars(seq_str.data(), seq_str.data() + seq_str.size(), seq);
         if (pr.ec != std::errc {}) {
             return std::nullopt;
         }

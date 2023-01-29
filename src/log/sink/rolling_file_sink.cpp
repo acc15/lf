@@ -56,8 +56,8 @@ namespace lf {
 
         info_set result;
         for (const fs::directory_entry& e: fs::directory_iterator(path.parent_path())) {
-            const fs::path path = e.path();
-            const std::string f_name = path.filename().string();
+            const fs::path p = e.path();
+            const std::string f_name = p.filename().string();
             std::optional<rolling_file_info> f_info = rolling_file_info::parse(f_name, log_name);
             if (!f_info.has_value()) {
                 continue;

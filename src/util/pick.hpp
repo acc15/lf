@@ -20,7 +20,7 @@ namespace lf {
         }
 
         size_t index;
-        const auto result = std::from_chars(t.begin(), t.end(), index);
+        const auto result = std::from_chars(t.data(), t.data() + t.size(), index);
 
         const size_t name_count = std::distance(b, e);
         if (result.ec == std::errc{} && index < name_count) {
