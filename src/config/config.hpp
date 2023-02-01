@@ -13,10 +13,11 @@
 
 namespace lf {
 
+    struct config_format: format<false> {};
+
     struct config {
 
-        static const lf::format format = lf::format::TEXT;
-        static const bool binary = false;
+        using format = config_format;
         static const char* const name;
         static const char* const env_name;
 
@@ -46,6 +47,6 @@ namespace lf {
 
     };
 
-    std::istream& operator>>(std::istream& s, with_format<format::TEXT, config&> dest);
+    std::istream& operator>>(std::istream& s, with_format<config_format, config> dest);
 
 }

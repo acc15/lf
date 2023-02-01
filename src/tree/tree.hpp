@@ -8,9 +8,9 @@
 namespace lf {
 
     template<typename T>
-    concept tree_data_concept = std::default_initializable<T> && std::equality_comparable<T>;
+    concept tree_data_type = std::default_initializable<T> && std::equality_comparable<T>;
 
-    template <tree_data_concept T>
+    template <tree_data_type T>
     struct tree {
         
         using data_type = T;
@@ -109,7 +109,7 @@ namespace lf {
     };
 
     template <typename Tree>
-    concept tree_concept = std::derived_from<Tree, tree<typename Tree::data_type>>;
+    concept tree_type = std::derived_from<Tree, tree<typename Tree::data_type>>;
 
 }
 

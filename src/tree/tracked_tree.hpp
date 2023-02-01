@@ -6,7 +6,7 @@
 
 namespace lf {
 
-    template <serializable_tree_concept Tree>
+    template <serializable_tree_type Tree>
     class tracked_tree {
     public:
         using tree_type = Tree;

@@ -33,7 +33,7 @@ namespace lf {
         return true;
     }
 
-    std::istream& operator>>(std::istream& s, with_format<format::TEXT, config&> dest) {
+    std::istream& operator>>(std::istream& s, with_format<config_format, config> dest) {
         config& cfg = dest.value;
         cfg.syncs.clear();
         

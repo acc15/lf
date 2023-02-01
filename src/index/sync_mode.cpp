@@ -21,15 +21,15 @@ namespace lf {
         return s << pick_indexed(mode, sync_mode_names);
     }
 
-    std::ostream& operator<<(std::ostream& s, with_format<format::TREE, const sync_mode&> mode) {
+    std::ostream& operator<<(std::ostream& s, with_format<tree_print_format, const sync_mode> mode) {
         return s << pick_indexed(mode.value, sync_mode_signs);
     }
 
-    std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const sync_mode&> mode) {
+    std::ostream& operator<<(std::ostream& s, with_format<tree_binary_format, const sync_mode> mode) {
         return s << static_cast<std::uint8_t>(mode.value);
     }
 
-    std::istream& operator>>(std::istream& s, with_format<format::BINARY, sync_mode&> mode) {
+    std::istream& operator>>(std::istream& s, with_format<tree_binary_format, sync_mode> mode) {
         std::uint8_t value;
         if (s >> value) {
             mode.value = static_cast<sync_mode>(value);

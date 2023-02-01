@@ -1,26 +1,36 @@
 #pragma once
 
+#include <concepts>
+
 namespace lf {
 
-	enum class format {
-		BINARY,
-		TEXT,
-		TREE // representation when printing tree
+	template <typename T>
+	concept format_type = requires {
+		{ T::binary } -> std::convertible_to<bool>;
 	};
 
-	template <auto Format, typename T>
+	template <bool Binary>
+	struct format {
+		static const bool binary = Binary;
+	};
+
+	template <format_type Format, typename T>
 	struct with_format {
-		T value;
+		using value_type = T;
+		using reference_type = value_type&;
+		using format_type = Format;
+
+		reference_type value;
 	};
 
-	template <auto Format, typename T>
-	with_format<Format, const T&> with_cref_format(const T& ref) {
-		return with_format<Format, const T&> { ref };
+	template <format_type Format, typename T>
+	constexpr auto write_as(const T& ref) {
+		return with_format<Format, const T> { ref };
 	}
 
-	template <auto Format, typename T>
-	with_format<Format, T&> with_ref_format(T& ref) {
-		return with_format<Format, T&> { ref };
+	template <format_type Format, typename T>
+	constexpr auto read_as(T& ref) {
+		return with_format<Format, T> { ref };
 	}
 
 }

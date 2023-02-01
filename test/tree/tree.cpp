@@ -88,7 +88,7 @@ TEST_CASE("print", "[tree]") {
     );
 }
 
-template <tree_data_concept T>
+template <tree_data_type T>
 void cmp_tree(const tree<T>& l, const tree<T>& r) {
     {
         INFO("l=" << l.data << ",r=" << r.data);
@@ -126,11 +126,11 @@ TEST_CASE("serialization", "[tree]") {
     const path path = temp_directory_path() / "tree_serialization_test.lf";
     
     std::fstream file(path, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc );
-    REQUIRE( file << with_ref_format<format::BINARY>(test_tree) );
+    REQUIRE( file << write_as<tree_binary_format>(test_tree) );
     REQUIRE( file.seekg(0).good() );
 
     state d;
-    REQUIRE( file >> with_ref_format<format::BINARY>(d) );
+    REQUIRE( file >> read_as<tree_binary_format>(d) );
 
     cmp_tree(test_tree, d);
 }
@@ -141,14 +141,14 @@ TEST_CASE("deserialize with wrong signature", "[tree]") {
     std::stringstream ss("WRONGSIGNATUREHERE!!!");
 
     state d;
-    REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(d) );
+    REQUIRE_FALSE( ss >> read_as<tree_binary_format>(d) );
     REQUIRE( t.str().find("invalid file signature") != std::string::npos );
 }
 
 TEST_CASE("deserialize must fail on empty stream", "[tree]") {
     state result; 
     std::stringstream ss;
-    REQUIRE_FALSE( ss >> with_ref_format<format::BINARY>(result));
+    REQUIRE_FALSE( ss >> read_as<tree_binary_format>(result));
 }
 
 TEST_CASE("deserialize must clear entries", "[tree]") {
@@ -157,8 +157,8 @@ TEST_CASE("deserialize must clear entries", "[tree]") {
     std::stringstream ss;
 
     state t1 = { true, { {"a", state { true }} } };
-    REQUIRE( ss << with_cref_format<format::BINARY>(t1) );
-    REQUIRE( ss >> with_ref_format<format::BINARY>(result) );
+    REQUIRE( ss << write_as<tree_binary_format>(t1) );
+    REQUIRE( ss >> read_as<tree_binary_format>(result) );
     ss.str("");
     ss.clear();
 
@@ -167,8 +167,8 @@ TEST_CASE("deserialize must clear entries", "[tree]") {
     REQUIRE(result.get("b") == false);
 
     state t2 = { false, { {"b", state { true }} } };
-    REQUIRE( ss << with_cref_format<format::BINARY>(t2) );
-    REQUIRE( ss >> with_ref_format<format::BINARY>(result) );
+    REQUIRE( ss << write_as<tree_binary_format>(t2) );
+    REQUIRE( ss >> read_as<tree_binary_format>(result) );
     ss.str("");
     ss.clear();
 

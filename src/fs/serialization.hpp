@@ -16,22 +16,20 @@
 namespace lf {
 
     template <typename T>
-    concept serializable = requires {
-        T::format;
-        {T::binary} -> std::convertible_to<bool>;
+    concept serializable_type = format_type<typename T::format> && requires {
         {T::name} -> std::convertible_to<std::string_view>;
     };
 
-    template <serializable T>
+    template <serializable_type T>
     constexpr std::ios_base::openmode get_serializable_openmode() {
-        return static_cast<std::ios_base::openmode>(T::binary ? std::ios_base::binary : 0);
+        return static_cast<std::ios_base::openmode>(T::format::binary ? std::ios_base::binary : 0);
     }
 
-	template <serializable T>
+	template <serializable_type T>
 	void load_file(const std::filesystem::path& path, T& result, bool optional = false) {
         const std::ios_base::openmode flags = std::ios_base::in | get_serializable_openmode<T>();
         log.debug() && log() << "loading " << T::name << " file from " << path 
-            << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << log::end;
+            << " with flags " << write_as<ios_flags_format>(flags) << "..." << log::end;
         
         std::ifstream file(path, flags);
         if (!file) {
@@ -39,7 +37,7 @@ namespace lf {
             return;
         }
 
-        file >> with_ref_format<T::format>(result);
+        file >> read_as<typename T::format>(result);
         if (file.fail() || file.bad()) {
             throw std::runtime_error(format_stream() 
                 << "unable to read " << T::name << " file from " << path << ", failed with"
@@ -55,18 +53,18 @@ namespace lf {
         log.debug() && log() << T::name << " file has been successfully loaded from " << path << log::end;
 	}
 
-	template <serializable T>
+	template <serializable_type T>
 	T load_file(const std::filesystem::path& path, bool optional = false) {
         T result;
         load_file(path, result, optional);
         return result;
 	}
 
-	template <serializable T>
+	template <serializable_type T>
 	void save_file(const std::filesystem::path& path, const T& ref) {
         const std::ios_base::openmode flags = std::ios_base::out | std::ios_base::trunc | get_serializable_openmode<T>(); 
 		log.debug() && log() << "saving " << T::name << " to " << path 
-            << " with flags " << with_cref_format<format::TEXT>(flags) << "..." << log::end;
+            << " with flags " << write_as<ios_flags_format>(flags) << "..." << log::end;
 
         create_parent_dirs(path);
 
@@ -75,7 +73,7 @@ namespace lf {
             throw_fs_error(format_stream() << "unable to open " << T::name << " file for writing", path, false);
         }
 
-        file << with_cref_format<T::format>(ref);
+        file << write_as<typename T::format>(ref);
         if (file.fail() || file.bad()) {
             throw std::runtime_error(format_stream() 
                 << "save file " << path << " failed with "

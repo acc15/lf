@@ -8,7 +8,9 @@
 
 namespace lf {
 
-    template <tree_concept Tree>
+    struct tree_print_format: format<false> {};
+
+    template <tree_type Tree>
     struct tree_print {
 
         using tree_type = Tree;
@@ -28,7 +30,7 @@ namespace lf {
         }
 
         static std::ostream& print(std::ostream& s, const tree_type& node) {
-            s << "<root> [" << with_cref_format<format::TREE>(node.data) << "]" << std::endl;
+            s << "<root> [" << write_as<tree_print_format>(node.data) << "]" << std::endl;
 
             std::vector<bool> indents;
             queue_type queue;
@@ -50,7 +52,7 @@ namespace lf {
                 bool last = queue.empty() || queue.back() == nullptr;
                 s << (last ? "└── " : "├── ");
 
-                s << p->first << " [" << with_cref_format<format::TREE>(p->second.data) << "]" << std::endl;
+                s << p->first << " [" << write_as<tree_print_format>(p->second.data) << "]" << std::endl;
                 if (p->second.entries.empty()) {
                     continue;
                 }
@@ -65,7 +67,7 @@ namespace lf {
 
     };
 
-    template <tree_concept Tree>
+    template <tree_type Tree>
     std::ostream& operator<<(std::ostream& s, const Tree& tree) {
         return tree_print<Tree>::print(s, tree);
     }

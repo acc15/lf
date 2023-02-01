@@ -8,7 +8,7 @@ TEST_CASE("test", "[ios_flags]") {
     std::stringstream s;
 
     std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc | std::ios_base::binary;
-    s << lf::with_cref_format<lf::format::TEXT>(mode);
-    REQUIRE( s.str() == "out | binary | truncate");
+    s << lf::write_as<lf::ios_flags_format>(mode);
+    REQUIRE( s.str() == "out|binary|trunc");
 
 }

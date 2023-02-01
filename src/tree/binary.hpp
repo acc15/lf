@@ -11,13 +11,15 @@
 
 namespace lf {
 
+    struct tree_binary_format: format<true> {};
+
     template <typename Tree>
-    concept serializable_tree_concept = tree_concept<Tree> && requires {
+    concept serializable_tree_type = tree_type<Tree> && requires {
         { Tree::file_signature } -> std::convertible_to<const char*>;
         { Tree::file_version } -> std::convertible_to<std::uint8_t>;
     };
 
-    template <serializable_tree_concept Tree>
+    template <serializable_tree_type Tree>
     struct tree_binary {
 
         using tree_type = Tree;
@@ -42,7 +44,7 @@ namespace lf {
                 return s;
             }
 
-            if (!(s << with_ref_format<format::BINARY>(tree.data))) {
+            if (!(s << write_as<tree_binary_format>(tree.data))) {
                 log.error() && log() << "unable to write root data: " << strerror(errno) << log::end;
                 return s;
             }
@@ -66,7 +68,7 @@ namespace lf {
                     break;
                 }
 
-                if (!(s << with_ref_format<format::BINARY>(e->second.data))) {
+                if (!(s << write_as<tree_binary_format>(e->second.data))) {
                     log.error() && log() << "unable to write entry " << e->first << " data: " << strerror(errno) << log::end;
                     break;
                 }
@@ -124,7 +126,7 @@ namespace lf {
                 return s;
             }
 
-            if (!(s >> with_ref_format<format::BINARY>(tree.data))) {
+            if (!(s >> read_as<tree_binary_format>(tree.data))) {
                 log.error() && log() << "unable to read root data: " << strerror(errno) << log::end;
                 return s;
             }
@@ -152,7 +154,7 @@ namespace lf {
                 }
 
                 nested_tree& entry = (*stack.back())[name];
-                if (!(s >> with_ref_format<format::BINARY>(entry.data))) {
+                if (!(s >> read_as<tree_binary_format>(entry.data))) {
                     log.error() && log() << "unable to read entry " << name << " data: " << strerror(errno) << log::end;
                     break;
                 }
@@ -166,13 +168,13 @@ namespace lf {
 
     };
 
-    template <serializable_tree_concept Tree>
-    std::ostream& operator<<(std::ostream& s, with_format<format::BINARY, const Tree&> tree) {
+    template <serializable_tree_type Tree>
+    std::ostream& operator<<(std::ostream& s, with_format<tree_binary_format, const Tree> tree) {
         return tree_binary<Tree>::write(s, tree.value);
     }
     
-    template <serializable_tree_concept Tree>
-    std::istream& operator>>(std::istream& s, with_format<format::BINARY, Tree&> tree) {
+    template <serializable_tree_type Tree>
+    std::istream& operator>>(std::istream& s, with_format<tree_binary_format, Tree> tree) {
         return tree_binary<Tree>::read(s, tree.value);
     }
 

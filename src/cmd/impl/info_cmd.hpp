@@ -14,7 +14,7 @@ namespace lf {
         bool run(const opt_map& params) const override;
 
     private:
-        template<serializable Tree>
+        template<serializable_type Tree>
         static void print_tree(const std::string& sync, const std::filesystem::path& p) {
             try {
                 const Tree t = load_file<Tree>(p);

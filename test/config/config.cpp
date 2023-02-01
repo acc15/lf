@@ -30,7 +30,7 @@ config test_parse(const std::string& yaml) {
     std::stringstream ss(yaml);
 
     config cfg;
-    ss >> with_ref_format<format::TEXT>(cfg);
+    ss >> read_as<config_format>(cfg);
     return cfg;
 }
 
