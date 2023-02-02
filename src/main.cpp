@@ -2,7 +2,7 @@
 
 #include "cmd/cmd_registry.hpp"
 #include "util/console.hpp"
-#include "log/config.hpp"
+#include "log/log_config.hpp"
 
 int main(const int argc, const char *argv[]) {
     lf::console_init();

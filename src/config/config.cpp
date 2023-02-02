@@ -9,6 +9,7 @@
 
 #include "config/config.hpp"
 #include "config/config_parser.hpp"
+#include "fs/os_path.hpp"
 
 namespace fs = std::filesystem;
 
@@ -89,38 +90,11 @@ namespace lf {
     
     fs::path config::get_path() {
         const char* config_path = std::getenv(env_name);
-        if (config_path != nullptr) {
-            return config_path;
-        }
-        return get_default_path();
+        return config_path != nullptr ? config_path : get_default_path();
     }
 
-    std::filesystem::path config::get_default_path() {
-        
-#if __linux__
-        const fs::path rel_path = fs::path("lf") / "lf.conf";
-        const char* home = std::getenv("HOME");
-        if (home != nullptr) {
-            return fs::path(home) / ".config" / rel_path;
-        }
-        return fs::path("/etc") / rel_path;
-#elif _WIN32
-        const fs::path rel_path = fs::path("lf") / "conf" / "lf.conf";
-        const char* local_app_data = std::getenv("LOCALAPPDATA");
-        if (local_app_data != nullptr) {
-            return fs::path(local_app_data) / rel_path;
-        }
-        const char* program_data = std::getenv("PROGRAMDATA");
-        if (program_data != nullptr) {
-            return fs::path(program_data) / rel_path;
-        }
-        return fs::path("C:\\ProgramData") / rel_path;
-#elif __APPLE__
-        const char* home = std::getenv("HOME");
-        return fs::path(home != nullptr ? home : "/") / "Library" / "Preferences" / "lf" / "lf.conf";
-#else
-#       error Unknown platform!
-#endif
+    fs::path config::get_default_path() {
+        return get_os_base_path(os_path_kind::CONFIG) / "lf" / "lf.conf";
     }
 
     config config::load() {

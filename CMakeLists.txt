@@ -91,8 +91,8 @@ add_library(lf_core
     src/log/log_stream.cpp
     src/log/log.hpp
     src/log/log.cpp
-    src/log/config.hpp
-    src/log/config.cpp
+    src/log/log_config.hpp
+    src/log/log_config.cpp
 
     # io
     src/io/null_stream.hpp
@@ -125,6 +125,8 @@ add_library(lf_core
     src/fs/error.hpp
     src/fs/error.cpp
     src/fs/serialization.hpp
+    src/fs/os_path.cpp
+    src/fs/os_path.hpp
     
     # sync
     src/sync/synchronizer.cpp
