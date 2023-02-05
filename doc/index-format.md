@@ -1,20 +1,20 @@
 # Index file format
 
-Index file is binary file which contains directory tree and current synchronization state
+Index file is binary file which contains directory tree and set synchronization modes
 
-## File tree with sync states
+## File tree with sync modes
 
 ### Entry
 
 ```plantuml
 @startebnf
 title leafsync entry grammar
-index = "LF" (* Signature *), "0-255" (* File format version, single byte *), root_entry;
-root = flags, entries;
+index = "LFI" (* Signature *), "0-255" (* File format version, single byte *), root_entry;
+root = mode (* byte *), entries;
 entries = { entry, "\0" };
-entry = entry_name, "\0", flags, entries (* Child entries *), "\0";
-entry_name = { "<any utf-8 char, except / and \0>" }-;
-flags (* single byte, binary format *) = "00000" (* Unused bits *), ("0" (* Entry isn't synchronized *) | "1" (* Entry is synchronized *)), ("00" (* Sync disabled *) | "01" (* Shallow sync enabled *) | "10" (* Deep sync enabled *));
+entry = name, "\0", mode, entries (* Child entries *), "\0";
+name = { "<any utf-8 char, except \0>" }-;
+mode = ("00" (* Sync disabled / ignore *) | "01" (* Shallow sync enabled *) | "10" (* Recursive sync enabled *));
 @endebnf
 ```
 
@@ -24,24 +24,24 @@ flags (* single byte, binary format *) = "00000" (* Unused bits *), ("0" (* Entr
 @startyaml
 signature: LF
 version: 0
-flags: 00000000
+mode: IGNORE
 entries:
   - name: dir_a
-    flags: 00000000
+    mode: IGNORE
     entries:
       - name: a.json
-        flags: 00000001
+        mode: SHALLOW
       - name: b.json
-        flags: 00000101
+        mode: SHALLOW
       - name: c.json
-        flags: 00000100
+        flags: IGNORE
   - name: dir_b
-    flags: 00000110
+    mode: RECURSIVE
     entries:
       - name: d.json
-        flags: 00001010
+        mode: RECURSIVE
       - name: e.json
-        flags: 00001010
+        mode: RECURSIVE
 
 @endyaml
 ```
