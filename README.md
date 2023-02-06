@@ -1,12 +1,16 @@
 # lf
 
-`lf` - is tiny program which allow to partially synchronize two directories or files.
+`lf` - is tiny command-line utility which allow to partially synchronize two directories or files.
 
-Partial tree sync may be useful when you want, for example, synchronize user home direcory (or even whole "root" filesystem on linux/Mac OS) - but you dont need to sync **ALL** files - just files you explicitly enable for sync. 
+Its designed especially for partial tree sync. Only files/directories which was explicitly marked for synchronization are processed (not every file in directory)
+
+Partial tree sync may be useful when you want, for example, synchronize whole user home direcory (or even whole "root" filesystem on linux/Mac OS) - but you dont need to sync **ALL** files - just files you explicitly enable for sync. 
 
 ## Comparison of existing software
 
-The key difference between existing software (with bidirectional sync support) such as:
+There is already a lot of file sync software, but not all can make partial sync, some of them are really cool, but i find them inconvinent for command-line usage. 
+
+The best tool which i found is `FreeFileSync` - it has a lot features (including partial sync)
 
 ### [Dropbox](https://www.dropbox.com/)
 
@@ -25,7 +29,11 @@ TBD
 
 ### [FreeFileSync](https://freefilesync.org/) 
 
-Powerful FreeFileSync has [filters and exclusion](https://freefilesync.org/manual.php?topic=exclude-files) and allows partial sync with a lot of options - but its extremely inconvential to manage Filter Include/Exclude list from command-line and therefore requires additional scripts to add/remove filters in XML `.ffs_batch` configuration.
+Powerful FreeFileSync has [filters and exclusion](https://freefilesync.org/manual.php?topic=exclude-files) and allows partial sync with a lot of options - but its extremely inconvential to manage Filter Include/Exclude list from command-line and therefore requires additional scripting to add/remove filters from XML `.ffs_batch` configuration.
+
+### [Syncthing](https://syncthing.net/)
+
+Only whole directories, but supports Ignore list.
 
 # Getting started
 
@@ -33,23 +41,19 @@ Powerful FreeFileSync has [filters and exclusion](https://freefilesync.org/manua
 
 To build `release` binary just run 
 
+on Linux/Mac OS
+
     release.sh
-
-on Linux/Mac OS, or
-
-    release.bat
 
 on Windows
 
-## Configuration file
-
-Config file describes directories and location of index and state files.
+    release.bat
 
 ## State file
 
 State file contains current synchronization state.
 Its a list of files which was synced to remote directory. 
-Required to correctly detect file add/remove.
+Required to correctly detect file addition/removal.
 
 ## Index file
 
@@ -59,6 +63,39 @@ List of files for synchronization is stored in binary file called index file. In
 
 - `lf add <paths>` - assigns synchronization mode to specified paths
 - `lf rm <paths>` - completed removed file-tree from index
+
+## Configuration file
+
+Config file describes directories and location of index and state files.
+Default config file location varies depending on platform.
+
+* Linux - `~/.config/lf/lf.conf`
+* Windows - `%LOCALAPPDATA%\lf\lf.conf`)
+* Mac OS - `~/Library/Preferences/lf/lf.conf`
+
+### Example
+
+    # Mirror (sync) name
+    [home]
+    
+    # Path to local directory
+    local=/home/user
+    
+    # Path to remote directory
+    remote=/mnt/router/sync
+    
+    # Path to state file (relative to local directory), defaults to 'lf.state'
+    # Also, any absolute path can be gived
+    #state=lf.state
+
+    # Path to index file (relative to remote directory), defaults to 'lf.index'
+    # Any absolute path can be gived, but it's required that any other host can access this file
+    #index=lf.index
+
+    # Config file may contain as many syncs as required
+    # [other]
+    # local=/local
+    # remote=/remote
 
 ## Sync algorithm
 
