@@ -372,3 +372,31 @@ TEST_CASE("must keep local unsynced file", "[synchronizer]") {
 
 }
 
+TEST_CASE("must sync permissions", "[synchronizer]") {
+
+    config::sync sync = make_sync();
+    lf::index index;
+    lf::tracked_state state;
+
+    const fs::path test_path = "a.txt";
+    index.set(test_path, sync_mode::SHALLOW);
+
+    write_text(sync.local / test_path, test_content);
+    
+    fs::perms perms = fs::perms::owner_all | fs::perms::group_all;
+
+    fs::permissions(sync.local / test_path, perms);
+    REQUIRE( fs::status(sync.local / test_path).permissions() == perms );
+
+    synchronizer(sync, index, state).run();
+    REQUIRE( fs::status(sync.remote / test_path).permissions() == perms );
+
+    fs::permissions(sync.remote / test_path, fs::perms::owner_all);
+    REQUIRE( fs::status(sync.remote / test_path).permissions() == fs::perms::owner_all );
+
+    plus50ms_last_write_time(sync.remote / test_path, sync.local / test_path);
+
+    synchronizer(sync, index, state).run();
+    REQUIRE( fs::status(sync.local / test_path).permissions() == fs::perms::owner_all );
+
+}
