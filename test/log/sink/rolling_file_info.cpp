@@ -30,13 +30,16 @@ TEST_CASE("rolling_file_info parse", "[rolling_file_info]") {
 
 }
 
+fs::file_time_type to_fs_time(fs::file_time_type::duration::rep rep) {
+    return fs::file_time_type(fs::file_time_type::duration(rep));
+}
 
 TEST_CASE("rolling_file_info compare", "[rolling_file_info]") {
 
-    rolling_file_info a = { .time = fs::file_time_type { fs::file_time_type::duration(100) }, .name = ".2024_03_01.", .seq = 20 };
-    rolling_file_info b = { .time = fs::file_time_type { fs::file_time_type::duration(200) }, .name = ".2024_01_30.", .seq = 9 };
-    rolling_file_info c = { .time = fs::file_time_type { fs::file_time_type::duration(200) }, .name = ".2024_01_30.", .seq = 10 };
-    rolling_file_info d = { .time = fs::file_time_type { fs::file_time_type::duration(200) }, .name = ".2024_02_02.", .seq = 1 };
+    rolling_file_info a = { .time = to_fs_time(100), .name = ".2024_03_01.", .seq = 20 };
+    rolling_file_info b = { .time = to_fs_time(200), .name = ".2024_01_30.", .seq = 9 };
+    rolling_file_info c = { .time = to_fs_time(200), .name = ".2024_01_30.", .seq = 10 };
+    rolling_file_info d = { .time = to_fs_time(200), .name = ".2024_02_02.", .seq = 1 };
 
     REQUIRE( a < b );
     REQUIRE( b < c );
