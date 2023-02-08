@@ -1,25 +1,26 @@
 #include "opts/opts.hpp"
 
+#include <algorithm>
+
 #include "log/log.hpp"
 
 namespace lf {
 
     const opt* opts::find_by_name(std::string_view name) const {
-        for (const opt& o: opts) {
-            if (o.name == name) {
-                return &o;
-            }
+        const auto it = std::find_if(opts.begin(), opts.end(), [name](const opt& o) { return o.name == name; });
+        if (it != opts.end()) {
+            return &(*it);  
         }
         log.warn() && log() << "unknown option: " << name << log::end;
         return nullptr;
     }
 
     const opt* opts::find_by_alias(std::string_view alias) const {
-        if (alias.size() == 1) {
-            for (const opt& o: opts) {
-                if (o.alias != 0 && o.alias == alias[0]) {
-                    return &o;
-                }
+        if (alias.length() == 1) {
+            const auto it = std::find_if(opts.begin(), opts.end(), 
+                [alias](const opt& o) { return o.alias != 0 && o.alias == alias[0]; });
+            if (it != opts.end()) {
+                return &(*it);
             }
         }
         log.warn() && log() << "unknown option alias: " << alias << log::end;

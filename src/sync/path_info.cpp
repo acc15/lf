@@ -17,10 +17,6 @@ namespace lf {
     {
     }
 
-    bool path_info::has_parent() const {
-        return item.has_parent_path();
-    }
-
     path_info path_info::parent() const {
         return path_info(local, root, item.parent_path());
     }

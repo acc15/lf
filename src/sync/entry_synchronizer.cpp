@@ -184,11 +184,11 @@ namespace lf {
             }
         }
 
-        fs::path path = cur.path;
+        fs::path cur_path = cur.path;
         for (; it != e; ++it) {
-            path /= *it;
-            if (!fs::create_directory(path)) {
-                throw fs::filesystem_error("unable to create directory", path, std::error_code {});
+            cur_path /= *it;
+            if (!fs::create_directory(cur_path)) {
+                throw fs::filesystem_error("unable to create directory", cur_path, std::error_code {});
             }
         }
 
@@ -241,7 +241,7 @@ namespace lf {
         dest[name] = { item.path / name, mode, false };
     }
 
-    void entry_synchronizer::queue(queue_map& map) {
+    void entry_synchronizer::queue(const queue_map& map) {
         s.queue.resize(s.queue.size() + map.size());
         auto q_it = s.queue.rbegin();
         for (auto entry: map) {

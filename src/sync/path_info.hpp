@@ -16,7 +16,6 @@ namespace lf {
 
         path_info(bool local, const std::filesystem::path& root_path, const std::filesystem::path& item_path);
 
-        bool has_parent() const;
         path_info parent() const;
 
         void init_time();

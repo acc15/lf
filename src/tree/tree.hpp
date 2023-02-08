@@ -86,23 +86,23 @@ namespace lf {
                 return set(data_type {}, !empty_only);
             }
 
-            tree* node = this;
-            tree* removal_node = nullptr;
+            tree* cur = this;
+            tree* removal = nullptr;
             typename map_type::iterator remove_iter;
             for (const std::filesystem::path& el: path) {
-                remove_iter = node->entries.find(el.string());
-                if (remove_iter == node->entries.end()) {
+                remove_iter = cur->entries.find(el.string());
+                if (remove_iter == cur->entries.end()) {
                     return false;
                 }
-                removal_node = node;
-                node = &remove_iter->second;
+                removal = cur;
+                cur = &remove_iter->second;
             }
 
-            if (empty_only && !node->entries.empty()) {
-                return node->set(data_type {}, false);
+            if (empty_only && !cur->entries.empty()) {
+                return cur->set(data_type {}, false);
             }
 
-            removal_node->entries.erase(remove_iter);
+            removal->entries.erase(remove_iter);
             return true;
         }
 

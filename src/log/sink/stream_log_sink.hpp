@@ -11,7 +11,7 @@ namespace lf {
     protected:
         void write(const log_message& messsage) override;
     public:
-        stream_log_sink(std::ostream& stream);
+        explicit stream_log_sink(std::ostream& stream);
     };
 
 }

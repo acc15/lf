@@ -53,7 +53,7 @@ namespace lf {
         void add_index_names(queue_map& dest);
         void add_queue_map_item(queue_map& dest, const std::string& name, sync_mode mode);
 
-        void queue(queue_map& map);
+        void queue(const queue_map& map);
         void copy_file(const path_info& src, const path_info& dst);
 
         bool delete_empty_dir(const path_info& p);

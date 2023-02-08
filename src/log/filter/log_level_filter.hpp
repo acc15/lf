@@ -8,7 +8,7 @@ namespace lf {
         log_level min_level;
 
     public:
-        log_level_filter(log_level min_level);
+        explicit log_level_filter(log_level min_level);
         bool level(log_level level) const override;
     };
 

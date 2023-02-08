@@ -23,7 +23,6 @@ namespace lf {
         std::string get_archive_suffix() const;
         std::filesystem::path next_archive_path(const info_set& archive_files) const;
 
-        void write_archive(const std::filesystem::path& archive_path) const;
         void delete_old_files(info_set& archive_files) const;
         void rollover();
 

@@ -46,11 +46,6 @@ namespace lf {
 
     }
 
-    void rolling_file_sink::write_archive(const std::filesystem::path& archive_path) const {
-        std::ofstream a(archive_path, std::ios_base::out | std::ios_base::trunc);
-        a << file.rdbuf();
-    }
-
     rolling_file_sink::info_set rolling_file_sink::get_archive_files() const {
         const std::string log_name = path.filename().string();
 
