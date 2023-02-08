@@ -4,7 +4,7 @@
 
 using namespace lf;
 
-TEST_CASE("put and find", "[string_map]") {
+TEST_CASE("unordered_string_map put and find", "[string_map]") {
     
     unordered_string_map<int> m;
 

@@ -163,6 +163,8 @@ add_executable(lf
 )
 target_link_libraries(lf PRIVATE lf_core)
 
+install(TARGETS lf)
+
 add_executable(lf_test 
     ${executable_src}
     test/main.cpp
@@ -199,4 +201,7 @@ add_executable(lf_test
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
 
-install(TARGETS lf)
+include(CTest)
+include(Catch)
+catch_discover_tests(lf_test)
+

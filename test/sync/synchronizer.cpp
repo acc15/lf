@@ -55,7 +55,7 @@ void write_test_file(const fs::path& path) {
     write_text(path, test_content);
 }
 
-TEST_CASE("file added", "[synchronizer]") {
+TEST_CASE("synchronizer file added", "[synchronizer]") {
 
     const bool local = GENERATE(true, false);
     INFO( test_direction(local) );
@@ -80,7 +80,7 @@ TEST_CASE("file added", "[synchronizer]") {
     REQUIRE( fs::last_write_time(sync.remote / test_deep_path) == fs::last_write_time(sync.local / test_deep_path) );
 }
 
-TEST_CASE("file deleted", "[synchronizer]") {
+TEST_CASE("synchronizer file deleted", "[synchronizer]") {
     
     const bool local = GENERATE(true, false);
     INFO( test_direction(local) );
@@ -104,7 +104,7 @@ TEST_CASE("file deleted", "[synchronizer]") {
 
 }
 
-TEST_CASE("file updated", "[synchronizer]") {
+TEST_CASE("synchronizer file updated", "[synchronizer]") {
 
     bool local = GENERATE(true, false);
     INFO( test_direction(local) );
@@ -135,7 +135,7 @@ TEST_CASE("file updated", "[synchronizer]") {
 
 }
 
-TEST_CASE("index removed", "[synchronizer]") {
+TEST_CASE("synchronizer index removed", "[synchronizer]") {
     auto sync = make_sync();
     lf::index index; 
     lf::tracked_state state;
@@ -153,7 +153,7 @@ TEST_CASE("index removed", "[synchronizer]") {
     REQUIRE( s.state.node(test_name) == nullptr );
 }
 
-TEST_CASE("can update file timestamp", "[synchronizer]") {
+TEST_CASE("synchronizer can update file timestamp", "[synchronizer]") {
     
     auto sync = make_sync();
     write_test_file(sync.local / test_name);
@@ -162,7 +162,7 @@ TEST_CASE("can update file timestamp", "[synchronizer]") {
 
 }
 
-TEST_CASE("local shallow dir to remote", "[synchronizer]") {
+TEST_CASE("synchronizer local shallow dir to remote", "[synchronizer]") {
 
     config::sync sync = make_sync();
     lf::index index;
@@ -188,7 +188,7 @@ TEST_CASE("local shallow dir to remote", "[synchronizer]") {
 
 }
 
-TEST_CASE("update shallow dir file", "[synchronizer]") {
+TEST_CASE("synchronizer update shallow dir file", "[synchronizer]") {
 
     config::sync sync = make_sync();
     lf::index index;
@@ -211,7 +211,7 @@ TEST_CASE("update shallow dir file", "[synchronizer]") {
 
 }
 
-TEST_CASE("delete shallow dir file", "[synchronizer]") {
+TEST_CASE("synchronizer delete shallow dir file", "[synchronizer]") {
 
     config::sync sync = make_sync();
     lf::index index;
@@ -241,7 +241,7 @@ TEST_CASE("delete shallow dir file", "[synchronizer]") {
 
 }
 
-TEST_CASE("file to dir", "[synchronizer]") {
+TEST_CASE("synchronizer file to dir", "[synchronizer]") {
 
     bool local = GENERATE(true, false);
     INFO( test_direction(local) );
@@ -268,7 +268,7 @@ TEST_CASE("file to dir", "[synchronizer]") {
 
 }
 
-TEST_CASE("dir to file", "[synchronizer]") {
+TEST_CASE("synchronizer dir to file", "[synchronizer]") {
 
     bool local = GENERATE(true, false);
     INFO( test_direction(local) );
@@ -295,7 +295,7 @@ TEST_CASE("dir to file", "[synchronizer]") {
 
 }
 
-TEST_CASE("nested file must override file", "[synchronizer]") {
+TEST_CASE("synchronizer nested file must override file", "[synchronizer]") {
     
     bool local = GENERATE(true, false);
     INFO( test_direction(local) );
@@ -321,7 +321,7 @@ TEST_CASE("nested file must override file", "[synchronizer]") {
 
 }
 
-TEST_CASE("avoid creating UNSPECIFIED directories", "[synchronizer]") {
+TEST_CASE("synchronizer avoid creating UNSPECIFIED directories", "[synchronizer]") {
     
     config::sync sync = make_sync();
     lf::index index;
@@ -352,7 +352,7 @@ TEST_CASE("avoid creating UNSPECIFIED directories", "[synchronizer]") {
 
 }
 
-TEST_CASE("must keep local unsynced file", "[synchronizer]") {
+TEST_CASE("synchronizer must keep local unsynced file", "[synchronizer]") {
     
     config::sync sync = make_sync();
     lf::index index;
@@ -372,7 +372,7 @@ TEST_CASE("must keep local unsynced file", "[synchronizer]") {
 
 }
 
-TEST_CASE("must sync permissions", "[synchronizer]") {
+TEST_CASE("synchronizer must sync permissions", "[synchronizer]") {
 
     config::sync sync = make_sync();
     lf::index index;

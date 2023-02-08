@@ -3,7 +3,7 @@
 #include <sstream>
 #include "io/ios_flags.hpp"
 
-TEST_CASE("test", "[ios_flags]") {
+TEST_CASE("ios_flags print", "[ios_flags]") {
     
     std::stringstream s;
 

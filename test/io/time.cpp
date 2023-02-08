@@ -10,7 +10,7 @@ std::string format(std::chrono::milliseconds::rep t) {
     return s.str();
 }
 
-TEST_CASE("format_date_time", "[datetime]") {
+TEST_CASE("datetime format_date_time", "[datetime]") {
 
     REQUIRE( format(1673953910406L) == "2023-01-17T11:11:50.406" );
     REQUIRE( format(1673953910006L) == "2023-01-17T11:11:50.006" );

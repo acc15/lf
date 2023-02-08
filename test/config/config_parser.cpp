@@ -44,7 +44,7 @@ config_vec test_parse_config(const std::string& text) {
     return result;
 }
 
-TEST_CASE("parse_config", "[config_parser]") {
+TEST_CASE("config_parser parse", "[config_parser]") {
     config_vec actual = test_parse_config(
         "no_section = yes\n"
         " # comment \n"
@@ -70,7 +70,7 @@ TEST_CASE("parse_config", "[config_parser]") {
     cmp_parse_config_vec(actual, expected);
 }
 
-TEST_CASE("empty key", "[config_parser]") {
+TEST_CASE("config_parser empty key", "[config_parser]") {
     lf::log_tester t(lf::INFO);
     test_parse_config("=");
     REQUIRE_THAT(t.str(), Catch::Matchers::ContainsSubstring("empty key"));

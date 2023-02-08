@@ -14,7 +14,7 @@ public:
     }
 };
 
-TEST_CASE("print", "[cmd_desc]") {
+TEST_CASE("cmd_desc print", "[cmd_desc]") {
     test_cmd cmd;
     std::stringstream ss;
     ss << cmd;

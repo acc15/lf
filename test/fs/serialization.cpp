@@ -28,7 +28,7 @@ std::ostream& operator<<(std::ostream& s, with_format<test_format, const test_se
     return s;
 }
 
-TEST_CASE("write", "[serialization]") {
+TEST_CASE("serialization write", "[serialization]") {
 
     std::stringstream s;
     test_serializable<int> t = { 11 };
@@ -36,7 +36,7 @@ TEST_CASE("write", "[serialization]") {
 
 }
 
-TEST_CASE("file not found", "[serialization]") {
+TEST_CASE("serialization file not found", "[serialization]") {
     test_serializable<int> t = { 12 };
 
     const std::filesystem::path p = test_dir_path / "no_such_file.txt";
