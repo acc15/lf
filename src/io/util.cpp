@@ -1,5 +1,7 @@
 #include "io/util.hpp"
 
+#include <cstring>
+
 using iob = std::ios_base;
 
 namespace lf {
@@ -10,6 +12,10 @@ namespace lf {
             s.clear(state & ~iob::failbit);
         }
         return s;
+    }
+
+    const char* get_errno_message() {
+        return std::strerror(errno);
     }
 
 }

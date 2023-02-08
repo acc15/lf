@@ -2,6 +2,7 @@
 
 #include "tree/tree.hpp"
 #include "io/format.hpp"
+#include "io/util.hpp"
 #include "log/log.hpp"
 
 #include <cstring>
@@ -35,17 +36,20 @@ namespace lf {
         static std::ostream& write(std::ostream& s, const tree_type& tree) {
             
             if (!(s << tree_type::file_signature)) {
-                log.error() && log() << "unable to write file signature: " << strerror(errno) << log::end;
+                log.error() && log() 
+                    << "unable to write file signature: " << get_errno_message() << log::end;
                 return s;
             }
 
             if (!(s << tree_type::file_version)) {
-                log.error() && log() << "unable to write file version: " << strerror(errno) << log::end;
+                log.error() && log() 
+                    << "unable to write file version: " << get_errno_message() << log::end;
                 return s;
             }
 
             if (!(s << write_as<tree_binary_format>(tree.data))) {
-                log.error() && log() << "unable to write root data: " << strerror(errno) << log::end;
+                log.error() && log() 
+                    << "unable to write root data: " << get_errno_message() << log::end;
                 return s;
             }
 
@@ -64,12 +68,14 @@ namespace lf {
 
                 log.trace() && log() << "writing entry " << e->first << "..." << log::end;
                 if (!(s << e->first << '\0')) {
-                    log.error() && log() << "unable to write entry " << e->first << " name: " << strerror(errno) << log::end;
+                    log.error() && log() 
+                        << "unable to write entry " << e->first << " name: " << get_errno_message() << log::end;
                     break;
                 }
 
                 if (!(s << write_as<tree_binary_format>(e->second.data))) {
-                    log.error() && log() << "unable to write entry " << e->first << " data: " << strerror(errno) << log::end;
+                    log.error() && log() 
+                        << "unable to write entry " << e->first << " data: " << get_errno_message() << log::end;
                     break;
                 }
 
@@ -82,7 +88,9 @@ namespace lf {
 
                     log.trace() && log() << "entry " << e->first << " is empty, writing zero char" << log::end;
                     if (!(s << '\0')) {
-                        log.error() && log() << "unable to write entry " << e->first << " finising zero char: " << strerror(errno) << log::end;
+                        log.error() && log() 
+                            << "unable to write entry " << e->first 
+                            << " finising zero char: " << get_errno_message() << log::end;
                         break;
                     }
 
@@ -105,7 +113,8 @@ namespace lf {
             uint8_t version;
 
             if (!(s >> signature)) {
-                log.error() && log() << "unable to read file signature: " << strerror(errno) << log::end;
+                log.error() && log() 
+                    << "unable to read file signature: " << get_errno_message() << log::end;
                 return s;
             }
             
@@ -116,18 +125,21 @@ namespace lf {
             }
 
             if (!(s >> version)) {
-                log.error() && log() << "unable to read file version: " << strerror(errno) << log::end;
+                log.error() && log() 
+                    << "unable to read file version: " << get_errno_message() << log::end;
                 return s;
             }
 
             if (version != tree_type::file_version) {
-                log.error() && log() << "invalid file version: " << static_cast<unsigned int>(version) << log::end;
+                log.error() && log() 
+                    << "invalid file version: " << static_cast<unsigned int>(version) << log::end;
                 s.setstate(std::istream::failbit);
                 return s;
             }
 
             if (!(s >> read_as<tree_binary_format>(tree.data))) {
-                log.error() && log() << "unable to read root data: " << strerror(errno) << log::end;
+                log.error() && log() 
+                    << "unable to read root data: " << get_errno_message() << log::end;
                 return s;
             }
 
@@ -149,13 +161,15 @@ namespace lf {
                 
                 std::string name;
                 if (!getline(s, name, '\0')) {
-                    log.error() && log() << "unable to read entry name: " << strerror(errno) << log::end;
+                    log.error() && log() 
+                        << "unable to read entry name: " << get_errno_message() << log::end;
                     break;
                 }
 
                 nested_tree& entry = (*stack.back())[name];
                 if (!(s >> read_as<tree_binary_format>(entry.data))) {
-                    log.error() && log() << "unable to read entry " << name << " data: " << strerror(errno) << log::end;
+                    log.error() && log() 
+                        << "unable to read entry " << name << " data: " << get_errno_message() << log::end;
                     break;
                 }
 

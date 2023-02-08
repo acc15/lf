@@ -6,6 +6,11 @@ project(lf LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+if (CMAKE_CXX_CPPCHECK)
+    list(APPEND CMAKE_CXX_CPPCHECK "--enable=warning" "--inline-suppr")
+endif()
+
 if (UNIX)
     set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
 elseif(WIN32)
