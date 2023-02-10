@@ -192,7 +192,6 @@ add_executable(lf_test
     test/fs/serialization.cpp
     test/util/pick.cpp
     test/util/string.cpp
-    test/util/string_map.cpp
 
     test/sync/synchronizer.cpp
     test/sync/entry_synchronizer.cpp

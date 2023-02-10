@@ -49,7 +49,11 @@ namespace lf {
                 return;
             }
 
-            config::sync& sync = cfg.syncs[e.section];
+            config::sync_vec::iterator it = cfg.find_by_name(e.section);
+            config::sync& sync = it == cfg.syncs.end() 
+                ? cfg.syncs.emplace_back(config::sync { .name = e.section })
+                : *it;
+
             if (e.key == "local") {
                 sync.local = e.value;
             } else if (e.key == "remote") {
@@ -65,12 +69,12 @@ namespace lf {
 
         auto it = cfg.syncs.begin();
         while (it != cfg.syncs.end()) {
-            config::sync& sync = it->second;
+            config::sync& sync = *it;
             
-            bool valid = check_config_path_absolute(it->first, sync.local, "local");
-            valid &= check_config_path_absolute(it->first, sync.remote, "remote");
-            valid &= check_config_path_specified(it->first, sync.index, "index");
-            valid &= check_config_path_specified(it->first, sync.state, "state");
+            bool valid = check_config_path_absolute(sync.name, sync.local, "local");
+            valid &= check_config_path_absolute(sync.name, sync.remote, "remote");
+            valid &= check_config_path_specified(sync.name, sync.index, "index");
+            valid &= check_config_path_specified(sync.name, sync.state, "state");
 
             if (valid) {
                 if (sync.index.is_relative()) {
@@ -113,7 +117,7 @@ namespace lf {
             return result;
         }
         for (std::string_view n: names) {
-            const auto it = syncs.find(n);
+            const auto it = find_by_name(n);
             if (it != syncs.end()) {
                 result.push_back(&(*it));
             }
@@ -124,7 +128,7 @@ namespace lf {
     config::sync_entry_match_map config::find_local_matches(const std::filesystem::path &p) const {
         sync_entry_match_map result;
         for (const auto& e: syncs) {
-            const std::filesystem::path& local_path = e.second.local;
+            const std::filesystem::path& local_path = e.local;
             if (!is_subpath(p, local_path)) {
                 continue;
             }
@@ -140,6 +144,14 @@ namespace lf {
             return config::sync_entry_vec();
         }
         return m.rbegin()->second;
+    }
+
+    config::sync_vec::const_iterator config::find_by_name(std::string_view name) const {
+        return std::find_if(syncs.begin(), syncs.end(), [name](const auto& e) { return e.name == name; });
+    }
+
+    config::sync_vec::iterator config::find_by_name(std::string_view name) {
+        return std::find_if(syncs.begin(), syncs.end(), [name](const auto& e) { return e.name == name; });
     }
 
     const char* const config::name = "config";

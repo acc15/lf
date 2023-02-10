@@ -24,21 +24,21 @@ namespace lf {
         if (syncs.empty()) {
             log.error() && log() 
                 << "no one sync found by supplied names, declared sync names: " 
-                << join(", ", cfg.syncs, [](const auto& e) { return e.first; }) 
+                << join(", ", cfg.syncs, [](const auto& e) { return e.name; }) 
                 << log::end;
             return 1;
         }
 
         bool ok = true;
-        for (const config::sync_entry* p: syncs) {
-            ok &= do_sync(p->first, p->second);
+        for (const config::sync* p: syncs) {
+            ok &= do_sync(*p);
         }
         return ok;
     }
 
-    bool sync_cmd::do_sync(const std::string& name, const config::sync& sync) const {
+    bool sync_cmd::do_sync(const config::sync& sync) const {
         log.info() && log() 
-            << "syncing \"" << name
+            << "syncing \"" << sync.name
             << "\", local: " << sync.local 
             << ", remote: " << sync.remote 
             << log::end;
@@ -57,7 +57,7 @@ namespace lf {
             state.save_if_changed(sync.state);
 
         } catch (const std::runtime_error& e) {
-            log.error() && log() << "unable to sync \"" << name << "\": " << e.what() << log::end;
+            log.error() && log() << "unable to sync \"" << sync.name << "\": " << e.what() << log::end;
             return false;
         }
         return true;

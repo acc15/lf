@@ -36,12 +36,12 @@ namespace lf {
             return false;
         }
 
-        for (const config::sync_entry* p: v) {
+        for (const config::sync* p: v) {
             if (print_state) {
-                print_tree<state>(p->first, p->second.state);
+                print_tree<state>(p->name, p->state);
             }
             if (print_index) {
-                print_tree<index>(p->first, p->second.index);
+                print_tree<index>(p->name, p->index);
             }
         }
         return true;

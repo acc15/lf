@@ -13,7 +13,7 @@ namespace lf {
         bool run(const opt_map& params) const override;
 
     private:
-        bool do_sync(const std::string& name, const config::sync& sync) const;
+        bool do_sync(const config::sync& sync) const;
     };
 
 }

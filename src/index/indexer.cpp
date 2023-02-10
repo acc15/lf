@@ -27,17 +27,21 @@ namespace lf {
 
         config::sync_entry_vec matches = cfg.find_most_specific_local_matches(path);
         for (const auto* e: matches) {
-            
-            const std::string& name = e->first;
-            const config::sync& sync = e->second;
+
+            const config::sync& sync = *e;
 
             const fs::path rel_path = relative_path(path, sync.local);
             tracked_index& index = load_index(sync.index);
             if (mode.has_value()) {
-                log.info() && log() << "set " << path << " mode to " << mode.value() << " in \"" << name << "\" sync index " << sync.index << log::end;
+                log.info() && log() 
+                    << "set " << path << " mode to " << mode.value() 
+                    << " in \"" << sync.name << "\" sync index " << sync.index 
+                    << log::end;
                 index.set(rel_path, mode.value());
             } else {
-                log.info() && log() << "rm " << path << " from \"" << name << "\" sync index " << sync.index << log::end;
+                log.info() && log() 
+                    << "rm " << path << " from \"" << sync.name << "\" sync index " << sync.index 
+                    << log::end;
                 index.remove(rel_path);
             }
         }

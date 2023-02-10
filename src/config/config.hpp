@@ -9,7 +9,6 @@
 #include <span>
 
 #include "io/format.hpp"
-#include "util/string_map.hpp"
 
 namespace lf {
 
@@ -22,23 +21,26 @@ namespace lf {
         static const char* const env_name;
 
         struct sync {
+            std::string name;
             std::filesystem::path local;
             std::filesystem::path remote;
             std::filesystem::path state = "lf.state";
             std::filesystem::path index = "lf.index";
         };
 
-        using sync_map = unordered_string_map<sync>;
-        using sync_entry = sync_map::value_type;
-        using sync_entry_vec = std::vector<const sync_entry*>;
+        using sync_vec = std::vector<sync>;
+        using sync_entry_vec = std::vector<const sync*>;
         using sync_entry_match_map = std::map<std::ptrdiff_t, sync_entry_vec>;
 
         static std::filesystem::path get_path();
         static std::filesystem::path get_default_path();
         
-        sync_map syncs; 
+        sync_vec syncs; 
 
         static config load();
+
+        sync_vec::iterator find_by_name(std::string_view name);
+        sync_vec::const_iterator find_by_name(std::string_view name) const;
 
         sync_entry_vec find_name_matches(const std::vector<std::string_view>& names) const;
         
