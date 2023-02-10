@@ -17,6 +17,17 @@
             "configurePreset": "release",
             "configuration": "Release",
             "targets": [ "lf" ]
+        },
+        {
+            "name": "test",
+            "configurePreset": "release",
+            "configuration": "Release"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "test",
+            "configurePreset": "release"
         }
     ],
     "workflowPresets": [
@@ -30,6 +41,23 @@
                 {
                     "type": "build",
                     "name": "release"
+                }
+            ]
+        },
+        {
+            "name": "test",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "release"
+                },
+                {
+                    "type": "build",
+                    "name": "test"
+                },
+                {
+                    "type": "test",
+                    "name": "test"
                 }
             ]
         }
