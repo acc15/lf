@@ -51,7 +51,7 @@ namespace lf {
 
             config::sync_vec::iterator it = cfg.find_by_name(e.section);
             config::sync& sync = it == cfg.syncs.end() 
-                ? cfg.syncs.emplace_back(config::sync { .name = e.section })
+                ? cfg.syncs.emplace_back(config::sync { .name = e.section, .local = {}, .remote = {} })
                 : *it;
 
             if (e.key == "local") {

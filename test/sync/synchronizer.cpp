@@ -26,6 +26,7 @@ config::sync make_sync(std::optional<bool> local_to_remote = std::nullopt) {
     fs::create_directories(remote);
 
     return {
+        .name = "test",
         .local = local,
         .remote = remote,
         .state = fs::path(),
