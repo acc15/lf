@@ -2,34 +2,40 @@
     "version": 6,
     "configurePresets": [
         {
-            "name": "default",
+            "name": "release",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "debug",
+            "inherits": "release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
         }
     ],
     "buildPresets": [
         {
+            "name": "all",
+            "configurePreset": "release",
+            "configuration": "Release"
+        },
+        {
             "name": "app",
-            "configurePreset": "default",
-            "configuration": "Release",
+            "inherits": "all",
             "targets": [
                 "lf"
             ]
-        },
-        {
-            "name": "all",
-            "configurePreset": "default",
-            "configuration": "Release"
         }
     ],
     "testPresets": [
         {
             "name": "test",
-            "configurePreset": "default"
+            "configurePreset": "release"
         }
     ],
     "workflowPresets": [
@@ -38,7 +44,7 @@
             "steps": [
                 {
                     "type": "configure",
-                    "name": "default"
+                    "name": "release"
                 },
                 {
                     "type": "build",
@@ -47,11 +53,11 @@
             ]
         },
         {
-            "name": "ci",
+            "name": "test",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "default"
+                    "name": "release"
                 },
                 {
                     "type": "build",
