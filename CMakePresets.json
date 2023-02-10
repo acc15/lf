@@ -2,7 +2,7 @@
     "version": 6,
     "configurePresets": [
         {
-            "name": "release",
+            "name": "default",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
@@ -13,21 +13,23 @@
     ],
     "buildPresets": [
         {
-            "name": "release",
-            "configurePreset": "release",
+            "name": "app",
+            "configurePreset": "default",
             "configuration": "Release",
-            "targets": [ "lf" ]
+            "targets": [
+                "lf"
+            ]
         },
         {
-            "name": "test",
-            "configurePreset": "release",
+            "name": "all",
+            "configurePreset": "default",
             "configuration": "Release"
         }
     ],
     "testPresets": [
         {
             "name": "test",
-            "configurePreset": "release"
+            "configurePreset": "default"
         }
     ],
     "workflowPresets": [
@@ -36,24 +38,24 @@
             "steps": [
                 {
                     "type": "configure",
-                    "name": "release"
+                    "name": "default"
                 },
                 {
                     "type": "build",
-                    "name": "release"
+                    "name": "app"
                 }
             ]
         },
         {
-            "name": "test",
+            "name": "ci",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "release"
+                    "name": "default"
                 },
                 {
                     "type": "build",
-                    "name": "test"
+                    "name": "all"
                 },
                 {
                     "type": "test",
