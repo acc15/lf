@@ -20,6 +20,6 @@ jobs:
         with:
           path: ~/.cache/vcpkg
           key: vcpkg-${{ runner.os }}
+      - run: sudo apt-get -y install ninja-build
       - uses: actions/checkout@v3
-      - run: sudo apt-get install ninja-build
       - run: cmake --workflow --preset test
