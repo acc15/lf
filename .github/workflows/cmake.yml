@@ -16,6 +16,10 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/vcpkg
+          key: vcpkg-${{ runner.os }}
       - uses: actions/checkout@v3
       - run: sudo apt-get install ninja-build
       - run: cmake --workflow --preset test
