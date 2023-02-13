@@ -1,3 +1,5 @@
+https://github.com/acc15/lf/actions/workflows/linux.yml/badge.svg
+
 # lf
 
 `lf` - is tiny command-line utility which allow to partially synchronize two directories or files.
@@ -38,6 +40,14 @@ Only whole directories, but supports Ignore list.
 # Getting started
 
 ## Compilation
+
+### Supported compiles and versions
+
+* Linux: GCC 12 or CLang 14
+* MacOS: CLang 14
+* Windows: VS 2022 (_MSCVER >= 1930)
+
+### Building
 
 To build `release` binary just run 
 
