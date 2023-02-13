@@ -1,4 +1,4 @@
-https://github.com/acc15/lf/actions/workflows/linux.yml/badge.svg
+![Linux build status](https://github.com/acc15/lf/actions/workflows/linux.yml/badge.svg "Linux build status")
 
 # lf
 
