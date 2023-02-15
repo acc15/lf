@@ -10,8 +10,7 @@
 
 namespace fs = std::filesystem;
 
-
-TEST_CASE("file lock get file descriptor", "[lock]") {
+TEST_CASE("file lock get file descriptor", "[.][lock]") {
 
     const char* path = "/mnt/router/tmp/test_lock.txt"; 
 
