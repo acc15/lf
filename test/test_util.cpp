@@ -1,3 +1,4 @@
+#include <catch2/interfaces/catch_interfaces_capture.hpp>
 #include "test_util.hpp"
 #include "fs/util.hpp"
 
@@ -16,8 +17,12 @@ namespace lf {
     const fs::path test_root_path = "/";
 #endif
 
-    fs::path create_temp_test_dir(const fs::path& test_path) {
-        fs::path p = fs::temp_directory_path() / "lf_test" / test_path;
+    fs::path create_temp_test_dir(const fs::path& suffix) {
+        fs::path p = fs::temp_directory_path() / "lf_test" / Catch::getResultCapture().getCurrentTestName();
+        if (!suffix.empty()) {
+            p /= suffix;
+        }
+
         fs::create_directories(p);
         for (auto child: fs::directory_iterator(p)) {
             fs::remove_all(child);

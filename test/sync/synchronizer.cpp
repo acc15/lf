@@ -12,12 +12,9 @@ using namespace lf;
 
 config::sync make_sync(std::optional<bool> local_to_remote = std::nullopt) {
 
-    fs::path test_path = fs::path("synchronizer") / Catch::getResultCapture().getCurrentTestName();
-    if (local_to_remote.has_value()) {
-        test_path /= (local_to_remote ? "l2r" : "r2l");
-    }
-
-    fs::path dest_test_dir = create_temp_test_dir(test_path);
+    fs::path dest_test_dir = create_temp_test_dir(local_to_remote.has_value() 
+        ? (local_to_remote ? "l2r" : "r2l") 
+        : fs::path());
 
     fs::path local = dest_test_dir / "local";
     fs::path remote = dest_test_dir / "remote";
