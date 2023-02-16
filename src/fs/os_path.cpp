@@ -4,7 +4,7 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    std::filesystem::path get_os_base_path(os_path_kind kind) {
+    std::filesystem::path get_os_base_path([[maybe_unused]] os_path_kind kind) {
 #if defined(_WIN32)
         const char* local_app_data = std::getenv("LOCALAPPDATA");
         if (local_app_data != nullptr) {

@@ -195,12 +195,9 @@ add_executable(lf_test
 
     test/sync/synchronizer.cpp
     test/sync/entry_synchronizer.cpp
-
+    
+    test/fs/lock.cpp
 )
-
-if (LINUX)
-    target_sources(lf_test PRIVATE test/fs/lock.cpp)
-endif()
 
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)

@@ -146,12 +146,16 @@ namespace lf {
         return m.rbegin()->second;
     }
 
-    config::sync_vec::const_iterator config::find_by_name(std::string_view name) const {
-        return std::find_if(syncs.begin(), syncs.end(), [name](const auto& e) { return e.name == name; });
+    config::sync_vec::const_iterator config::find_by_name(std::string_view search_name) const {
+        return std::find_if(syncs.begin(), syncs.end(), [search_name](const auto& e) { 
+            return e.name == search_name; 
+        });
     }
 
-    config::sync_vec::iterator config::find_by_name(std::string_view name) {
-        return std::find_if(syncs.begin(), syncs.end(), [name](const auto& e) { return e.name == name; });
+    config::sync_vec::iterator config::find_by_name(std::string_view search_name) {
+        return std::find_if(syncs.begin(), syncs.end(), [search_name](const auto& e) { 
+            return e.name == search_name; 
+        });
     }
 
     const char* const config::name = "config";
