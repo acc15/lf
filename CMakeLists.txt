@@ -196,7 +196,7 @@ add_executable(lf_test
     test/sync/synchronizer.cpp
     test/sync/entry_synchronizer.cpp
     
-    test/fs/lock.cpp
+    test/fs/adv_fstream.cpp
 )
 
 target_include_directories(lf_test PRIVATE test)
