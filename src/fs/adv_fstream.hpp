@@ -82,8 +82,6 @@ namespace lf {
             return UnlockFileEx(handle(), 0, MAX_DWORD, MAX_DWORD, &ov);
         }
 
-#else
-#   error "Unsupported platform!!!"
 #endif
 
         bool truncate() {

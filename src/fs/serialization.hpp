@@ -1,8 +1,8 @@
 #pragma once
 
+#include "fs/adv_fstream.hpp"
 #include <string_view>
 #include <filesystem>
-#include <fstream>
 #include <concepts>
 #include <exception>
 
@@ -31,10 +31,17 @@ namespace lf {
         log.debug() && log() << "loading " << T::name << " file from " << path 
             << " with flags " << write_as<ios_flags_format>(flags) << "..." << log::end;
         
-        std::ifstream file(path, flags);
+        adv_ifstream file(path, flags);
         if (!file) {
             throw_fs_error(format_stream() << "unable to open " << T::name << " file for reading", path, optional);
             return;
+        }
+
+        if (!file.lock(LOCK_WAIT)) {
+            throw std::filesystem::filesystem_error(
+                format_stream() << "unable to lock " << T::name << " file for reading", 
+                path, 
+                std::error_code(EAGAIN, std::iostream_category()));
         }
 
         file >> read_as<typename T::format>(result);
