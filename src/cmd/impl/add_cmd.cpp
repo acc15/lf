@@ -17,15 +17,12 @@ namespace lf {
     }
 
     bool add_cmd::run(const opt_map& params) const {
-        config cfg = config::load();
-
         indexer indexer;
-        indexer.process(cfg, params["shallow"], sync_mode::SHALLOW);
-        indexer.process(cfg, params["recursive"], sync_mode::RECURSIVE);
-        indexer.process(cfg, params["ignore"], sync_mode::IGNORE);
-        indexer.save_changes();
-        
-        return indexer.is_successful();
+        indexer.init();
+        indexer.process(params["shallow"], sync_mode::SHALLOW);
+        indexer.process(params["recursive"], sync_mode::RECURSIVE);
+        indexer.process(params["ignore"], sync_mode::IGNORE);
+        return indexer.save_changes();
     }
 
 }

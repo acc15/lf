@@ -97,7 +97,7 @@ namespace lf {
         }
 
         basic_adv_filebuf() {}
-        basic_adv_filebuf(basic_adv_filebuf&& m): filebuf(m) {}
+        basic_adv_filebuf(basic_adv_filebuf&& m): filebuf(std::move(m)) {}
         ~basic_adv_filebuf() noexcept override {}
 
     };
@@ -128,7 +128,8 @@ namespace lf {
             open(path, mode);
         }
 
-        basic_adv_fstream(basic_adv_fstream&& m): stream_type(std::move(m._buf)) {
+        basic_adv_fstream(basic_adv_fstream&& m): stream_type(std::move(m)), _buf(std::move(m._buf)) {
+            stream_type::set_rdbuf(&_buf);
         }
 
         ~basic_adv_fstream() override {}

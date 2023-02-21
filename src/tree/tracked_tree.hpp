@@ -15,63 +15,71 @@ namespace lf {
         using path = std::filesystem::path;
 
     private:
-        bool changed = false;
-        tree_type root;
+        bool _mod = false;
+        tree_type _root;
 
     public:
         tracked_tree& operator=(const tree_type& v) {
-            root = v;
+            _root = v;
             return *this;
         }
 
         bool empty() const {
-            return root.empty();
+            return _root.empty();
         }
 
         bool is_changed() const {
-            return changed;
+            return _mod;
         }
 
         void load(const path& path, bool optional = false) {
-            changed = false;
-            load_file(path, root, optional);
+            _mod = false;
+            load_file(path, _root, optional);
         }
 
         void save_if_changed(const path& path) {
-            if (changed) {
-                save_file(path, root);
-                changed = false;
+            if (_mod) {
+                save_file(path, _root);
+                _mod = false;
             } else {
                 log.debug() && log() << "skipped save of " << tree_type::name << " to " << path << " as it wasn't modified" << log::end;
             }
         }
 
+        tree_type& root() {
+            return _root;
+        }
+
+        const tree_type& root() const {
+            return _root;
+        }
+
         const node_type* node() const {
-            return &root;
+            return &_root;
         }
 
         const node_type* node(const std::filesystem::path& path) const {
-            return root.node(path);
+            return _root.node(path);
         }
 
         data_type get() const {
-            return root.data;
+            return _root.data;
         }
 
         data_type get(const std::filesystem::path& path) const {
-            return root.get(path);
+            return _root.get(path);
         }
 
         void remove(const std::filesystem::path& path, bool empty_only = false) {
-            changed |= root.remove(path, empty_only);
+            _mod |= _root.remove(path, empty_only);
         }
 
         void set(const data_type& value, bool remove_children = false) {
-            changed |= root.set(value, remove_children);
+            _mod |= _root.set(value, remove_children);
         }
 
         void set(const std::filesystem::path& path, const data_type& value, bool remove_children = false) {
-            changed |= root.set(path, value, remove_children);
+            _mod |= _root.set(path, value, remove_children);
         }
 
     };

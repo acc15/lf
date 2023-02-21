@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config/config.hpp"
+#include "fs/adv_fstream.hpp"
 
 #include <span>
 #include <unordered_map>
@@ -16,17 +17,20 @@ namespace lf {
 
     class indexer {
     public:
-        void process(const config& cfg, const std::vector<std::string_view>& paths, std::optional<sync_mode> mode);
-        void process(const config& cfg, std::string_view path_str, std::optional<sync_mode> mode);
-        void save_changes();
+        void init();
 
-        bool is_successful() const;
+        void process(const std::vector<std::string_view>& paths, std::optional<sync_mode> mode);
+        void process(std::string_view path_str, std::optional<sync_mode> mode);
+        bool save_changes();
 
     private:
-        using index_map = std::unordered_map<std::filesystem::path, tracked_index>;
+        using index_pair = std::pair<tracked_index, adv_fstream>;
+        using index_map = std::unordered_map<std::filesystem::path, index_pair>;
+        using index_entry = index_map::value_type;
 
-        bool success = true;
+        bool _success = true;
         index_map _indexes;
+        config _config;
 
         bool validate(sync_mode mode, const std::filesystem::path& path) const;
         tracked_index& load_index(const std::filesystem::path& index_path);

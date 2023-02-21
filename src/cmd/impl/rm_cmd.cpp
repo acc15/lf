@@ -11,13 +11,10 @@ namespace lf {
     }
 
     bool rm_cmd::run(const opt_map& params) const {
-        const config cfg = config::load();
-
         indexer indexer;
-        indexer.process(cfg, params[""], std::nullopt);
-        indexer.save_changes();
-
-        return indexer.is_successful();
+        indexer.init();
+        indexer.process(params[""], std::nullopt);
+        return indexer.save_changes();
     }
 
 }
