@@ -26,7 +26,13 @@ namespace lf {
     }
 
     template <typename Stream, typename PathLike>
-    bool open_and_lock(Stream& file, const PathLike& path, const char* name, std::ios_base::openmode mode, bool optional = false) {
+    bool open_and_lock(
+        Stream& file, 
+        const PathLike& path, 
+        const char* name, 
+        std::ios_base::openmode mode, 
+        bool optional = false
+    ) {
         file.open(path, mode);
         if (!file) {
             throw_fs_error(
@@ -35,12 +41,15 @@ namespace lf {
                 optional);
             return false;
         }
-        if (!file.lock(mode & std::ios_base::out)) {
+        
+        file.lock(mode & std::ios_base::out);
+        if (!file) {
             throw std::filesystem::filesystem_error(
                 format_stream() << "unable to lock " << name << " file with flags " << write_as<ios_flags_format>(mode), 
                 path, 
                 std::error_code(EAGAIN, std::iostream_category()));
         }
+
         return true;
     }
 

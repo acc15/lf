@@ -74,12 +74,12 @@ namespace lf {
 
     void indexer::init_entry(const std::filesystem::path& path, tracked_index& index, adv_fstream& file) {
 
-        create_parent_dirs(path);
-            
+        using m = std::ios_base; 
         try {
-            open_and_lock(file, path, index::name, 
-                std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::app | std::ios_base::ate);
+            create_parent_dirs(path);
+            open_and_lock(file, path, index::name, m::in | m::out | m::binary | m::app | m::ate);
         } catch (const std::runtime_error& e) {
+            _success = false;
             log.error() && log() << e.what() << log::end;
             return;
         }
@@ -102,6 +102,7 @@ namespace lf {
         if (!index.changed || !file) {
             return;
         }
+
         file.truncate();            
 
         try {

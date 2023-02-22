@@ -71,8 +71,13 @@ TEST_CASE("adv_ofstream lock unlock", "[adv_fstream]") {
 
     const fs::path p = create_temp_test_dir() / "test.txt";
     adv_ofstream f1(p);
-    REQUIRE( f1.lock(true) );
-    REQUIRE( f1.unlock() );
+    REQUIRE( f1.good() );
+
+    f1.lock(true);
+    REQUIRE( f1.good() );
+
+    f1.unlock();
+    REQUIRE( f1.good() );
 
 }
 

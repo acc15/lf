@@ -152,12 +152,16 @@ namespace lf {
             }
         }
 
-        bool lock(bool exclusive, bool wait = true) {
-            return _buf.lock(exclusive, wait);
+        void lock(bool exclusive, bool wait = true) {
+            if (!_buf.lock(exclusive, wait)) {
+                stream_type::setstate(std::ios_base::failbit);
+            }
         }
 
-        bool unlock() {
-            return _buf.unlock();
+        void unlock() {
+            if (!_buf.unlock()) {
+                stream_type::setstate(std::ios_base::failbit);
+            }
         }
 
         FILE* file() const {
