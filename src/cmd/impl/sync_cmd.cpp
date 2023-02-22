@@ -1,5 +1,5 @@
-#include <iostream>
-
+#include "fs/adv_fstream.hpp"
+#include "fs/serialization.hpp"
 #include "cmd/impl/sync_cmd.hpp"
 #include "config/config.hpp"
 #include "log/log.hpp"
@@ -44,23 +44,42 @@ namespace lf {
             << log::end;
 
         try {
-
-            index index;
-            load_file(sync.index, index, true);
-
-            tracked_state state;
-            state.load(sync.state, true);
-
-            synchronizer s(sync, index, state);
-            s.run();
-
-            state.save_if_changed(sync.state);
-
+            do_sync_safe(sync);
         } catch (const std::runtime_error& e) {
             log.error() && log() << "unable to sync \"" << sync.name << "\": " << e.what() << log::end;
             return false;
         }
         return true;
     }
+
+    void sync_cmd::do_sync_safe(const config::sync& sync) const {
+        
+        using m = std::ios_base;
+        
+        index index;
+        adv_fstream index_stream;
+        if (open_and_lock(sync.index, index_stream, index::name, true, m::in | m::out | m::binary)) {
+            load_file(sync.index, index_stream, index);
+        }
+
+        tracked_state state;
+        adv_fstream state_stream;
+        open_and_lock(sync.state, state_stream, state::name, false, m::in | m::out | m::binary | m::app | m::ate);
+        if (state_stream.tellg() > 0) { // file not empty
+            state_stream.seekg(0);
+            load_file(sync.state, state_stream, state.root);
+        }
+
+        synchronizer s(sync, index, state);
+        s.run();
+
+        if (state.changed) {
+            state_stream.truncate();
+            save_file(sync.state, state_stream, state.root);
+        }
+
+    }
+
+
 
 }

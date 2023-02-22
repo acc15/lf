@@ -25,13 +25,13 @@ namespace lf {
         return static_cast<std::ios_base::openmode>(T::format::binary ? std::ios_base::binary : 0);
     }
 
-    template <typename Stream, typename PathLike>
+    template <typename Stream>
     bool open_and_lock(
+        const std::filesystem::path& path, 
         Stream& file, 
-        const PathLike& path, 
         const char* name, 
-        std::ios_base::openmode mode, 
-        bool optional = false
+        bool optional,
+        std::ios_base::openmode mode
     ) {
         file.open(path, mode);
         if (!file) {
@@ -58,7 +58,7 @@ namespace lf {
         const std::ios_base::openmode flags = std::ios_base::in | get_serializable_openmode<T>();
  
         adv_ifstream file;
-        if (!open_and_lock(file, path, T::name, flags, optional)) {
+        if (!open_and_lock(path, file, T::name, optional, flags)) {
             return;
         }
         load_file(path, file, result);

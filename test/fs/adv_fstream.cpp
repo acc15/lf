@@ -55,7 +55,7 @@ TEST_CASE("adv_ofstream shouldnt truncate", "[adv_ofstream]") {
     f1 << "test";
     f1.close();
 
-    adv_ofstream f2(p);
+    adv_ofstream f2(p, std::ios_base::app);
     f2.close();
 
     adv_ifstream f3(p);

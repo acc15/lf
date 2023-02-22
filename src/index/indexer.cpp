@@ -77,7 +77,7 @@ namespace lf {
         using m = std::ios_base; 
         try {
             create_parent_dirs(path);
-            open_and_lock(file, path, index::name, m::in | m::out | m::binary | m::app | m::ate);
+            open_and_lock(path, file, index::name, false, m::in | m::out | m::binary | m::app | m::ate);
         } catch (const std::runtime_error& e) {
             _success = false;
             log.error() && log() << e.what() << log::end;
