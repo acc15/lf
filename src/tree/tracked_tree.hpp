@@ -22,20 +22,6 @@ namespace lf {
             return root.empty();
         }
 
-        void load(const path& path, bool optional = false) {
-            changed = false;
-            load_file(path, root, optional);
-        }
-
-        void save_if_changed(const path& path) {
-            if (changed) {
-                save_file(path, root);
-                changed = false;
-            } else {
-                log.debug() && log() << "skipped save of " << tree_type::name << " to " << path << " as it wasn't modified" << log::end;
-            }
-        }
-
         const node_type* node() const {
             return &root;
         }

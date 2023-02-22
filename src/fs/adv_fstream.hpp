@@ -176,8 +176,8 @@ namespace lf {
         basic_adv_filebuf<char_type, traits_type> _buf;
     };
 
-    using adv_ifstream = basic_adv_fstream<std::basic_istream<char>, std::ios_base::in>;
-    using adv_ofstream = basic_adv_fstream<std::basic_ostream<char>, std::ios_base::out>;
+    using adv_ifstream = basic_adv_fstream<std::basic_istream<char>, std::ios_base::in, std::ios_base::in>;
+    using adv_ofstream = basic_adv_fstream<std::basic_ostream<char>, std::ios_base::out, std::ios_base::out>;
     using adv_fstream = basic_adv_fstream<std::basic_iostream<char>, std::ios_base::in | std::ios_base::out>;
 
 }

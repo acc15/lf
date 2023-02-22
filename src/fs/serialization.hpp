@@ -64,13 +64,6 @@ namespace lf {
         load_file(path, file, result);
 	}
 
-	template <serializable_type T>
-	T load_file(const std::filesystem::path& path, bool optional = false) {
-        T result;
-        load_file(path, result, optional);
-        return result;
-	}
-
     template <serializable_type T>
     void load_file(const std::filesystem::path& path, std::istream& file, T& ref) {
         log.debug() && log() << "loading " << T::name << " file from " << path << "..." << log::end;
@@ -91,24 +84,19 @@ namespace lf {
         log.debug() && log() << T::name << " file has been successfully loaded from " << path << log::end;
     }
 
+	template <serializable_type T>
+	T load_file(const std::filesystem::path& path, bool optional = false) {
+        T result;
+        load_file(path, result, optional);
+        return result;
+	}
+
     template <serializable_type T>
     T load_file(const std::filesystem::path& path, std::istream& file) {
         T result;
         load_file(path, file, result);
         return result;
     }
-
-	template <serializable_type T>
-	void save_file(const std::filesystem::path& path, const T& ref) {
-        create_parent_dirs(path);
-
-        const std::ios_base::openmode flags = std::ios_base::out | std::ios_base::trunc | get_serializable_openmode<T>(); 
-        std::ofstream file(path, flags);
-        if (!file) {
-            throw_fs_error(format_stream() << "unable to open " << T::name << " file for writing", path, false);
-        }
-        save_file(path, file, ref);
-	}
 
     template <serializable_type T>
     void save_file(const std::filesystem::path& path, std::ostream& file, const T& ref) {
