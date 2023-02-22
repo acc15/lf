@@ -35,6 +35,10 @@ namespace lf {
         bool validate(sync_mode mode, const std::filesystem::path& path) const;
         tracked_index& load_index(const std::filesystem::path& index_path);
         
+        void init_entry(const std::filesystem::path& path, tracked_index& index, adv_fstream& file);
+        void save_entry(const std::filesystem::path& path, tracked_index& index, adv_fstream& file);
+
+
     };
 
 }

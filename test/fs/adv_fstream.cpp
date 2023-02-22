@@ -71,7 +71,77 @@ TEST_CASE("adv_ofstream lock unlock", "[adv_fstream]") {
 
     const fs::path p = create_temp_test_dir() / "test.txt";
     adv_ofstream f1(p);
-    REQUIRE( f1.lock(LOCK_EXCLUSIVE) );
+    REQUIRE( f1.lock(true) );
     REQUIRE( f1.unlock() );
+
+}
+
+TEST_CASE("adv_fstream check initial file and fd", "[adv_fstream]") {
+
+    adv_fstream f;
+    REQUIRE( f.file() == nullptr );
+    REQUIRE( f.fd() == -1 );
+
+}
+
+TEST_CASE("adv_fstream truncate must set failbit when no file open", "[adv_fstream]") {
+
+    adv_fstream f;
+    REQUIRE( f.good() );
+
+    f.setstate(std::ios_base::eofbit);
+    REQUIRE_FALSE( f.good() );
+
+    f.truncate();
+    REQUIRE( f.fail() );
+    REQUIRE( f.eof() );
+
+}
+
+TEST_CASE("adv_fstream truncate clears iostate on success", "[adv_fstream]") {
+
+    const fs::path p = create_temp_test_dir() / "test.txt";
+    adv_fstream f(p, std::ios_base::in | std::ios_base::out | std::ios_base::app | std::ios_base::ate);
+
+    f.setstate(std::ios_base::eofbit);
+    f.truncate();
+    REQUIRE(f.good());
+
+}
+
+TEST_CASE("adv_fstream can write after truncate", "[adv_fstream]") {
+
+    const fs::path p = create_temp_test_dir() / "test.txt";
+    adv_ofstream f1(p);
+    f1 << "test";
+    f1.close();
+
+    adv_fstream f2(p, std::ios_base::in | std::ios_base::out | std::ios_base::app | std::ios_base::ate);
+    REQUIRE( f2.good() );
+    REQUIRE( f2.tellg() == 4 );
+
+    f2.seekg(0);
+
+    std::string t1;
+    f2 >> t1;
+    REQUIRE( t1 == "test" );
+    REQUIRE( f2.eof() );
+
+    f2.truncate();
+    REQUIRE( f2.good() );
+
+    REQUIRE( f2.tellp() == 0 );
+    REQUIRE( f2.tellg() == 0 );
+
+    f2 << "overwrite";
+    f2.close();
+
+    adv_ifstream f3(p);
+
+    std::string t2;
+    f3 >> t2;
+    f3.close();
+
+    REQUIRE(t2 == "overwrite");
 
 }

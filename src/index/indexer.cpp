@@ -54,22 +54,7 @@ namespace lf {
 
     bool indexer::save_changes() {
         for (index_entry& e: _indexes) {
-            tracked_index& i = e.second.first;
-            if (!i.is_changed()) {
-                continue;
-            }
-
-            const std::filesystem::path& path = e.first;
-            adv_fstream& file = e.second.second;
-            
-            file.truncate();            
-            try {
-                save_file(path, file, i.root());
-            } catch (const std::runtime_error& e) {
-                log.error() && log() << e.what() << log::end;
-                _success = false;
-            }
-            
+            save_entry(e.first, e.second.first, e.second.second);
         }
         return _success;
     }
@@ -82,26 +67,49 @@ namespace lf {
 
         const auto r = _indexes.emplace(index_path, index_pair {});
         if (r.second) {
-            
-            adv_fstream& file = r.first->second.second;
-
-            file.open(index_path, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::app);
-            if (!file) {
-
-            }
-
-            if (!file.lock(lock_mode::LOCK_WAIT | lock_mode::LOCK_EXCLUSIVE)) {
-                
-            }
-
-            tracked_index& index = r.first->second.first;
-            try {
-                load_file(index_path, file, index.root());
-            } catch (const std::runtime_error& e) {
-                log.debug() && log() << e.what() << log::end;
-            }
+            init_entry(r.first->first, r.first->second.first, r.first->second.second);
         }
         return r.first->second.first;
+    }
+
+    void indexer::init_entry(const std::filesystem::path& path, tracked_index& index, adv_fstream& file) {
+
+        create_parent_dirs(path);
+            
+        try {
+            open_and_lock(file, path, index::name, 
+                std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::app | std::ios_base::ate);
+        } catch (const std::runtime_error& e) {
+            log.error() && log() << e.what() << log::end;
+            return;
+        }
+
+        if (file.tellg() == 0) {
+            // new empty file, skip loading
+            return;
+        }
+
+        file.seekg(0);
+        try {
+            load_file(path, file, index.root);
+        } catch (const std::runtime_error& e) {
+            log.debug() && log() << e.what() << log::end;
+        }
+
+    }
+
+    void indexer::save_entry(const std::filesystem::path& path, tracked_index& index, adv_fstream& file) {
+        if (!index.changed || !file) {
+            return;
+        }
+        file.truncate();            
+
+        try {
+            save_file(path, file, index.root);
+        } catch (const std::runtime_error& e) {
+            log.error() && log() << e.what() << log::end;
+            _success = false;
+        }
     }
 
 }

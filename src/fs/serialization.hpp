@@ -25,23 +25,33 @@ namespace lf {
         return static_cast<std::ios_base::openmode>(T::format::binary ? std::ios_base::binary : 0);
     }
 
+    template <typename Stream, typename PathLike>
+    bool open_and_lock(Stream& file, const PathLike& path, const char* name, std::ios_base::openmode mode, bool optional = false) {
+        file.open(path, mode);
+        if (!file) {
+            throw_fs_error(
+                format_stream() << "unable to open " << name << " file with flags " << write_as<ios_flags_format>(mode), 
+                path, 
+                optional);
+            return false;
+        }
+        if (!file.lock(mode & std::ios_base::out)) {
+            throw std::filesystem::filesystem_error(
+                format_stream() << "unable to lock " << name << " file with flags " << write_as<ios_flags_format>(mode), 
+                path, 
+                std::error_code(EAGAIN, std::iostream_category()));
+        }
+        return true;
+    }
+
 	template <serializable_type T>
 	void load_file(const std::filesystem::path& path, T& result, bool optional = false) {
         const std::ios_base::openmode flags = std::ios_base::in | get_serializable_openmode<T>();
  
-        adv_ifstream file(path, flags);
-        if (!file) {
-            throw_fs_error(format_stream() << "unable to open " << T::name << " file for reading", path, optional);
+        adv_ifstream file;
+        if (!open_and_lock(file, path, T::name, flags, optional)) {
             return;
         }
-
-        if (!file.lock(LOCK_WAIT)) {
-            throw std::filesystem::filesystem_error(
-                format_stream() << "unable to lock " << T::name << " file for reading", 
-                path, 
-                std::error_code(EAGAIN, std::iostream_category()));
-        }
-
         load_file(path, file, result);
 	}
 

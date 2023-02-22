@@ -3,7 +3,7 @@
         "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
     },
     "cmake.debugConfig": {
-        "args": ["info"]
+        "args": ["add", "/home/acc15/.zshrc"]
     },
     "cmake.environment": {
         "LF_LEVEL": "INFO"

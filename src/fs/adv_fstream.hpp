@@ -17,11 +17,6 @@
 
 namespace lf {
 
-    enum lock_mode {
-        LOCK_EXCLUSIVE = 1,
-        LOCK_WAIT = 2
-    };
-
     template <typename Elem, typename Traits>
     class basic_adv_filebuf: public std::basic_filebuf<Elem, Traits> {
 
@@ -36,17 +31,17 @@ namespace lf {
 
     public:
         FILE* file() const {
-            assert( filebuf::is_open() );
             return const_cast<typename filebuf::__file_type&>(filebuf::_M_file).file();
         }
 
         int fd() const {
-            assert( filebuf::is_open() );
-            return const_cast<typename filebuf::__file_type&>(filebuf::_M_file).fd();
+            return filebuf::_M_file.is_open() 
+                ? const_cast<typename filebuf::__file_type&>(filebuf::_M_file).fd() 
+                : -1;
         }
 
-        bool lock(int mode) {
-            return _lock(mode & LOCK_EXCLUSIVE ? F_WRLCK : F_RDLCK, mode & LOCK_WAIT);
+        bool lock(bool exclusive, bool wait) {
+            return _lock(exclusive ? F_WRLCK : F_RDLCK, wait);
         }
 
         bool unlock() {
@@ -57,12 +52,10 @@ namespace lf {
         using std::basic_filebuf<Elem, Traits>::_Myfile;
     public:
         FILE* file() const {
-            assert( filebuf::is_open() );
             return _Myfile;
         }
 
         int fd() const {
-            assert( filebuf::is_open() );
             return _fileno(_Myfile);
         }
 
@@ -70,9 +63,8 @@ namespace lf {
             return _get_osfhandle( fd() );
         }
 
-        bool lock(int mode) {
-            DWORD flags = (mode & LOCK_EXCLUSIVE ? LOCKFILE_EXCLUSIVE_LOCK : 0) 
-                | (mode & LOCK_WAIT ? 0 : LOCKFILE_FAIL_IMMEDIATELY);
+        bool lock(bool exclusive, bool wait) {
+            DWORD flags = (exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0) | (wait ? 0 : LOCKFILE_FAIL_IMMEDIATELY);
             OVERLAPPED ov = { 0 };
             return LockFileEx(handle(), flags, MAX_DWORD, MAX_DWORD, &ov);
         }
@@ -153,13 +145,15 @@ namespace lf {
         }
 
         void truncate() {
-            if (!_buf.truncate()) {
+            if (_buf.truncate()) {
+                stream_type::clear();
+            } else {
                 stream_type::setstate(std::ios_base::failbit);
             }
         }
 
-        bool lock(int mode) {
-            return _buf.lock(mode);
+        bool lock(bool exclusive, bool wait = true) {
+            return _buf.lock(exclusive, wait);
         }
 
         bool unlock() {
@@ -167,12 +161,10 @@ namespace lf {
         }
 
         FILE* file() const {
-            assert( is_open() );
             return _buf.file();
         }
 
         int fd() const {
-            assert( is_open() );
             return _buf.fd();
         }
 
