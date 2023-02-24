@@ -1,5 +1,5 @@
 #!/bin/sh
 
-rm -rf build
+rm -rf release
 cmake --workflow --preset release
-cmake --install build
+cmake --install release

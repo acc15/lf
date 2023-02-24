@@ -1,5 +1,5 @@
 @echo off
 
-rmdir "build" /s /q
+rmdir "release" /s /q
 cmake --workflow --preset release
-cmake --install "build"
+cmake --install "release"
