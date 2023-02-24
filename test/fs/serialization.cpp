@@ -40,11 +40,5 @@ TEST_CASE("serialization file not found", "[serialization]") {
     test_serializable<int> t = { 12 };
 
     const std::filesystem::path p = test_dir_path / "no_such_file.txt";
-    try {
-        load_file(p, t);
-        FAIL("no exception was thrown");
-    } catch (const file_not_found_error& e) {
-        REQUIRE(p == e.path1());
-        REQUIRE(e.code().value() == ENOENT);
-    }
+    REQUIRE_FALSE( load_file(p, t) );
 }

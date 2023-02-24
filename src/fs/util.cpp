@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "fs/util.hpp"
+#include "log/log.hpp"
 
 namespace fs = std::filesystem;
 
@@ -36,6 +37,14 @@ namespace lf {
         fs::copy_file(src, dst, fs::copy_options::overwrite_existing);
         fs::file_time_type src_time = fs::last_write_time(src);
         fs::last_write_time(dst, src_time);
+    }
+
+    void throw_fs_error(const std::string& what, const std::filesystem::path& path) {
+        std::filesystem::filesystem_error err(what, path, std::error_code(errno, std::iostream_category()));
+        if (err.code().value() != ENOENT) {
+            throw err;
+        }
+        log.debug() && log() << err.what() << log::end;
     }
 
 }

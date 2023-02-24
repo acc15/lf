@@ -127,8 +127,6 @@ add_library(lf_core
     src/fs/util.cpp
     src/fs/time.hpp 
     src/fs/time.cpp
-    src/fs/error.hpp
-    src/fs/error.cpp
     src/fs/serialization.hpp
     src/fs/os_path.cpp
     src/fs/os_path.hpp

@@ -10,5 +10,7 @@ namespace lf {
     bool create_parent_dirs(const std::filesystem::path& path);
     std::filesystem::path join_path(const std::filesystem::path& path, const std::filesystem::path& rel);
     void copy_file_with_timestamp(const std::filesystem::path& src, const std::filesystem::path& dst);
+
+    void throw_fs_error(const std::string& what, const std::filesystem::path& path);
     
 }

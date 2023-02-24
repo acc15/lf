@@ -7,7 +7,6 @@
 #include <exception>
 
 #include "fs/util.hpp"
-#include "fs/error.hpp"
 #include "log/log.hpp"
 #include "io/ios_flags.hpp"
 #include "io/format_stream.hpp"
@@ -30,15 +29,13 @@ namespace lf {
         const std::filesystem::path& path, 
         Stream& file, 
         const char* name, 
-        bool optional,
         std::ios_base::openmode mode
     ) {
         file.open(path, mode);
         if (!file) {
             throw_fs_error(
                 format_stream() << "unable to open " << name << " file with flags " << write_as<ios_flags_format>(mode), 
-                path, 
-                optional);
+                path);
             return false;
         }
         
@@ -54,14 +51,15 @@ namespace lf {
     }
 
 	template <serializable_type T>
-	void load_file(const std::filesystem::path& path, T& result, bool optional = false) {
+	bool load_file(const std::filesystem::path& path, T& result) {
         const std::ios_base::openmode flags = std::ios_base::in | get_serializable_openmode<T>();
  
         adv_ifstream file;
-        if (!open_and_lock(path, file, T::name, optional, flags)) {
-            return;
+        if (!open_and_lock(path, file, T::name, flags)) {
+            return false;
         }
         load_file(path, file, result);
+        return true;
 	}
 
     template <serializable_type T>
@@ -85,18 +83,11 @@ namespace lf {
     }
 
 	template <serializable_type T>
-	T load_file(const std::filesystem::path& path, bool optional = false) {
+	T load_file(const std::filesystem::path& path) {
         T result;
-        load_file(path, result, optional);
+        load_file(path, result);
         return result;
 	}
-
-    template <serializable_type T>
-    T load_file(const std::filesystem::path& path, std::istream& file) {
-        T result;
-        load_file(path, file, result);
-        return result;
-    }
 
     template <serializable_type T>
     void save_file(const std::filesystem::path& path, std::ostream& file, const T& ref) {

@@ -58,13 +58,13 @@ namespace lf {
         
         index index;
         adv_fstream index_stream;
-        if (open_and_lock(sync.index, index_stream, index::name, true, m::in | m::out | m::binary)) {
+        if (open_and_lock(sync.index, index_stream, index::name, m::in | m::out | m::binary)) {
             load_file(sync.index, index_stream, index);
         }
 
         tracked_state state;
         adv_fstream state_stream;
-        open_and_lock(sync.state, state_stream, state::name, false, m::in | m::out | m::binary | m::app | m::ate);
+        open_and_lock(sync.state, state_stream, state::name, m::in | m::out | m::binary | m::app | m::ate);
         if (state_stream.tellg() > 0) { // file not empty
             state_stream.seekg(0);
             load_file(sync.state, state_stream, state.root);
