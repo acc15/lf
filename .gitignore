@@ -1,5 +1,6 @@
 # clangd
 .cache/
+release/
 
 # KDevelop
 .kdev4/
