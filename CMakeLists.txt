@@ -102,6 +102,7 @@ add_library(lf_core
     # io
     src/io/null_stream.hpp
     src/io/null_stream.cpp
+    src/io/stream_type.hpp
     src/io/openmode.hpp
     src/io/openmode.cpp
     src/io/format_stream.hpp

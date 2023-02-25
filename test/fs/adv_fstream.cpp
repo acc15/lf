@@ -150,3 +150,14 @@ TEST_CASE("adv_fstream can write after truncate", "[adv_fstream]") {
     REQUIRE(t2 == "overwrite");
 
 }
+
+TEST_CASE("default_openmode", "[adv_fstream]") {
+
+    REQUIRE( lf::default_openmode<adv_ifstream>::default_mode == std::ios_base::in );
+    REQUIRE( lf::default_openmode<adv_ifstream>::force_mode == std::ios_base::in );
+    REQUIRE( lf::default_openmode<adv_ofstream>::default_mode == std::ios_base::out );
+    REQUIRE( lf::default_openmode<adv_ofstream>::force_mode == std::ios_base::out );
+    REQUIRE( lf::default_openmode<adv_fstream>::default_mode == 0 );
+    REQUIRE( lf::default_openmode<adv_fstream>::force_mode == 0 );
+
+}
