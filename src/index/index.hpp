@@ -7,8 +7,6 @@
 namespace lf {
     
     struct index: tree<sync_mode> {
-        using format = tree_binary_format;
-        
         static const char* const name;
         static const char file_signature[4];
         static const uint8_t file_version;

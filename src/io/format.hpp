@@ -1,17 +1,20 @@
 #pragma once
 
 #include <concepts>
+#include <ios>
 
 namespace lf {
 
 	template <typename T>
 	concept format_type = requires {
-		{ T::binary } -> std::convertible_to<bool>;
+		{ T::openmode } -> std::convertible_to<std::ios_base::openmode>;
 	};
 
 	template <bool Binary>
 	struct format {
-		static const bool binary = Binary;
+		static constexpr std::ios_base::openmode openmode = Binary 
+			? std::ios_base::binary 
+			: static_cast<std::ios_base::openmode>(0);
 	};
 
 	template <format_type Format, typename T>

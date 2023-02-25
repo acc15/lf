@@ -10,7 +10,6 @@ struct test_format: format<false> {};
 
 template <typename T>
 struct test_serializable {
-    using format = test_format;
     static const char* name;
     T data;
 };
@@ -40,5 +39,5 @@ TEST_CASE("serialization file not found", "[serialization]") {
     test_serializable<int> t = { 12 };
 
     const std::filesystem::path p = test_dir_path / "no_such_file.txt";
-    REQUIRE_FALSE( load_file(p, t) );
+    REQUIRE_FALSE( load_file<test_format>(p, t) );
 }

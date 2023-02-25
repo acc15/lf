@@ -54,20 +54,20 @@ namespace lf {
 
     void sync_cmd::do_sync_safe(const config::sync& sync) const {
         
-        using m = std::ios_base;
-        
         index index;
+
         adv_fstream index_stream;
-        if (open_and_lock(sync.index, index_stream, index::name, m::in | m::out | m::binary)) {
-            load_file(sync.index, index_stream, index);
+        if (open_and_lock<tree_binary_format, lf::index>(sync.index, index_stream, OPEN_READ_LOCK)) {
+            load_file<tree_binary_format>(sync.index, index_stream, index);
         }
 
         tracked_state state;
         adv_fstream state_stream;
-        open_and_lock(sync.state, state_stream, state::name, m::in | m::out | m::binary | m::app | m::ate);
+
+        open_and_lock<tree_binary_format, lf::state>(sync.state, state_stream, OPEN_READ_WRITE_LOCK);
         if (state_stream.tellg() > 0) { // file not empty
             state_stream.seekg(0);
-            load_file(sync.state, state_stream, state.root);
+            load_file<tree_binary_format>(sync.state, state_stream, state.root);
         }
 
         synchronizer s(sync, index, state);
@@ -75,7 +75,7 @@ namespace lf {
 
         if (state.changed) {
             state_stream.truncate();
-            save_file(sync.state, state_stream, state.root);
+            save_file<tree_binary_format>(sync.state, state_stream, state.root);
         }
 
     }

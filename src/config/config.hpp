@@ -16,7 +16,6 @@ namespace lf {
 
     struct config {
 
-        using format = config_format;
         static const char* const name;
         static const char* const env_name;
 

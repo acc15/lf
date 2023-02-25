@@ -103,7 +103,7 @@ namespace lf {
 
     config config::load() {
         const fs::path path = get_path();
-        config cfg = load_file<config>(path);
+        config cfg = load_file<config_format, config>(path);
         if (cfg.syncs.empty()) {
             throw std::runtime_error(format_stream() << "config file at " << path << " doesn't have any valid sync entry");
         }
