@@ -102,8 +102,8 @@ add_library(lf_core
     # io
     src/io/null_stream.hpp
     src/io/null_stream.cpp
-    src/io/ios_flags.hpp
-    src/io/ios_flags.cpp
+    src/io/openmode.hpp
+    src/io/openmode.cpp
     src/io/format_stream.hpp
     src/io/format_stream.cpp
     src/io/joiner.hpp
@@ -180,7 +180,7 @@ add_executable(lf_test
     test/io/log_tester.hpp
     test/io/log_tester.cpp
     test/io/time.cpp
-    test/io/ios_flags.cpp
+    test/io/openmode.cpp
 
     test/config/config_parser.cpp
     test/config/config.cpp
@@ -195,6 +195,7 @@ add_executable(lf_test
     test/sync/entry_synchronizer.cpp
     
     test/fs/adv_fstream.cpp
+    test/fs/new_format.cpp
 )
 
 target_include_directories(lf_test PRIVATE test)

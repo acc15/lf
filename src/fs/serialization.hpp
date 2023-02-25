@@ -8,7 +8,7 @@
 
 #include "fs/util.hpp"
 #include "log/log.hpp"
-#include "io/ios_flags.hpp"
+#include "io/openmode.hpp"
 #include "io/format_stream.hpp"
 #include "io/format.hpp"
 
@@ -34,7 +34,7 @@ namespace lf {
         file.open(path, mode);
         if (!file) {
             throw_fs_error(
-                format_stream() << "unable to open " << name << " file with flags " << write_as<ios_flags_format>(mode), 
+                format_stream() << "unable to open " << name << " file with flags " << write_as<openmode_format>(mode), 
                 path);
             return false;
         }
@@ -42,7 +42,7 @@ namespace lf {
         file.lock(mode & std::ios_base::out);
         if (!file) {
             throw std::filesystem::filesystem_error(
-                format_stream() << "unable to lock " << name << " file with flags " << write_as<ios_flags_format>(mode), 
+                format_stream() << "unable to lock " << name << " file with flags " << write_as<openmode_format>(mode), 
                 path, 
                 std::error_code(EAGAIN, std::iostream_category()));
         }

@@ -15,6 +15,8 @@
 #   include <fcntl.h>
 #endif 
 
+#include "io/openmode.hpp"
+
 namespace lf {
 
     template <typename Elem, typename Traits>
@@ -94,20 +96,18 @@ namespace lf {
 
     };
 
+
     /**
     @brief fstream with additional features:
     - file locking (OS dependent: fcntl on POSIX or LockFile on Windows)
     - access to internal FILE* and file descriptor
     - ability to truncate file after creation
     **/
-    template <
-        typename Parent, 
-        std::ios_base::openmode DefaultMode, 
-        std::ios_base::openmode AddMode = static_cast<std::ios_base::openmode>(0)
-    >
+    template <typename Parent>
     class basic_adv_fstream: public Parent {
     public:
 
+        using default_openmode = lf::default_openmode<Parent>;
         using stream_type = Parent;
         using char_type = typename Parent::char_type;
         using traits_type = typename Parent::traits_type;
@@ -116,7 +116,10 @@ namespace lf {
         }
 
         template <typename PathLike>
-        basic_adv_fstream(const PathLike& path, std::ios_base::openmode mode = DefaultMode): stream_type(&_buf) {
+        basic_adv_fstream(
+            const PathLike& path, 
+            std::ios_base::openmode mode = default_openmode::default_mode
+        ): stream_type(&_buf) {
             open(path, mode);
         }
 
@@ -131,8 +134,8 @@ namespace lf {
         }
 
         template <typename PathLike>
-        void open(const PathLike& path, std::ios_base::openmode mode = DefaultMode) {
-            std::ios_base::openmode target_mode = mode | AddMode;
+        void open(const PathLike& path, std::ios_base::openmode mode = default_openmode::default_mode) {
+            std::ios_base::openmode target_mode = mode | default_openmode::force_mode;
             if (_buf.open(path, target_mode) != nullptr) {
                 stream_type::clear();
             } else {
@@ -176,8 +179,8 @@ namespace lf {
         basic_adv_filebuf<char_type, traits_type> _buf;
     };
 
-    using adv_ifstream = basic_adv_fstream<std::basic_istream<char>, std::ios_base::in, std::ios_base::in>;
-    using adv_ofstream = basic_adv_fstream<std::basic_ostream<char>, std::ios_base::out, std::ios_base::out>;
-    using adv_fstream = basic_adv_fstream<std::basic_iostream<char>, std::ios_base::in | std::ios_base::out>;
+    using adv_ifstream = basic_adv_fstream<std::basic_istream<char>>;
+    using adv_ofstream = basic_adv_fstream<std::basic_ostream<char>>;
+    using adv_fstream = basic_adv_fstream<std::basic_iostream<char>>;
 
 }

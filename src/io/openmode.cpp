@@ -1,4 +1,4 @@
-#include "io/ios_flags.hpp"
+#include "io/openmode.hpp"
 
 #include <vector>
 #include <utility>
@@ -16,7 +16,7 @@ namespace lf {
         // { std::ios_base::noreplace, "open in exclusive mode" },
     };
 
-    std::ostream& operator<<(std::ostream& s, with_format<ios_flags_format, const std::ios_base::openmode> flags) {
+    std::ostream& operator<<(std::ostream& s, with_format<openmode_format, const std::ios_base::openmode> flags) {
         bool need_sep = false;
         for (const auto& mode_pair: ios_flag_names) {
             if ((flags.value & mode_pair.first) == 0) {
