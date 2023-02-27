@@ -34,6 +34,8 @@ namespace lf {
         
         std::ios_base::openmode target_mode = mode | Format::openmode;
 
+        log.debug() && log() << "opening " << path << " with mode " << target_mode << log::end;
+
         file.open(path, target_mode);
         if (!file) {
             throw_fs_error(
@@ -43,7 +45,10 @@ namespace lf {
             return false;
         }
         
-        file.lock(mode & std::ios_base::out);
+        bool exclusive = mode & std::ios_base::out;
+        log.debug() && log() << "locking " << path << " with exclusive " << exclusive << log::end;
+
+        file.lock(exclusive);
         if (!file) {
             throw std::filesystem::filesystem_error(
                 format_stream() << "unable to lock " 
@@ -51,6 +56,10 @@ namespace lf {
                 path, 
                 std::error_code(EAGAIN, std::iostream_category()));
         }
+
+        log.debug() && log() << "file " << path 
+            << " has been successfully opened with mode " << target_mode 
+            << " and locked exclusive " << exclusive << log::end;
 
         return true;
     }
