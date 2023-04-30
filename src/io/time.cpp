@@ -14,12 +14,14 @@ namespace lf {
 #ifdef _WIN32
         errno_t err = utc ? gmtime_s(&tm, &t) : localtime_s(&tm, &t);
         if (err != 0) {
-            throw std::system_error(err, std::generic_category(), format_stream() << "unable to convert time_t " << t << " to tm");
+            throw std::system_error(err, std::generic_category(), format_stream() 
+                << "unable to convert time_t " << t << " to tm");
         }
 #else
         std::tm* ptr = utc ? gmtime_r(&t, &tm) : localtime_r(&t, &tm);
         if (ptr != &tm) {
-            throw std::system_error(errno, std::generic_category(), format_stream() << "unable to convert time_t " << t << " to tm");
+            throw std::system_error(errno, std::generic_category(), format_stream() 
+                << "unable to convert time_t " << t << " to tm");
         }
 #endif
     }
@@ -80,7 +82,11 @@ namespace lf {
     }
 
     std::ostream& operator<<(std::ostream& s, const format_date_time_s<std::chrono::file_clock::time_point>& fmt) {
-        return s << format_date_time_s<std::chrono::system_clock::time_point> { file_clock_to_system(fmt.tp), fmt.utc, fmt.format };
+        return s << format_date_time_s<std::chrono::system_clock::time_point> { 
+            file_clock_to_system(fmt.tp), 
+            fmt.utc, 
+            fmt.format 
+        };
     }
 
 }

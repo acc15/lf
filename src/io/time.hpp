@@ -16,7 +16,11 @@ namespace lf {
     };
 
     template <typename Timepoint>
-    format_date_time_s<Timepoint> format_date_time(const Timepoint& tp, bool utc = false, std::string_view format = "%FT%T.%N03") {
+    format_date_time_s<Timepoint> format_date_time(
+        const Timepoint& tp, 
+        bool utc = false, 
+        std::string_view format = "%FT%T.%N03"
+    ) {
         return format_date_time_s<Timepoint> { tp, utc, format };
     }
 
