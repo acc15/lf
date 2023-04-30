@@ -34,7 +34,9 @@ namespace lf {
         
         std::ios_base::openmode target_mode = mode | Format::openmode;
 
-        log.debug() && log() << "opening " << path << " with mode " << target_mode << log::end;
+        log.debug() && log() 
+            << "opening " << path << " with mode " << write_as<openmode_format>(target_mode) 
+            << log::end;
 
         file.open(path, target_mode);
         if (!file) {
@@ -58,7 +60,7 @@ namespace lf {
         }
 
         log.debug() && log() << "file " << path 
-            << " has been successfully opened with mode " << target_mode 
+            << " has been successfully opened with mode " << write_as<openmode_format>(target_mode)
             << " and locked exclusive " << exclusive << log::end;
 
         return true;

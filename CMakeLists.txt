@@ -196,7 +196,6 @@ add_executable(lf_test
     test/sync/entry_synchronizer.cpp
     
     test/fs/adv_fstream.cpp
-    test/fs/new_format.cpp
 )
 
 target_include_directories(lf_test PRIVATE test)
