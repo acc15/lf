@@ -3,6 +3,7 @@
 
 #include <string>
 #include <optional>
+#include <utility>
 
 #include "sync/synchronizer.hpp"
 #include "test_util.hpp"
@@ -31,6 +32,14 @@ config::sync make_sync(std::optional<bool> local_to_remote = std::nullopt) {
     };
 }
 
+const fs::path& pick_path(const config::sync& sync, bool local) {
+    return local ? sync.local : sync.remote;
+}
+
+std::pair<fs::path, fs::path> make_paths(const config::sync& sync, const fs::path& path, bool swap = false) {
+    return std::make_pair(pick_path(sync, !swap) / path, pick_path(sync, swap) / path);
+}
+
 const char* test_direction(bool local) {
     return local ? "local to remote" : "remote to local";
 }
@@ -46,7 +55,8 @@ fs::file_time_type plus50ms_last_write_time(const std::filesystem::path& dst, co
     return actual_t;
 }
 
-const std::string test_name = "test.txt";
+const fs::path test_path = "test.txt";
+const fs::path test_deep_path = fs::path("a") / test_path;
 const std::string test_content = "abc\nxyz";
 
 void write_test_file(const fs::path& path) {
@@ -58,24 +68,24 @@ TEST_CASE("synchronizer file added", "[synchronizer]") {
     const bool local = GENERATE(true, false);
     INFO( test_direction(local) );
     
-    config::sync sync = make_sync(local);
+    const config::sync sync = make_sync(local);
+    const auto [l, r] = make_paths(sync, test_deep_path, local);
     lf::index index;
     lf::tracked_state state;
 
-    const fs::path test_deep_path = fs::path("a") / test_name; 
-    write_test_file((local ? sync.local : sync.remote) / test_deep_path);
+    write_test_file(l);
     
     index.set(test_deep_path, sync_mode::SHALLOW);
 
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE( read_text((local ? sync.remote : sync.local) / test_deep_path ) == test_content );
+    REQUIRE( read_text(r) == test_content );
     
     REQUIRE_FALSE( state.get(test_deep_path.parent_path()) );
     REQUIRE( state.get(test_deep_path) );
 
-    REQUIRE( fs::last_write_time(sync.remote / test_deep_path) == fs::last_write_time(sync.local / test_deep_path) );
+    REQUIRE( fs::last_write_time(l) == fs::last_write_time(r) );
 }
 
 TEST_CASE("synchronizer file deleted", "[synchronizer]") {
@@ -83,22 +93,24 @@ TEST_CASE("synchronizer file deleted", "[synchronizer]") {
     const bool local = GENERATE(true, false);
     INFO( test_direction(local) );
     
-    config::sync sync = make_sync(local);
+    const config::sync sync = make_sync(local);
+    const auto [l, r] = make_paths(sync, test_path, local);
+
     lf::index index;
     lf::tracked_state state;
 
-    write_test_file((local ? sync.local : sync.remote) / test_name);
+    write_test_file(l);
 
-    index.set(test_name, sync_mode::SHALLOW);
-    state.set(test_name, true);
+    index.set(test_path, sync_mode::SHALLOW);
+    state.set(test_path, true);
 
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE( index.get(test_name) == sync_mode::SHALLOW );
-    REQUIRE_FALSE( state.get(test_name) );
-    REQUIRE_FALSE( fs::exists(sync.remote / test_name) );
-    REQUIRE_FALSE( fs::exists(sync.local  / test_name) );
+    REQUIRE( index.get(test_path) == sync_mode::SHALLOW );
+    REQUIRE_FALSE( state.get(test_path) );
+    REQUIRE_FALSE( fs::exists(r) );
+    REQUIRE_FALSE( fs::exists(l) );
 
 }
 
@@ -107,29 +119,28 @@ TEST_CASE("synchronizer file updated", "[synchronizer]") {
     bool local = GENERATE(true, false);
     INFO( test_direction(local) );
     
-    config::sync sync = make_sync(local);
+    const config::sync sync = make_sync(local);
+    const auto [l, r] = make_paths(sync, test_path, local);
+
     lf::index index;
     lf::tracked_state state;
 
-    fs::path l = local ? sync.local : sync.remote;
-    fs::path r = !local ? sync.local : sync.remote;
+    write_text(l, test_content);
+    write_text(r, "abc\n");
 
-    write_text(l / test_name, test_content);
-    write_text(r / test_name, "abc\n");
+    auto change_t = plus50ms_last_write_time(l, r);
 
-    auto change_t = plus50ms_last_write_time(l / test_name, r / test_name);
-
-    index.set(test_name, sync_mode::SHALLOW);
-    state.set(test_name, true);
+    index.set(test_path, sync_mode::SHALLOW);
+    state.set(test_path, true);
 
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE( read_text(r / test_name) == test_content );
-    REQUIRE( read_text(l / test_name) == test_content );
-    REQUIRE( fs::last_write_time(r / test_name) == change_t );
-    REQUIRE( fs::last_write_time(l / test_name) == change_t );
-    REQUIRE( s.state.get(test_name) == true );
+    REQUIRE( read_text(r) == test_content );
+    REQUIRE( read_text(l) == test_content );
+    REQUIRE( fs::last_write_time(r) == change_t );
+    REQUIRE( fs::last_write_time(l) == change_t );
+    REQUIRE( s.state.get(test_path) == true );
 
 }
 
@@ -138,25 +149,25 @@ TEST_CASE("synchronizer index removed", "[synchronizer]") {
     lf::index index; 
     lf::tracked_state state;
 
-    write_test_file(sync.local / test_name);
-    write_test_file(sync.remote / test_name);
+    write_test_file(sync.local / test_path);
+    write_test_file(sync.remote / test_path);
 
-    state.set(test_name, true);
+    state.set(test_path, true);
 
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE_FALSE( fs::exists(sync.remote / test_name) );
-    REQUIRE( fs::exists(sync.local / test_name) );
-    REQUIRE( s.state.node(test_name) == nullptr );
+    REQUIRE_FALSE( fs::exists(sync.remote / test_path) );
+    REQUIRE( fs::exists(sync.local / test_path) );
+    REQUIRE( s.state.node(test_path) == nullptr );
 }
 
 TEST_CASE("synchronizer can update file timestamp", "[synchronizer]") {
     
     auto sync = make_sync();
-    write_test_file(sync.local / test_name);
-    write_test_file(sync.remote / test_name);
-    plus50ms_last_write_time(sync.local / test_name, sync.remote / test_name);
+    write_test_file(sync.local / test_path);
+    write_test_file(sync.remote / test_path);
+    plus50ms_last_write_time(sync.local / test_path, sync.remote / test_path);
 
 }
 
@@ -245,24 +256,23 @@ TEST_CASE("synchronizer file to dir", "[synchronizer]") {
     INFO( test_direction(local) );
     
     config::sync sync = make_sync(local);
+    const auto [l, r] = make_paths(sync, test_path, local);
+
     lf::index index;
     lf::tracked_state state;
 
-    const fs::path l = local ? sync.local : sync.remote;
-    const fs::path r = local ? sync.remote : sync.local;
+    write_test_file(l);
+    write_test_file(r / "x.txt");
 
-    write_test_file(l / test_name);
-    write_test_file(r / test_name / "x.txt");
+    plus50ms_last_write_time(l, r);
 
-    plus50ms_last_write_time(l / test_name, r / test_name);
-
-    index.set(test_name, sync_mode::SHALLOW);
+    index.set(test_path, sync_mode::SHALLOW);
 
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE( fs::status(r / test_name).type() == fs::file_type::regular );
-    REQUIRE( read_text(r / test_name) == test_content );
+    REQUIRE( fs::status(r).type() == fs::file_type::regular );
+    REQUIRE( read_text(r) == test_content );
 
 }
 
@@ -271,25 +281,24 @@ TEST_CASE("synchronizer dir to file", "[synchronizer]") {
     bool local = GENERATE(true, false);
     INFO( test_direction(local) );
     
-    config::sync sync = make_sync(local);
+    const config::sync sync = make_sync(local);
+    const auto [l, r] = make_paths(sync, test_path, local);
+
     lf::index index;
     lf::tracked_state state;
 
-    const fs::path l = local ? sync.local : sync.remote;
-    const fs::path r = local ? sync.remote : sync.local;
+    write_test_file(l / "x.txt");
+    write_test_file(r);
 
-    write_test_file(l / test_name / "x.txt");
-    write_test_file(r / test_name);
+    plus50ms_last_write_time(l, r);
 
-    plus50ms_last_write_time(l / test_name, r / test_name);
-
-    index.set(test_name, sync_mode::SHALLOW);
+    index.set(test_path, sync_mode::SHALLOW);
 
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE( fs::status(r / test_name).type() == fs::file_type::directory );
-    REQUIRE( read_text(r / test_name / "x.txt") == test_content );
+    REQUIRE( fs::status(r).type() == fs::file_type::directory );
+    REQUIRE( read_text(r / "x.txt") == test_content );
 
 }
 
@@ -298,24 +307,22 @@ TEST_CASE("synchronizer nested file must override file", "[synchronizer]") {
     bool local = GENERATE(true, false);
     INFO( test_direction(local) );
 
-    config::sync sync = make_sync(local);
+    const config::sync sync = make_sync(local);
+    const auto [l, r] = make_paths(sync, test_deep_path, local);
+
     lf::index index;
     lf::tracked_state state;
 
-    const fs::path l = local ? sync.local : sync.remote;
-    const fs::path r = local ? sync.remote : sync.local;
+    write_test_file(l);
+    write_test_file(r.parent_path());
 
-    const fs::path test_path = fs::path("a") / test_name;
-    write_test_file(l / test_path);
-    write_test_file(r / test_path.parent_path());
-
-    index.set(test_path, sync_mode::SHALLOW);
+    index.set(test_deep_path, sync_mode::SHALLOW);
 
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE( fs::status(r / test_path.parent_path()).type() == fs::file_type::directory );
-    REQUIRE( read_text(r / test_path) == test_content );
+    REQUIRE( fs::status(r.parent_path()).type() == fs::file_type::directory );
+    REQUIRE( read_text(r) == test_content );
 
 }
 
@@ -330,7 +337,7 @@ TEST_CASE("synchronizer avoid creating UNSPECIFIED directories", "[synchronizer]
 
     const fs::path keep_dir = "a";
     const fs::path cleanup_dir = keep_dir / "b";
-    const fs::path path = cleanup_dir / test_name;
+    const fs::path path = cleanup_dir / test_path;
 
     // file present in remote, but dir "test" removed in local
     fs::create_directory(l / keep_dir);
@@ -352,49 +359,73 @@ TEST_CASE("synchronizer avoid creating UNSPECIFIED directories", "[synchronizer]
 
 TEST_CASE("synchronizer must keep local unsynced file", "[synchronizer]") {
     
-    config::sync sync = make_sync();
+    const fs::path p = fs::path("a") / test_path;
+    const config::sync sync = make_sync();
+    const auto [l, r] = make_paths(sync, p);
+
     lf::index index;
     lf::tracked_state state;
 
-    fs::path test_path = fs::path("a") / test_name;
-
-    write_text(sync.local / test_path, test_content);
+    write_text(l, test_content);
     
-    state.set(test_path, true);
+    state.set(p, true);
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE( fs::exists(sync.local / test_path) );
-    REQUIRE_FALSE( fs::exists(sync.remote / test_path) );
-    REQUIRE_FALSE( state.get(test_path) );
+    REQUIRE( fs::exists(l) );
+    REQUIRE_FALSE( fs::exists(r) );
+    REQUIRE_FALSE( state.get(p) );
 
 }
 
 TEST_CASE("synchronizer must sync permissions", "[synchronizer]") {
 
-    config::sync sync = make_sync();
+    const fs::path test_path = "a.txt";
+    const config::sync sync = make_sync();
+    const auto [l, r] = make_paths(sync, test_path);
+
     lf::index index;
     lf::tracked_state state;
 
-    const fs::path test_path = "a.txt";
     index.set(test_path, sync_mode::SHALLOW);
 
-    write_text(sync.local / test_path, test_content);
+    write_text(l, test_content);
     
     fs::perms perms = fs::perms::owner_all | fs::perms::group_all;
 
-    fs::permissions(sync.local / test_path, perms);
-    REQUIRE( fs::status(sync.local / test_path).permissions() == perms );
+    fs::permissions(l, perms);
+    REQUIRE( fs::status(l).permissions() == perms );
 
     synchronizer(sync, index, state).run();
-    REQUIRE( fs::status(sync.remote / test_path).permissions() == perms );
+    REQUIRE( fs::status(r).permissions() == perms );
 
-    fs::permissions(sync.remote / test_path, fs::perms::owner_all);
-    REQUIRE( fs::status(sync.remote / test_path).permissions() == fs::perms::owner_all );
+    fs::permissions(r, fs::perms::owner_all);
+    REQUIRE( fs::status(r).permissions() == fs::perms::owner_all );
 
-    plus50ms_last_write_time(sync.remote / test_path, sync.local / test_path);
+    plus50ms_last_write_time(r, l);
 
     synchronizer(sync, index, state).run();
-    REQUIRE( fs::status(sync.local / test_path).permissions() == fs::perms::owner_all );
+    REQUIRE( fs::status(l).permissions() == fs::perms::owner_all );
+
+}
+
+TEST_CASE("synchronizer empty state but local and remote are same", "[synchronizer]") {
+
+    config::sync sync = make_sync();
+    const auto [l, r] = make_paths(sync, test_path);
+
+    lf::index index = { sync_mode::IGNORE, { { test_path.string(), { sync_mode::SHALLOW } }} };
+    lf::tracked_state state;
+
+    write_text(l, test_content);
+    fs::copy_file(l, r);
+
+    synchronizer s(sync, index, state);
+    s.run();
+
+    REQUIRE( fs::exists(l) );
+    REQUIRE( fs::exists(r) );
+    REQUIRE( fs::last_write_time(l) == fs::last_write_time(r) );
+    REQUIRE( state.get(test_path) );
 
 }
