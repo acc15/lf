@@ -12,7 +12,7 @@ namespace lf {
         void write(const log_message& message) override;
 
     public:
-        std::vector<std::unique_ptr<log_sink>> sinks;
+        std::vector<std::shared_ptr<log_sink>> sinks;
     };
 
 }

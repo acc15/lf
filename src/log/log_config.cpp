@@ -35,11 +35,12 @@ namespace lf {
     }
 
     void log_init() {
-        log.filter = std::make_unique<log_level_filter>(get_log_level_env());
-        log.formatter = std::make_unique<simple_log_formatter>();
-        log.sinks.clear();
-        log.sinks.push_back(std::make_unique<stream_log_sink>(std::cout));
-        log.sinks.push_back(std::make_unique<rolling_file_sink>(get_log_file_env(), 10 * 1024 * 1024, 9));
+        log.filter = std::make_shared<log_level_filter>(get_log_level_env());
+        log.formatter = std::make_shared<simple_log_formatter>();
+        log.sinks = { 
+            std::make_shared<stream_log_sink>(std::cout),
+            std::make_shared<rolling_file_sink>(get_log_file_env(), 10 * 1024 * 1024, 9)
+        };
     }
 
 }

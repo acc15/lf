@@ -5,7 +5,9 @@
 namespace lf {
 
     log_stream::log_stream(log_sink& sink, const log_message& msg): 
-        std::ostream(sink.filter && !sink.filter->level(msg.level) ? static_cast<std::streambuf*>(&nullout.nullbuf) : &buf), 
+        std::ostream(sink.filter && !sink.filter->level(msg.level) 
+            ? static_cast<std::streambuf*>(&nullout.nullbuf) 
+            : &buf), 
         sink(sink), 
         message(msg) 
     {
