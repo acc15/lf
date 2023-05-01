@@ -36,7 +36,11 @@ const fs::path& pick_path(const config::sync& sync, bool local) {
     return local ? sync.local : sync.remote;
 }
 
-std::pair<fs::path, fs::path> make_paths(const config::sync& sync, const fs::path& path, bool swap = false) {
+std::pair<fs::path, fs::path> make_paths(
+    const config::sync& sync, 
+    const fs::path& path = fs::path(), 
+    bool swap = false
+) {
     return std::make_pair(pick_path(sync, !swap) / path, pick_path(sync, swap) / path);
 }
 
@@ -324,14 +328,13 @@ TEST_CASE("synchronizer: nested file must override file", "[synchronizer]") {
 
 }
 
-TEST_CASE("synchronizer: avoid creating UNSPECIFIED directories", "[synchronizer]") {
+TEST_CASE("synchronizer: must delete empty local and remote directories and remote files", "[synchronizer]") {
     
     config::sync sync = make_sync();
     lf::index index;
     lf::tracked_state state;
 
-    const fs::path l = sync.local;
-    const fs::path r = sync.remote;
+    const auto [l, r] = make_paths(sync);
 
     const fs::path keep_dir = "a";
     const fs::path cleanup_dir = keep_dir / "b";
@@ -349,7 +352,6 @@ TEST_CASE("synchronizer: avoid creating UNSPECIFIED directories", "[synchronizer
     REQUIRE( state.empty() );
     REQUIRE( index.empty() );
 
-    // both dirs is empty
     REQUIRE( fs::is_empty(l) ); 
     REQUIRE( fs::is_empty(r) );
 
@@ -362,9 +364,11 @@ TEST_CASE("synchronizer: must keep local unsynced file", "[synchronizer]") {
 
     lf::index index;
     lf::tracked_state state;
+    index.set(test_deep_path.parent_path(), sync_mode::RECURSIVE);
     index.set(test_deep_path, sync_mode::NONE);
 
     write_text(l, test_content);
+    fs::create_directories(r);
     
     synchronizer s(sync, index, state);
     s.run();
@@ -374,6 +378,7 @@ TEST_CASE("synchronizer: must keep local unsynced file", "[synchronizer]") {
     REQUIRE_FALSE( state.get(test_deep_path) );
 
 }
+
 
 TEST_CASE("synchronizer: must sync permissions", "[synchronizer]") {
 
@@ -411,7 +416,7 @@ TEST_CASE("synchronizer: not synced, but local and remote are same", "[synchroni
     config::sync sync = make_sync();
     const auto [l, r] = make_paths(sync, test_path);
 
-    lf::index index = { sync_mode::IGNORE, { { test_path.string(), { sync_mode::SHALLOW } }} };
+    lf::index index = { sync_mode::NONE, { { test_path.string(), { sync_mode::SHALLOW } }} };
     lf::tracked_state state;
 
     write_text(l, test_content);
@@ -435,7 +440,8 @@ TEST_CASE("synchronizer: remote file deleted, index deleted, local synced - must
     write_test_file(l);
 
     lf::index index;
-    lf::tracked_state state = lf::state { false, {{test_path.string(), {true}}} };
+    lf::tracked_state state;
+    state.set(test_path, true);
 
     synchronizer s(sync, index, state);
     s.run();
@@ -470,7 +476,7 @@ TEST_CASE("synchronizer: remote dir, local synced file - must delete local file"
 TEST_CASE("synchronizer: recursive, must keep local ignored dir", "[synchronizer]") {
 
     config::sync sync = make_sync();
-    const auto [l, r] = make_paths(sync, fs::path());
+    const auto [l, r] = make_paths(sync);
 
     const fs::path root_path = "a";
     const fs::path synced_path = root_path / "d.txt";

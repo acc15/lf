@@ -44,14 +44,14 @@ namespace lf {
 
     void entry_synchronizer::cleanup() {
         log(TRACE) << "cleanup directory";
-        s.state.remove(item.path, true);
         if (item.path.empty()) {
             return;
         }
-        if (item.mode == sync_mode::NONE) {
+        if (local.type == directory || (s.state.get(item.path) && item.mode == sync_mode::NONE)) {
             delete_empty_dir_or_file(local);
         }
         delete_empty_dir_or_file(remote);
+        s.state.remove(item.path, true);
     }
 
     void entry_synchronizer::process() {
