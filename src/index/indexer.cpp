@@ -30,9 +30,7 @@ namespace lf {
 
         config::sync_entry_vec matches = _config.find_most_specific_local_matches(path);
         for (const auto* e: matches) {
-
             const config::sync& sync = *e;
-
             const fs::path rel_path = relative_path(path, sync.local);
             tracked_index& index = load_index(sync.index);
             if (mode.has_value()) {
@@ -48,7 +46,6 @@ namespace lf {
                 index.remove(rel_path);
             }
         }
-
     }
 
     bool indexer::save_changes() {
