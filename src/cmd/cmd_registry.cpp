@@ -9,6 +9,7 @@
 
 #include "cmd/impl/sync_cmd.hpp"
 #include "cmd/impl/add_cmd.hpp"
+#include "cmd/impl/mv_cmd.hpp"
 #include "cmd/impl/rm_cmd.hpp"
 #include "cmd/impl/info_cmd.hpp"
 
@@ -16,12 +17,14 @@ namespace lf {
 
     const sync_cmd _sync;
     const add_cmd _add;
+    const mv_cmd _mv;
     const rm_cmd _rm;
     const info_cmd _info;
 
     const cmd* const cmd_registry::list[] = { 
         &_sync, 
         &_add, 
+        &_mv,
         &_rm,
         &_info
     };

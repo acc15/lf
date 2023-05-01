@@ -150,6 +150,8 @@ add_library(lf_core
     src/cmd/impl/sync_cmd.cpp
     src/cmd/impl/add_cmd.hpp 
     src/cmd/impl/add_cmd.cpp 
+    src/cmd/impl/mv_cmd.hpp 
+    src/cmd/impl/mv_cmd.cpp 
     src/cmd/impl/rm_cmd.hpp 
     src/cmd/impl/rm_cmd.cpp 
     src/cmd/impl/info_cmd.hpp 
