@@ -119,4 +119,13 @@ namespace lf {
         log.debug() && log() << Data::name << " has been successfully saved to " << path << log::end;
     }
 
+    template <format_type Format, serializable_type Data>
+    void save_file(const std::filesystem::path& path, const Data& ref) {
+        adv_ofstream file;
+        if (!open_and_lock<Format, Data, adv_ofstream>(path, file, std::ios_base::out)) {
+            return;
+        }
+        save_file<Format, Data>(path, file, ref);
+    }
+
 }

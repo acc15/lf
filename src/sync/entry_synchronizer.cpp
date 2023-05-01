@@ -35,7 +35,7 @@ namespace lf {
     void entry_synchronizer::run() {
         if (item.cleanup) {
             cleanup();
-        } else if (item.mode == sync_mode::IGNORE) {
+        } else if (item.mode == sync_mode::NONE || item.mode == sync_mode::IGNORE) {
             process();
         } else {
             sync();
@@ -59,26 +59,46 @@ namespace lf {
         if (local.type == directory) {
             process_dir();
         } else {
-            log(DEBUG) << "ignored";
-            s.state.remove(item.path);
+            process_other();
         }
+
         if (remote.type != not_found) {
             log(INFO) << "deleting remote " << remote.type;
             fs::remove(remote.path);
         }
     }
 
-    void entry_synchronizer::process_dir() {        
+    void entry_synchronizer::process_other() {
+        if (!s.state.get(item.path)) {
+            log(DEBUG) << "not synced";
+            return;
+        }
+        if (item.mode == sync_mode::IGNORE) {
+            log(DEBUG) << "ignored";
+        } else if (local.type != not_found) {
+            log(INFO) << "deleting local " << local.type;
+            fs::remove(local.path);
+        } else {
+            log(DEBUG) << "not exists";
+        }
+        s.state.remove(item.path);
+    }
+
+    void entry_synchronizer::process_dir() {
         queue_map map;
         add_state_names(map);
         add_index_names(map);
         if (map.empty()) {
-            cleanup();
+            if (item.mode == sync_mode::NONE) { // cleaning up empty dir
+                cleanup();
+            }
             return;
         }
 
         log(TRACE) << "processing directory";
-        s.queue.push_back(sync_item { item.path, item.mode, true });
+        if (item.mode == sync_mode::NONE) { // scheduling cleanup of empty dir (if not ignored)
+            s.queue.push_back(sync_item { item.path, item.mode, true });
+        }
         queue(map);
 
     }
@@ -223,7 +243,7 @@ namespace lf {
             return;
         }
         for (const auto& state_pair: state_node->entries) {
-            add_queue_map_item(dest, state_pair.first, sync_mode::IGNORE);
+            add_queue_map_item(dest, state_pair.first, sync_mode::NONE);
         }
     }
 

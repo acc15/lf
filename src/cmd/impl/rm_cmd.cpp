@@ -4,16 +4,18 @@
 namespace lf {
 
     rm_cmd::rm_cmd(): cmd(
-        { "r", "rm" }, 
-        "removes specified files and directories from corresponding index files",
-        { { "", 0, "paths to remove from index", "paths", 0, opt::UNBOUNDED } }
+        { "r", "rm", "d", "del", "delete" }, 
+        "removes specified files and directories from index files",
+        { 
+            { "force", 'F', "also completely removes file/directory (from both sides)" },
+            { "", 0, "paths to remove", "paths", 0, opt::UNBOUNDED }
+        }
     ) {
     }
 
     bool rm_cmd::run(const opt_map& params) const {
         indexer indexer;
-        indexer.init();
-        indexer.process(params[""], std::nullopt);
+        indexer.process(params[""], params.has("force") ? std::nullopt : std::optional<sync_mode>(sync_mode::IGNORE));
         return indexer.save_changes();
     }
 

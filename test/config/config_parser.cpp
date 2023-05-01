@@ -44,7 +44,7 @@ config_vec test_parse_config(const std::string& text) {
     return result;
 }
 
-TEST_CASE("config_parser parse", "[config_parser]") {
+TEST_CASE("config_parser: parse", "[config_parser]") {
     config_vec actual = test_parse_config(
         "no_section = yes\n"
         " # comment \n"

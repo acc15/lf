@@ -8,8 +8,7 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    void indexer::init() {
-        _config = config::load();
+    indexer::indexer(): _config(config::load()) {
     }
 
     void indexer::process(const std::vector<std::string_view>& paths, std::optional<sync_mode> mode) {
@@ -102,7 +101,7 @@ namespace lf {
             return;
         }
 
-        file.truncate();            
+        file.truncate();
 
         try {
             save_file<tree_binary_format, lf::index>(path, file, index.root);

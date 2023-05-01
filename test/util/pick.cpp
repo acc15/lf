@@ -10,7 +10,7 @@ enum class test_enum {
 
 const char* test_enum_names[] = { "hello", "WORLD", "unknown" };
 
-TEST_CASE("parse_enum", "[pick]") {
+TEST_CASE("util: parse_enum", "[pick]") {
     REQUIRE( lf::parse_enum<test_enum>(" hElLo  ", test_enum::DEFAULT, test_enum_names) == test_enum::HELLO );
     REQUIRE( lf::parse_enum<test_enum>("world ", test_enum::DEFAULT, test_enum_names) == test_enum::WORLD );
     REQUIRE( lf::parse_enum<test_enum>("  unknown", test_enum::DEFAULT, test_enum_names) == test_enum::DEFAULT );

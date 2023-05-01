@@ -52,7 +52,7 @@ const state test_tree = { false, {
 
 const path test_index_path = "b/03.sql";
 
-TEST_CASE("tree_print", "[tree]") {
+TEST_CASE("tree: print", "[tree]") {
     std::stringstream ss;
 
     ss << std::boolalpha;
@@ -111,18 +111,18 @@ void cmp_tree(const tree<T>& l, const tree<T>& r) {
     }
 }
 
-TEST_CASE("tree get", "[tree]") {
+TEST_CASE("tree: get", "[tree]") {
     REQUIRE(test_tree.get(test_index_path));
     REQUIRE_FALSE(test_tree.get("a/b/c"));
 }
 
-TEST_CASE("tree set update flags", "[tree]") {
+TEST_CASE("tree: set update flags", "[tree]") {
     state tree;
     tree.set(test_index_path, true);
     REQUIRE(tree.get(test_index_path));
 }
 
-TEST_CASE("tree serialization", "[tree]") {
+TEST_CASE("tree: serialization", "[tree]") {
     const path path = temp_directory_path() / "tree_serialization_test.lf";
     
     std::fstream file(path, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc );
@@ -135,7 +135,7 @@ TEST_CASE("tree serialization", "[tree]") {
     cmp_tree(test_tree, d);
 }
 
-TEST_CASE("tree deserialize with wrong signature", "[tree]") {
+TEST_CASE("tree: deserialize with wrong signature", "[tree]") {
     log_tester t(INFO);
 
     std::stringstream ss("WRONGSIGNATUREHERE!!!");
@@ -145,13 +145,13 @@ TEST_CASE("tree deserialize with wrong signature", "[tree]") {
     REQUIRE( t.str().find("invalid file signature") != std::string::npos );
 }
 
-TEST_CASE("tree deserialize must fail on empty stream", "[tree]") {
+TEST_CASE("tree: deserialize must fail on empty stream", "[tree]") {
     state result; 
     std::stringstream ss;
     REQUIRE_FALSE( ss >> read_as<tree_binary_format>(result));
 }
 
-TEST_CASE("tree deserialize must clear entries", "[tree]") {
+TEST_CASE("tree: deserialize must clear entries", "[tree]") {
 
     state result; 
     std::stringstream ss;
@@ -177,7 +177,7 @@ TEST_CASE("tree deserialize must clear entries", "[tree]") {
     REQUIRE(result.get("b") == true);
 }
 
-TEST_CASE("tree set", "[tree]") {
+TEST_CASE("tree: set", "[tree]") {
     state tree;
     CHECK_FALSE( tree.set(false) );
     REQUIRE( tree.set(true) );
@@ -185,7 +185,7 @@ TEST_CASE("tree set", "[tree]") {
     REQUIRE( tree.set(false) );
 }
 
-TEST_CASE("tree set must create node with default", "[tree]") {
+TEST_CASE("tree: set must create node with default", "[tree]") {
     state tree;
     REQUIRE( tree.entries.empty() );
 
@@ -194,7 +194,7 @@ TEST_CASE("tree set must create node with default", "[tree]") {
     REQUIRE( tree.node(test_index_path)->data == false );
 }
 
-TEST_CASE("tree set must keep node with default", "[tree]") {
+TEST_CASE("tree: set must keep node with default", "[tree]") {
     state tree;
 
     CHECK( tree.set(test_index_path, true) );
@@ -205,7 +205,7 @@ TEST_CASE("tree set must keep node with default", "[tree]") {
     REQUIRE( tree.node(test_index_path) != nullptr );
 }
 
-TEST_CASE("tree set must preserve adjanced entries when removing redunant entries", "[tree]") {
+TEST_CASE("tree: set must preserve adjanced entries when removing redunant entries", "[tree]") {
     state tree;
 
     const path adjanced_path = test_index_path.parent_path() / "x.jpg";
@@ -218,7 +218,7 @@ TEST_CASE("tree set must preserve adjanced entries when removing redunant entrie
     REQUIRE( tree.node(adjanced_path) != nullptr );
 }
 
-TEST_CASE("tree set must keep entries with children", "[tree]") {
+TEST_CASE("tree: set must keep entries with children", "[tree]") {
     const path intermediate_path = "a/b";
     const path nested_path = intermediate_path / "c/test.yaml";
 
@@ -232,7 +232,7 @@ TEST_CASE("tree set must keep entries with children", "[tree]") {
     REQUIRE( tree.node(nested_path) != nullptr );
 }
 
-TEST_CASE("tree remove", "[tree]") {
+TEST_CASE("tree: remove", "[tree]") {
     
     const path intermediate_path = "a/b";
     const path nested_path = intermediate_path / "c/test.yaml";
@@ -248,7 +248,7 @@ TEST_CASE("tree remove", "[tree]") {
 
 }
 
-TEST_CASE("tree set must return false when not modified", "[tree]") {
+TEST_CASE("tree: set must return false when not modified", "[tree]") {
 
     const path path = "a/b/c";
     
@@ -260,7 +260,7 @@ TEST_CASE("tree set must return false when not modified", "[tree]") {
 
 }
 
-TEST_CASE("tree remove if empty", "[tree]") {
+TEST_CASE("tree: remove if empty", "[tree]") {
     const path path = "a/b/c";
 
     state tree;
@@ -269,7 +269,7 @@ TEST_CASE("tree remove if empty", "[tree]") {
     REQUIRE( tree.node(path) != nullptr );
 }
 
-TEST_CASE("tree remove if empty must set default value", "[tree]") {
+TEST_CASE("tree: remove if empty must set default value", "[tree]") {
     const path path = "a/b/c";
 
     state tree;
@@ -282,7 +282,7 @@ TEST_CASE("tree remove if empty must set default value", "[tree]") {
 
 }
 
-TEST_CASE("tree must keep unspecified inside recursive and shallow", "[tree]") {
+TEST_CASE("tree: must keep unspecified inside recursive and shallow", "[tree]") {
 
     const path common = "a/b";
     const path p1 = common / "c";

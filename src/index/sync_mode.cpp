@@ -4,13 +4,15 @@
 namespace lf {
     
     const char* sync_mode_names[] = { 
-        "IGNORE", 
-        "SHALLOW", 
-        "RECURSIVE", 
+        "NONE", // path not present in index
+        "IGNORE", // path is ignored
+        "SHALLOW", // shallow directory or single file
+        "RECURSIVE", // recursive directory
         "(invalid sync mode)" 
     };
 
     const char* sync_mode_signs[] = { 
+        " ", 
         "-", 
         "+", 
         "*", 

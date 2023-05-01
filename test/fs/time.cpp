@@ -32,7 +32,7 @@ std::map<fs_rep, fs_rep> linux_ntfs_expectations = {
 };
 
 #if defined (__linux__)
-TEST_CASE("fs time ntfs_last_write_time", "[time]") {
+TEST_CASE("fs time: ntfs_last_write_time", "[time]") {
     for (const auto& e: linux_ntfs_expectations) {
         fs_time set = fs_tp(e.first);
         fs_time actual = lf::ntfs_last_write_time(set);
@@ -41,7 +41,7 @@ TEST_CASE("fs time ntfs_last_write_time", "[time]") {
     }
 }
 
-TEST_CASE("fs time write_ntfs_timestamp", "[.time]") {
+TEST_CASE("fs time: write_ntfs_timestamp", "[.time]") {
     fs::path test_ntfs_path = "/mnt/router/tmp/test.txt";
     REQUIRE( fs::exists(test_ntfs_path) );
 

@@ -15,7 +15,10 @@ namespace lf {
     info_cmd::info_cmd(): cmd(
         {"i", "info"}, 
         "prints info about indexed files, their sync modes and current synchronization state",
-        { opt { "index", 'I', "prints index" }, opt { "state", 'S', "prints state"} }
+        { 
+            { "index", 'I', "prints index" }, 
+            { "state", 'S', "prints state"} 
+        }
     ) {
     }
     

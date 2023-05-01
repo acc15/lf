@@ -9,7 +9,8 @@
 namespace lf {
     
     enum class sync_mode {
-        IGNORE,
+        NONE,
+        IGNORE, // path is unsynced (ignored), no syncs will be performed
         SHALLOW,
         RECURSIVE
     };

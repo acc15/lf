@@ -38,6 +38,7 @@ namespace lf {
 
         void process();
         void process_dir();
+        void process_other();
 
         void sync();
         void sync_not_found(const path_info& src, const path_info& dst);

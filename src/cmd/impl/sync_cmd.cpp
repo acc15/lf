@@ -13,7 +13,7 @@ namespace lf {
         { "s", "sync" }, 
         "synchronizes mirrors", 
         { 
-            opt { "", '\0', "configured names to synchronize", "syncs", 0, opt::UNBOUNDED }
+            { "", '\0', "configured names to synchronize", "syncs", 0, opt::UNBOUNDED }
         }
     ) {}
 

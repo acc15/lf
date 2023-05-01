@@ -8,7 +8,7 @@ namespace fs = std::filesystem;
 
 using namespace lf;
 
-TEST_CASE("adv_fstream write read file", "[adv_fstream]") {
+TEST_CASE("adv_fstream: write read file", "[adv_fstream]") {
     const fs::path p = create_temp_test_dir() / "test.txt";
 
     adv_ofstream out(p);
@@ -26,7 +26,7 @@ TEST_CASE("adv_fstream write read file", "[adv_fstream]") {
     REQUIRE(str == "test");
 }
 
-TEST_CASE("adv_fstream write truncate write read", "[adv_fstream]") {
+TEST_CASE("adv_fstream: write truncate write read", "[adv_fstream]") {
     const fs::path p = create_temp_test_dir() / "test.txt";
 
     adv_fstream f(p, std::ios_base::in | std::ios_base::out | std::ios_base::trunc);
@@ -48,7 +48,7 @@ TEST_CASE("adv_fstream write truncate write read", "[adv_fstream]") {
     REQUIRE(str == "test");
 }
 
-TEST_CASE("adv_ofstream shouldnt truncate", "[adv_ofstream]") {
+TEST_CASE("adv_ofstream: shouldnt truncate", "[adv_ofstream]") {
     const fs::path p = create_temp_test_dir() / "test.txt";
 
     adv_ofstream f1(p);
@@ -67,7 +67,7 @@ TEST_CASE("adv_ofstream shouldnt truncate", "[adv_ofstream]") {
     REQUIRE( str == "test" );
 }
 
-TEST_CASE("adv_ofstream lock unlock", "[adv_fstream]") {
+TEST_CASE("adv_ofstream: lock unlock", "[adv_fstream]") {
 
     const fs::path p = create_temp_test_dir() / "test.txt";
     adv_ofstream f1(p);
@@ -81,7 +81,7 @@ TEST_CASE("adv_ofstream lock unlock", "[adv_fstream]") {
 
 }
 
-TEST_CASE("adv_fstream check initial file and fd", "[adv_fstream]") {
+TEST_CASE("adv_fstream: check initial file and fd", "[adv_fstream]") {
 
     adv_fstream f;
     REQUIRE( f.file() == nullptr );
@@ -89,7 +89,7 @@ TEST_CASE("adv_fstream check initial file and fd", "[adv_fstream]") {
 
 }
 
-TEST_CASE("adv_fstream truncate must set failbit when no file open", "[adv_fstream]") {
+TEST_CASE("adv_fstream: truncate must set failbit when no file open", "[adv_fstream]") {
 
     adv_fstream f;
     REQUIRE( f.good() );
@@ -103,7 +103,7 @@ TEST_CASE("adv_fstream truncate must set failbit when no file open", "[adv_fstre
 
 }
 
-TEST_CASE("adv_fstream truncate clears iostate on success", "[adv_fstream]") {
+TEST_CASE("adv_fstream: truncate clears iostate on success", "[adv_fstream]") {
 
     const fs::path p = create_temp_test_dir() / "test.txt";
     adv_fstream f(p, std::ios_base::in | std::ios_base::out | std::ios_base::app | std::ios_base::ate);
@@ -114,7 +114,7 @@ TEST_CASE("adv_fstream truncate clears iostate on success", "[adv_fstream]") {
 
 }
 
-TEST_CASE("adv_fstream can write after truncate", "[adv_fstream]") {
+TEST_CASE("adv_fstream: can write after truncate", "[adv_fstream]") {
 
     const fs::path p = create_temp_test_dir() / "test.txt";
     adv_ofstream f1(p);
@@ -151,7 +151,7 @@ TEST_CASE("adv_fstream can write after truncate", "[adv_fstream]") {
 
 }
 
-TEST_CASE("default_openmode", "[adv_fstream]") {
+TEST_CASE("adv_fstream: default openmode", "[adv_fstream]") {
 
     REQUIRE( lf::default_openmode<adv_ifstream>::default_mode == std::ios_base::in );
     REQUIRE( lf::default_openmode<adv_ifstream>::force_mode == std::ios_base::in );

@@ -18,6 +18,9 @@ namespace lf {
         tree_type root;
         bool changed = false;
 
+        tracked_tree(): root(), changed(false) {}
+        tracked_tree(const tree_type& init): root(init), changed(false) {}
+
         bool empty() const {
             return root.empty();
         }

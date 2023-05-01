@@ -7,7 +7,7 @@
 using namespace lf;
 namespace fs = std::filesystem;
 
-TEST_CASE("path is_subpath", "[path]") {
+TEST_CASE("path: is_subpath", "[path]") {
     REQUIRE( is_subpath("a/b/c", "a/b") );
     REQUIRE_FALSE( is_subpath("a/b/c", "b") );
     REQUIRE_FALSE( is_subpath("a", "a/b/c") );
@@ -15,7 +15,7 @@ TEST_CASE("path is_subpath", "[path]") {
     REQUIRE( is_subpath(test_root_path / "a", test_root_path / "a") );
 }
 
-TEST_CASE("path create_parent_dirs", "[path]") {
+TEST_CASE("path: create_parent_dirs", "[path]") {
 
     fs::path p1 = "abc";
     REQUIRE_FALSE( p1.has_parent_path() );
@@ -27,7 +27,7 @@ TEST_CASE("path create_parent_dirs", "[path]") {
 
 }
 
-TEST_CASE("path join_path", "[path]") {
+TEST_CASE("path: join_path", "[path]") {
 
     REQUIRE( join_path("abc", fs::path()) == fs::path("abc") );
     REQUIRE( join_path("abc", "xyz") == fs::path("abc") / "xyz" );

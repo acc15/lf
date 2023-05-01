@@ -34,7 +34,7 @@ config test_parse(const std::string& yaml) {
     return cfg;
 }
 
-TEST_CASE("config parse", "[config]") {
+TEST_CASE("config: parse", "[config]") {
 
     const std::string text = 
         "[home]\n"
@@ -66,13 +66,13 @@ TEST_CASE("config parse", "[config]") {
 
 }
 
-TEST_CASE("config empty section", "[config]") {
+TEST_CASE("config: empty section", "[config]") {
     log_tester t(INFO);
     test_parse("state=test.abc");
     REQUIRE_THAT(t.str(), Catch::Matchers::ContainsSubstring("empty section"));
 }
 
-TEST_CASE("config parse partial", "[config]") {
+TEST_CASE("config: parse partial", "[config]") {
     log_tester t(INFO);
     auto p = test_parse(
         "[home]\n"
@@ -85,7 +85,7 @@ TEST_CASE("config parse partial", "[config]") {
     REQUIRE(msg.find("local") != std::string::npos);
 }
 
-TEST_CASE("config find_local_matches", "[config]") {
+TEST_CASE("config: find_local_matches", "[config]") {
     auto home_path = test_root_path / "home";
     config cfg = {
         .syncs = {

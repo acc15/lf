@@ -7,7 +7,7 @@ using namespace lf;
 
 namespace fs = std::filesystem;
 
-TEST_CASE("entry_synchronizer create_dir_if_not_exists", "[entry_synchronizer]") {
+TEST_CASE("entry_synchronizer: create_dir_if_not_exists", "[entry_synchronizer]") {
     
     config::sync sync;
     lf::index index;

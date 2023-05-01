@@ -24,7 +24,7 @@ TEST_CASE("unicode env", "[unicode]") {
     REQUIRE( std::strcmp(actual_env, expect_env) == 0 );
 }
 
-TEST_CASE("unicode list dir", "[unicode]") {
+TEST_CASE("unicode: list dir", "[unicode]") {
     std::set<std::string> actual_names;
     for (const auto& e : std::filesystem::directory_iterator(unicode_dir)) {
         actual_names.insert(e.path().filename().string());
@@ -34,7 +34,7 @@ TEST_CASE("unicode list dir", "[unicode]") {
     REQUIRE( actual_names == expect_names );
 }
 
-TEST_CASE("unicode list utf8 file", "[unicode]") {
+TEST_CASE("unicode: list utf8 file", "[unicode]") {
     std::vector<std::string> expect_lines = { "Русский текст" };
     std::vector<std::string> actual_lines;
 

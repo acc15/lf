@@ -14,7 +14,7 @@ const std::string log_name = "test.log";
 const fs::path log_dir = fs::temp_directory_path() / "lf_test" / "rolling_file_sink";
 const fs::path log_file = log_dir / log_name;
 
-TEST_CASE("rolling_file_sink rollover", "[rolling_file_sink]") {
+TEST_CASE("rolling_file_sink: rollover", "[rolling_file_sink]") {
     
     fs::remove_all(log_dir);
 
@@ -39,7 +39,7 @@ TEST_CASE("rolling_file_sink rollover", "[rolling_file_sink]") {
 
 }
 
-TEST_CASE("rolling_file_sink append", "[rolling_file_sink]") {
+TEST_CASE("rolling_file_sink: append", "[rolling_file_sink]") {
     write_text(log_file, "abc");
 
     {

@@ -3,7 +3,7 @@
 #include <sstream>
 #include "io/openmode.hpp"
 
-TEST_CASE("openmode print", "[openmode]") {
+TEST_CASE("openmode: print", "[openmode]") {
     
     std::stringstream s;
 
@@ -13,7 +13,7 @@ TEST_CASE("openmode print", "[openmode]") {
 
 }
 
-TEST_CASE("default modes", "[openmode]") {
+TEST_CASE("openmode: default modes", "[openmode]") {
     
     REQUIRE( lf::default_openmode<std::istream>::default_mode == std::ios_base::in );
     REQUIRE( lf::default_openmode<std::istream>::force_mode == std::ios_base::in );

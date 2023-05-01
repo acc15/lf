@@ -17,7 +17,7 @@ namespace lf {
 
     class indexer {
     public:
-        void init();
+        indexer();
 
         void process(const std::vector<std::string_view>& paths, std::optional<sync_mode> mode);
         void process(std::string_view path_str, std::optional<sync_mode> mode);
@@ -37,7 +37,6 @@ namespace lf {
         
         void init_entry(const std::filesystem::path& path, tracked_index& index, adv_fstream& file);
         void save_entry(const std::filesystem::path& path, tracked_index& index, adv_fstream& file);
-
 
     };
 

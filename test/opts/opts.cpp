@@ -15,7 +15,7 @@ const opts test_opts = {
     "shallow"
 };
 
-TEST_CASE("opts parse", "[opts]") {
+TEST_CASE("opts: parse", "[opts]") {
 
     const char* argv[] = { "-R", "a", "\\escape", "/root", "-I", "-d", "default", "shallow" };
     const opt_map m = test_opts.parse(argv);
@@ -28,7 +28,7 @@ TEST_CASE("opts parse", "[opts]") {
     
 }
 
-TEST_CASE("opts usage", "[opts]") {
+TEST_CASE("opts: usage", "[opts]") {
     std::stringstream s;
     s << test_opts;
     REQUIRE( s.str() == 
