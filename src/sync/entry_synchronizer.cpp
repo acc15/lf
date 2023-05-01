@@ -45,30 +45,29 @@ namespace lf {
     void entry_synchronizer::cleanup() {
         log(TRACE) << "cleanup directory";
         s.state.remove(item.path, true);
-        if (!item.path.empty()) {
-            delete_empty_dir(local);
-            delete_empty_dir(remote);
+        if (item.path.empty()) {
+            return;
         }
+        if (item.mode == sync_mode::NONE) {
+            delete_empty_dir_or_file(local);
+        }
+        delete_empty_dir_or_file(remote);
     }
 
     void entry_synchronizer::process() {
-        if (remote.type == directory) {
-            process_dir();
-            return;
-        }
-        if (local.type == directory) {
+        if (remote.type == directory || local.type == directory) {
             process_dir();
         } else {
             process_other();
         }
+    }
 
+    void entry_synchronizer::process_other() {
         if (remote.type != not_found) {
             log(INFO) << "deleting remote " << remote.type;
             fs::remove(remote.path);
         }
-    }
-
-    void entry_synchronizer::process_other() {
+        
         if (!s.state.get(item.path)) {
             log(DEBUG) << "not synced";
             return;
@@ -89,18 +88,13 @@ namespace lf {
         add_state_names(map);
         add_index_names(map);
         if (map.empty()) {
-            if (item.mode == sync_mode::NONE) { // cleaning up empty dir
-                cleanup();
-            }
+            cleanup();
             return;
         }
 
         log(TRACE) << "processing directory";
-        if (item.mode == sync_mode::NONE) { // scheduling cleanup of empty dir (if not ignored)
-            s.queue.push_back(sync_item { item.path, item.mode, true });
-        }
+        s.queue.push_back(sync_item { item.path, item.mode, true });
         queue(map);
-
     }
 
     void entry_synchronizer::sync() {
@@ -216,11 +210,11 @@ namespace lf {
         return true;
     }
 
-    bool entry_synchronizer::delete_empty_dir(const path_info& p) {
-        if (p.type != fs::file_type::directory || !fs::is_empty(p.path)) {
+    bool entry_synchronizer::delete_empty_dir_or_file(const path_info& p) {
+        if (p.type == not_found || (p.type == directory && !fs::is_empty(p.path))) {
             return false;
         }
-        log(INFO) << "deleting empty " << p.name << " " << p.type;
+        log(INFO) << "deleting " << p.name << " " << p.type << " " << p.name;
         fs::remove(p.path);
         return true;
     }
@@ -242,8 +236,9 @@ namespace lf {
         if (state_node == nullptr) {
             return;
         }
+        const sync_mode next_mode = item.mode == sync_mode::IGNORE ? sync_mode::IGNORE : sync_mode::NONE;
         for (const auto& state_pair: state_node->entries) {
-            add_queue_map_item(dest, state_pair.first, sync_mode::NONE);
+            add_queue_map_item(dest, state_pair.first, next_mode);
         }
     }
 

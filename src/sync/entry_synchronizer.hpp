@@ -57,8 +57,7 @@ namespace lf {
         void queue(const queue_map& map);
         void copy_file(const path_info& src, const path_info& dst);
 
-        bool delete_empty_dir(const path_info& p);
-        bool delete_if_exists(const path_info& p);
+        bool delete_empty_dir_or_file(const path_info& p);
         
         std::ostream& log(log_level level);
 

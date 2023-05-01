@@ -7,7 +7,7 @@ namespace lf {
         { "r", "rm", "d", "del", "delete" }, 
         "removes specified files and directories from index files",
         { 
-            { "force", 'F', "also completely removes file/directory (from both sides)" },
+            { "force", 'F', "also deletes file/directory (from both sides)" },
             { "", 0, "paths to remove", "paths", 0, opt::UNBOUNDED }
         }
     ) {

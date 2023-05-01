@@ -155,8 +155,8 @@ TEST_CASE("synchronizer: file removed from index (ignored)", "[synchronizer]") {
     synchronizer s(sync, index, state);
     s.run();
 
-    REQUIRE_FALSE( fs::exists(sync.remote / test_path) );
-    REQUIRE( fs::exists(sync.local / test_path) );
+    REQUIRE_FALSE( fs::exists(r) );
+    REQUIRE( fs::exists(l) );
     REQUIRE( s.state.node(test_path) == nullptr );
 }
 
@@ -443,5 +443,61 @@ TEST_CASE("synchronizer: remote file deleted, index deleted, local synced - must
     REQUIRE_FALSE( fs::exists(l) );
     REQUIRE_FALSE( fs::exists(r) );
     REQUIRE_FALSE( state.get(test_path) );
+
+}
+
+TEST_CASE("synchronizer: remote dir, local synced file - must delete local file", "[synchronizer]") {
+
+    config::sync sync = make_sync();
+    const auto [l, r] = make_paths(sync, test_path);
+
+    fs::create_directories(r);
+    write_test_file(l);
+
+    lf::index index;
+    lf::tracked_state state;
+    state.set(test_path, true);
+
+    synchronizer s(sync, index, state);
+    s.run();
+
+    REQUIRE_FALSE( fs::exists(l) );
+    REQUIRE_FALSE( fs::exists(r) );
+    REQUIRE_FALSE( state.get(test_path) );
+
+}
+
+TEST_CASE("synchronizer: recursive, must keep local ignored dir", "[synchronizer]") {
+
+    config::sync sync = make_sync();
+    const auto [l, r] = make_paths(sync, fs::path());
+
+    const fs::path root_path = "a";
+    const fs::path synced_path = root_path / "d.txt";
+    const fs::path ignored_path = root_path / "b";
+    const fs::path ignored_file = ignored_path /  "c.txt";
+
+    lf::index index;
+    index.set(root_path, sync_mode::RECURSIVE);
+    index.set(ignored_path, sync_mode::IGNORE);
+
+    lf::tracked_state state;
+    state.set(root_path, true);
+    state.set(synced_path, true);
+    state.set(ignored_path, true);
+    state.set(ignored_file, true);
+
+    write_test_file(l / ignored_file);
+    write_test_file(l / synced_path);
+    fs::create_directories(r / root_path);
+    fs::copy_file(l / synced_path, r / synced_path);
+
+    synchronizer s(sync, index, state);
+    s.run();
+    
+    REQUIRE( fs::exists(l / ignored_file) );
+    REQUIRE( state.get(synced_path) );
+    REQUIRE_FALSE( state.get(ignored_file) );
+    REQUIRE_FALSE( state.get(ignored_path) );
 
 }
