@@ -152,8 +152,8 @@ add_library(lf_core
     src/cmd/impl/add_cmd.cpp 
     src/cmd/impl/mv_cmd.hpp 
     src/cmd/impl/mv_cmd.cpp 
-    src/cmd/impl/rm_cmd.hpp 
-    src/cmd/impl/rm_cmd.cpp 
+    src/cmd/impl/del_cmd.hpp 
+    src/cmd/impl/del_cmd.cpp 
     src/cmd/impl/info_cmd.hpp 
     src/cmd/impl/info_cmd.cpp 
  )
