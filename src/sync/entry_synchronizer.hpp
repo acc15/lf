@@ -58,6 +58,7 @@ namespace lf {
         void copy_file(const path_info& src, const path_info& dst);
 
         bool delete_empty_dir_or_file(const path_info& p);
+        void delete_path(const path_info& p);
         
         std::ostream& log(log_level level);
 

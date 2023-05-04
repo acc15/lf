@@ -55,6 +55,7 @@ namespace lf {
     }
 
     void entry_synchronizer::process() {
+        log(TRACE) << "processing";
         if (remote.type == directory || local.type == directory) {
             process_dir();
         } else {
@@ -63,22 +64,15 @@ namespace lf {
     }
 
     void entry_synchronizer::process_other() {
-        if (remote.type != not_found) {
-            log(INFO) << "deleting remote " << remote.type;
-            fs::remove(remote.path);
-        }
-        
+        delete_path(remote);
         if (!s.state.get(item.path)) {
             log(DEBUG) << "not synced";
             return;
         }
         if (item.mode == sync_mode::IGNORE) {
             log(DEBUG) << "ignored";
-        } else if (local.type != not_found) {
-            log(INFO) << "deleting local " << local.type;
-            fs::remove(local.path);
         } else {
-            log(DEBUG) << "not exists";
+            delete_path(local);
         }
         s.state.remove(item.path);
     }
@@ -92,7 +86,6 @@ namespace lf {
             return;
         }
 
-        log(TRACE) << "processing directory";
         s.queue.push_back(sync_item { item.path, item.mode, true });
         queue(map);
     }
@@ -214,9 +207,17 @@ namespace lf {
         if (p.type == not_found || (p.type == directory && !fs::is_empty(p.path))) {
             return false;
         }
-        log(INFO) << "deleting " << p.name << " " << p.type;
-        fs::remove(p.path);
+        delete_path(p);
         return true;
+    }
+
+    void entry_synchronizer::delete_path(const path_info& p) {
+        if (p.type != not_found) {
+            log(INFO) << "deleting " << p.name << " " << p.type;
+            fs::remove(p.path);
+        } else {
+            log(TRACE) << p.name << " not exists";
+        }
     }
 
     void entry_synchronizer::add_dir_entries(const path_info& i, queue_map& dest) {
