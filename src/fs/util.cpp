@@ -39,8 +39,17 @@ namespace lf {
         fs::last_write_time(dst, src_time);
     }
 
+    std::filesystem::filesystem_error make_fs_error(const std::string& what, const std::filesystem::path& path) {
+        std::error_code ec(errno, std::iostream_category());
+        return std::filesystem::filesystem_error(what, path, ec);
+    }
+
     void throw_fs_error(const std::string& what, const std::filesystem::path& path) {
-        std::filesystem::filesystem_error err(what, path, std::error_code(errno, std::iostream_category()));
+        throw make_fs_error(what, path);
+    }
+
+    void throw_fs_error_if_exists(const std::string& what, const std::filesystem::path& path) {
+        std::filesystem::filesystem_error err = make_fs_error(what, path);
         if (err.code().value() != ENOENT) {
             throw err;
         }

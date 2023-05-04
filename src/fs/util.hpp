@@ -12,5 +12,6 @@ namespace lf {
     void copy_file_with_timestamp(const std::filesystem::path& src, const std::filesystem::path& dst);
 
     void throw_fs_error(const std::string& what, const std::filesystem::path& path);
+    void throw_fs_error_if_exists(const std::string& what, const std::filesystem::path& path);
     
 }

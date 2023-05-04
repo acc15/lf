@@ -8,8 +8,8 @@
 namespace lf {
 
     class sync_cmd: public cmd {
-        bool do_sync(const config::sync& sync) const;
-        void do_sync_safe(const config::sync& sync) const;
+        bool do_sync(const config& config) const;
+        void do_sync_safe(const config& config) const;
     
     public:
         sync_cmd();

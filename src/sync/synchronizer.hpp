@@ -11,11 +11,11 @@ namespace lf {
         
     class synchronizer {
     public:
-        synchronizer(const config::sync& sync, const lf::index& index, tracked_state& state);
+        synchronizer(const config& config, const lf::index& index, tracked_state& state);
 
         void run();
 
-        const lf::config::sync& config;
+        const lf::config& config;
         const lf::index& index;
         tracked_state& state;
  

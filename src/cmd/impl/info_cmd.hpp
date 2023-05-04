@@ -15,10 +15,9 @@ namespace lf {
 
     private:
         template<serializable_type Tree>
-        static void print_tree(const std::string& sync, const std::filesystem::path& p) {
+        static void print_tree(const std::filesystem::path& p) {
             try {
-                const Tree t = load_file<tree_binary_format, Tree>(p);
-                std::cout << Tree::name << " of \"" << sync << "\" sync: " << std::endl << t;
+                std::cout << load_file<tree_binary_format, Tree>(p);
             } catch (const std::runtime_error& e) {
                 log.debug() && log() << e.what() << log::end;
             }

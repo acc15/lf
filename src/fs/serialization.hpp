@@ -40,7 +40,7 @@ namespace lf {
 
         file.open(path, target_mode);
         if (!file) {
-            throw_fs_error(
+            throw_fs_error_if_exists(
                 format_stream() << "unable to open " 
                     << Data::name << " file with flags " << write_as<openmode_format>(mode), 
                 path);
