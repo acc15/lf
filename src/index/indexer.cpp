@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 namespace lf {
 
     indexer::indexer(): _config(config::load()) {
-        init_index();
+        load_index();
     }
 
     void indexer::process(const std::vector<std::string_view>& paths, std::optional<sync_mode> mode) {

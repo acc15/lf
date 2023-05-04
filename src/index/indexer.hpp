@@ -27,11 +27,8 @@ namespace lf {
         tracked_index _index;
         adv_fstream _file;
         config _config;
-
-        bool validate(sync_mode mode, const std::filesystem::path& path) const;
-        tracked_index& load_index(const std::filesystem::path& index_path);
         
-        void init_index();
+        void load_index();
         void save_index();
 
     };
