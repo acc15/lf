@@ -214,7 +214,7 @@ namespace lf {
         if (p.type == not_found || (p.type == directory && !fs::is_empty(p.path))) {
             return false;
         }
-        log(INFO) << "deleting " << p.name << " " << p.type << " " << p.name;
+        log(INFO) << "deleting " << p.name << " " << p.type;
         fs::remove(p.path);
         return true;
     }
