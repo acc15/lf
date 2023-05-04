@@ -1,15 +1,20 @@
+#include <iostream>
+#include <filesystem>
+
 #include "cmd/impl/mv_cmd.hpp"
 
 #include "log/log.hpp"
+#include "index/indexer.hpp"
 
-#include <iostream>
+namespace fs = std::filesystem;
 
 namespace lf {
 
     mv_cmd::mv_cmd() : cmd(
         { "m", "move", "mv" }, 
-        "moves file or directory to specified path (and updates index files)",
+        "moves index node to another path",
         {
+            opt { "force", 'F', "also moves file or directory" },
             opt { "", '\0', "path to source file or directory", "source", 1, 1 },
             opt { "", '\0', "path to target file or directory", "target", 1, 1 },
         }
@@ -23,13 +28,16 @@ namespace lf {
             return false;
         }
 
+        indexer i;
         for (auto it = paths.begin(); it != paths.end();) {
-            const std::string_view from = *it;
+            const auto from = i.resolve(*it);
             ++it;
-            const std::string_view to = *it;
+            const auto to = i.resolve(*it);
             ++it;
-
-            std::cout << "from " << from << " to " << to << std::endl;
+            if (!from.has_value() || !to.has_value()) {
+                continue;
+            }
+            // TODO implement
         }
 
         return true;

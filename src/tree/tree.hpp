@@ -71,7 +71,7 @@ namespace lf {
             bool modified = false;
             tree* n = this;
             for (const std::filesystem::path& el: path) {
-                const std::pair<typename map_type::iterator, bool> r = n->entries.emplace(std::move(el.string()), tree {});
+                const auto r = n->entries.emplace(std::move(el.string()), tree {});
                 if (r.second) {
                     modified = true;
                 }

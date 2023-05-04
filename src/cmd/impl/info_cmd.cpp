@@ -8,7 +8,7 @@ namespace lf {
 
     info_cmd::info_cmd(): cmd(
         {"i", "info"}, 
-        "prints index or state tree",
+        "prints index",
         { 
             { "state", 'S', "prints state"} 
         }

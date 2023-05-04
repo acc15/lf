@@ -17,8 +17,8 @@ namespace lf {
 
     bool add_cmd::run(const opt_map& params) const {
         indexer indexer;
-        indexer.process(params["shallow"], sync_mode::SHALLOW);
-        indexer.process(params["recursive"], sync_mode::RECURSIVE);
+        indexer.set_batch(params["shallow"], sync_mode::SHALLOW);
+        indexer.set_batch(params["recursive"], sync_mode::RECURSIVE);
         return indexer.save_changes();
     }
 

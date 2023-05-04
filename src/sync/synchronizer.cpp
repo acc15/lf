@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    synchronizer::synchronizer(const lf::config& config, const lf::index& index, lf::tracked_state& state): 
+    synchronizer::synchronizer(const lf::config& config, const lf::index& index, tracked_state& state): 
         config(config), 
         index(index), 
         state(state)

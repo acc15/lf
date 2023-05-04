@@ -8,90 +8,103 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    indexer::indexer(): _config(config::load()) {
+    indexer::indexer(): config(config::load()) {
         load_index();
     }
 
-    void indexer::process(const std::vector<std::string_view>& paths, std::optional<sync_mode> mode) {
+    void indexer::set_batch(const std::vector<std::string_view>& paths, sync_mode mode) {
         for (const std::string_view& p: paths) {
-            process(p, mode);
+            const auto pi = resolve(p);
+            if (!pi.has_value()) {
+                continue;
+            }
+            set(pi->index, mode);
         }
     }
 
-    void indexer::process(std::string_view path_str, std::optional<sync_mode> mode) {
+    void indexer::move(const std::filesystem::path& from, const std::filesystem::path& to) {
+        log.info() && log() 
+            << "moving " << from << " to " << to
+            << " in index " << config.index << log::end;
+        tree<sync_mode>* from_node = index.root.node(from);
+        // TODO implement
+    }
 
-        fs::path path;
+    void indexer::set(const std::filesystem::path& path, sync_mode mode) {
+        log.info() && log() 
+            << "set " << path << " mode to " << mode
+            << " in index " << config.index << log::end;
+        index.set(path, mode);
+    }
+
+    void indexer::remove(const std::filesystem::path& path) {
+        log.info() && log() << "rm " << path << " from index " << config.index << log::end;
+        index.remove(path);
+    }
+
+    std::optional<indexer::path_info> indexer::resolve(std::string_view path_str) {
+        path_info pi;
+        
         try {
-            path = normalize_path(path_str);
+            pi.abs = normalize_path(path_str);
         } catch (const fs::filesystem_error& ex) {
             log.error() && log() << "unable to normalize path \"" << path_str << "\", error: " << ex.what() << log::end;
-            _success = false;
-            return;
+            success = false;
+            return std::nullopt;
         }
 
-        if (!is_subpath(path, _config.local)) {
+        if (!is_subpath(pi.abs, config.local)) {
             log.error() && log()
-                << "path " << path << " is outside of local sync directory " 
-                << _config.local << log::end;
-            _success = false;
-            return;
+                << "path " << pi.abs << " is outside of local sync directory " 
+                << config.local << log::end;
+            success = false;
+            return std::nullopt;
         }
 
-        const fs::path rel_path = relative_path(path, _config.local);
-        if (mode.has_value()) {
-            log.info() && log() 
-                << "set " << path << " mode to " << mode.value() 
-                << " in index " << _config.index 
-                << log::end;
-            _index.set(rel_path, mode.value());
-        } else {
-            log.info() && log() 
-                << "rm " << path << " from index " << _config.index 
-                << log::end;
-            _index.remove(rel_path);
-        }
+        pi.index = relative_path(pi.abs, config.local);
+        return pi;
     }
 
     bool indexer::save_changes() {
         save_index();
-        return _success;
+        return success;
     }
 
     void indexer::load_index() {
         try {
-            create_parent_dirs(_config.index);
-            open_and_lock<tree_binary_format, lf::index>(_config.index, _file, OPEN_READ_WRITE_LOCK);
+            create_parent_dirs(config.index);
+            open_and_lock<tree_binary_format, lf::index>(config.index, file, OPEN_READ_WRITE_LOCK);
         } catch (const std::runtime_error& e) {
-            _success = false;
+            success = false;
             log.error() && log() << e.what() << log::end;
             return;
         }
 
-        if (_file.tellg() == 0) {
+        if (file.tellg() == 0) {
             // new empty file, skip loading
             return;
         }
 
-        _file.seekg(0);
+        file.seekg(0);
         try {
-            load_file<tree_binary_format>(_config.index, _file, _index.root);
+            load_file<tree_binary_format>(config.index, file, index.root);
         } catch (const std::runtime_error& e) {
             log.debug() && log() << e.what() << log::end;
         }
     }
 
     void indexer::save_index() {
-        if (!_index.changed || !_file) {
+        if (!index.changed || !file) {
             return;
         }
 
-        _file.truncate();
+        file.truncate();
 
         try {
-            save_file<tree_binary_format, lf::index>(_config.index, _file, _index.root);
+            save_file<tree_binary_format, lf::index>(config.index, file, index.root);
         } catch (const std::runtime_error& e) {
             log.error() && log() << e.what() << log::end;
-            _success = false;
+            success = false;
         }
     }
 
