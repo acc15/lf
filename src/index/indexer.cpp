@@ -57,7 +57,7 @@ namespace lf {
         return _success;
     }
 
-    void indexer::init_index() {
+    void indexer::load_index() {
         try {
             create_parent_dirs(_config.index);
             open_and_lock<tree_binary_format, lf::index>(_config.index, _file, OPEN_READ_WRITE_LOCK);
