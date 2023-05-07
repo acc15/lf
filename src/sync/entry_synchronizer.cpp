@@ -249,7 +249,12 @@ namespace lf {
             return;
         }
         for (const auto& index_pair: index_node->entries) {
-            add_queue_map_item(dest, index_pair.first, index_pair.second.data);
+            const sync_mode entry_mode = index_pair.second.data;
+            // inheriting RECURSIVE mode when index has NONE (intermediate node)
+            const sync_mode effective_mode = entry_mode == sync_mode::NONE && item.mode == sync_mode::RECURSIVE 
+                ? item.mode 
+                : entry_mode;
+            add_queue_map_item(dest, index_pair.first, effective_mode);
         }
     }
 

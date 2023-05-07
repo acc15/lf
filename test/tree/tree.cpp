@@ -303,3 +303,13 @@ TEST_CASE("tree: must keep unspecified inside recursive and shallow", "[tree]") 
     REQUIRE( index.node(p2)->data == sync_mode::IGNORE );
 
 }
+
+TEST_CASE("tree: move", "[tree]") {
+
+    lf::index index;
+    index.set("a/b/c.txt", sync_mode::SHALLOW);
+
+    // CHECK( index.move("a/b/c.txt", "x/y/z.txt") );
+    REQUIRE( index.get("a/b/c.txt") == sync_mode::NONE );
+    REQUIRE( index.get("x/y/z.txt") == sync_mode::SHALLOW );
+}

@@ -356,7 +356,7 @@ TEST_CASE("synchronizer: must delete empty local and remote directories and remo
 
 }
 
-TEST_CASE("synchronizer: must keep local unsynced file", "[synchronizer]") {
+TEST_CASE("synchronizer: must keep local IGNORE file", "[synchronizer]") {
     
     const config config = make_sync();
     const auto [l, r] = make_paths(config, test_deep_path);
@@ -364,7 +364,7 @@ TEST_CASE("synchronizer: must keep local unsynced file", "[synchronizer]") {
     lf::index index;
     lf::tracked_state state;
     index.set(test_deep_path.parent_path(), sync_mode::RECURSIVE);
-    index.set(test_deep_path, sync_mode::NONE);
+    index.set(test_deep_path, sync_mode::IGNORE);
 
     write_text(l, test_content);
     fs::create_directories(r);
@@ -504,5 +504,34 @@ TEST_CASE("synchronizer: recursive, must keep local ignored dir", "[synchronizer
     REQUIRE( state.get(synced_path) );
     REQUIRE_FALSE( state.get(ignored_file) );
     REQUIRE_FALSE( state.get(ignored_path) );
+
+}
+
+TEST_CASE("synchronizer: must inherit RECURSIVE mode if NONE in index", "[synchronizer]") {
+
+    const auto config = make_sync();
+    const auto [l, r] = make_paths(config);
+
+    const fs::path root_dir = "a";
+    const fs::path intermediate_dir = root_dir / "b";
+    const fs::path ignore_dir = intermediate_dir / "c";
+    const fs::path recursive_sync_file = intermediate_dir / "test.txt";
+
+    lf::index index;
+    index.set(root_dir, sync_mode::RECURSIVE);
+    index.set(ignore_dir, sync_mode::IGNORE);
+
+    write_test_file(l / recursive_sync_file);
+
+    lf::tracked_state state;
+    synchronizer s(config, index, state);
+    s.run();
+
+    REQUIRE( fs::exists(l / recursive_sync_file) );
+    REQUIRE( fs::exists(r / recursive_sync_file) );
+    REQUIRE( read_text(l / recursive_sync_file) == read_text(r / recursive_sync_file) );
+    REQUIRE( state.get(recursive_sync_file) );
+    REQUIRE( state.get(intermediate_dir) );
+    REQUIRE( state.get(root_dir) );
 
 }
