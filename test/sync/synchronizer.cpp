@@ -507,6 +507,34 @@ TEST_CASE("synchronizer: recursive, must keep local ignored dir", "[synchronizer
 
 }
 
+TEST_CASE("synchronizer: must inherit IGNORE mode if NONE in index", "[synchronizer]") {
+
+    const auto config = make_sync();
+    const auto [l, r] = make_paths(config);
+
+    const fs::path root_dir = "a";
+    const fs::path intermediate_dir = root_dir / "b";
+    const fs::path shallow_sync_file = intermediate_dir / "test.txt";
+
+    lf::index index;
+    index.set(root_dir, sync_mode::IGNORE);
+    index.set(shallow_sync_file, sync_mode::SHALLOW);
+
+    fs::create_directories(l / intermediate_dir);
+
+    lf::tracked_state state;
+    state.set(shallow_sync_file, true);
+
+    synchronizer s(config, index, state);
+    s.run();
+
+    REQUIRE( fs::exists(l / intermediate_dir) );
+    REQUIRE_FALSE( state.get(shallow_sync_file) );
+    REQUIRE_FALSE( state.get(intermediate_dir) );
+    REQUIRE_FALSE( state.get(root_dir) );
+
+}
+
 TEST_CASE("synchronizer: must inherit RECURSIVE mode if NONE in index", "[synchronizer]") {
 
     const auto config = make_sync();

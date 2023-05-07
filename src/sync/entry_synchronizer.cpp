@@ -47,7 +47,7 @@ namespace lf {
         if (item.path.empty()) {
             return;
         }
-        if (local.type == directory || (s.state.get(item.path) && item.mode == sync_mode::NONE)) {
+        if (item.mode == sync_mode::NONE && (local.type == directory || s.state.get(item.path))) {
             delete_empty_dir_or_file(local);
         }
         delete_empty_dir_or_file(remote);
@@ -251,9 +251,9 @@ namespace lf {
         for (const auto& index_pair: index_node->entries) {
             const sync_mode entry_mode = index_pair.second.data;
             // inheriting RECURSIVE mode when index has NONE (intermediate node)
-            const sync_mode effective_mode = entry_mode == sync_mode::NONE && item.mode == sync_mode::RECURSIVE 
-                ? item.mode 
-                : entry_mode;
+            const sync_mode effective_mode = (item.mode == sync_mode::IGNORE || item.mode == sync_mode::RECURSIVE) 
+                && entry_mode == sync_mode::NONE ? item.mode : entry_mode;
+                
             add_queue_map_item(dest, index_pair.first, effective_mode);
         }
     }
