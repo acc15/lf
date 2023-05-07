@@ -7,6 +7,20 @@
 using namespace lf;
 namespace fs = std::filesystem;
 
+TEST_CASE("path: normalize_path", "[path]") {
+    const auto cd = fs::current_path();
+    const auto this_dir = cd.filename().string();
+
+    REQUIRE( normalize_path("") == cd );
+    REQUIRE( normalize_path(".") == cd );
+    REQUIRE( normalize_path("./") == cd );
+    REQUIRE( normalize_path("../") == cd.parent_path() );
+    REQUIRE( normalize_path("../a.txt") == cd.parent_path() / "a.txt" );
+    REQUIRE( normalize_path("./a.txt") == cd / "a.txt" );
+    REQUIRE( normalize_path("./a.txt") == cd / "a.txt" );
+    REQUIRE( normalize_path(fs::path("..") / this_dir / "a.txt") == cd / "a.txt" );
+}
+
 TEST_CASE("path: is_subpath", "[path]") {
     REQUIRE( is_subpath("a/b/c", "a/b") );
     REQUIRE_FALSE( is_subpath("a/b/c", "b") );
