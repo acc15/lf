@@ -100,6 +100,7 @@ add_library(lf_core
     src/log/log_config.cpp
 
     # io
+    src/io/adv_fstream.hpp
     src/io/null_stream.hpp
     src/io/null_stream.cpp
     src/io/stream_type.hpp
@@ -180,6 +181,8 @@ add_executable(lf_test
     test/log/sink/rolling_file_sink.cpp
     
     test/cmd/cmd.cpp
+
+    test/io/adv_fstream.cpp
     test/io/log_tester.hpp
     test/io/log_tester.cpp
     test/io/time.cpp
@@ -187,17 +190,16 @@ add_executable(lf_test
 
     test/config/config_parser.cpp
     test/config/config.cpp
+    
     test/fs/util.cpp
     test/fs/time.cpp
-
     test/fs/serialization.cpp
+
     test/util/pick.cpp
     test/util/string.cpp
 
     test/sync/synchronizer.cpp
     test/sync/entry_synchronizer.cpp
-    
-    test/fs/adv_fstream.cpp
 )
 
 target_include_directories(lf_test PRIVATE test)

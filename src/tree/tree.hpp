@@ -16,6 +16,8 @@ namespace lf {
         using data_type = T;
         using map_type = std::map<std::string, tree>;
         using entry_ptr = typename map_type::const_pointer;
+        using map_iter = typename map_type::iterator;
+        using removal_pair = std::pair<map_type*, map_iter>;
         using node_type = tree;
 
         data_type data = {};
@@ -48,6 +50,24 @@ namespace lf {
         data_type get(const std::filesystem::path& path) const {
             const tree* e = node(path);
             return e != nullptr ? e->data : data_type {};
+        }
+
+        bool move(const std::filesystem::path& src, const std::filesystem::path& dst) {
+            namespace fs = std::filesystem;
+
+            removal_pair removal;
+            node_type* node = this;
+            for (const fs::path& el: src) {
+                const auto it = node->entries.find(el.string());
+                if (it == node->entries.end()) {
+                    return false;
+                }
+                removal = std::make_pair(&node->entries, it);
+                node = &it->second;
+            }
+           
+            
+            return false;
         }
 
         bool set(const data_type& other, bool remove_children = false) {

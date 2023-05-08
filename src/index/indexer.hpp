@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "config/config.hpp"
-#include "fs/adv_fstream.hpp"
+#include "io/adv_fstream.hpp"
 #include "index/index.hpp"
 
 namespace lf {

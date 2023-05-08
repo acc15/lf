@@ -13,8 +13,8 @@
 #include "io/log_tester.hpp"
 
 using namespace lf;
-using namespace std::filesystem;
 
+namespace fs = std::filesystem;
 const state test_tree = { false, {
     { "a", state { false, {
         { "01.json", state { false } }, 
@@ -50,7 +50,7 @@ const state test_tree = { false, {
     }}}
 }};
 
-const path test_index_path = "b/03.sql";
+const fs::path test_index_path = "b/03.sql";
 
 TEST_CASE("tree: print", "[tree]") {
     std::stringstream ss;
@@ -123,7 +123,7 @@ TEST_CASE("tree: set update flags", "[tree]") {
 }
 
 TEST_CASE("tree: serialization", "[tree]") {
-    const path path = temp_directory_path() / "tree_serialization_test.lf";
+    const fs::path path = fs::temp_directory_path() / "tree_serialization_test.lf";
     
     std::fstream file(path, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc );
     REQUIRE( file << write_as<tree_binary_format>(test_tree) );
@@ -208,7 +208,7 @@ TEST_CASE("tree: set must keep node with default", "[tree]") {
 TEST_CASE("tree: set must preserve adjanced entries when removing redunant entries", "[tree]") {
     state tree;
 
-    const path adjanced_path = test_index_path.parent_path() / "x.jpg";
+    const fs::path adjanced_path = test_index_path.parent_path() / "x.jpg";
 
     CHECK( tree.set(test_index_path, true) );
     CHECK( tree.set(adjanced_path, true) );
@@ -219,8 +219,8 @@ TEST_CASE("tree: set must preserve adjanced entries when removing redunant entri
 }
 
 TEST_CASE("tree: set must keep entries with children", "[tree]") {
-    const path intermediate_path = "a/b";
-    const path nested_path = intermediate_path / "c/test.yaml";
+    const fs::path intermediate_path = "a/b";
+    const fs::path nested_path = intermediate_path / "c/test.yaml";
 
     state tree;
     CHECK( tree.set(intermediate_path, true) );
@@ -234,8 +234,8 @@ TEST_CASE("tree: set must keep entries with children", "[tree]") {
 
 TEST_CASE("tree: remove", "[tree]") {
     
-    const path intermediate_path = "a/b";
-    const path nested_path = intermediate_path / "c/test.yaml";
+    const fs::path intermediate_path = "a/b";
+    const fs::path nested_path = intermediate_path / "c/test.yaml";
 
     state tree;
     CHECK( tree.set(intermediate_path, true) );
@@ -250,7 +250,7 @@ TEST_CASE("tree: remove", "[tree]") {
 
 TEST_CASE("tree: set must return false when not modified", "[tree]") {
 
-    const path path = "a/b/c";
+    const fs::path path = "a/b/c";
     
     state tree;
     REQUIRE( tree.set(path, true) );
@@ -261,7 +261,7 @@ TEST_CASE("tree: set must return false when not modified", "[tree]") {
 }
 
 TEST_CASE("tree: remove if empty", "[tree]") {
-    const path path = "a/b/c";
+    const fs::path path = "a/b/c";
 
     state tree;
     CHECK( tree.set(path, true) );
@@ -270,7 +270,7 @@ TEST_CASE("tree: remove if empty", "[tree]") {
 }
 
 TEST_CASE("tree: remove if empty must set default value", "[tree]") {
-    const path path = "a/b/c";
+    const fs::path path = "a/b/c";
 
     state tree;
     CHECK( tree.set(path, true) );
@@ -284,9 +284,9 @@ TEST_CASE("tree: remove if empty must set default value", "[tree]") {
 
 TEST_CASE("tree: must keep unspecified inside recursive and shallow", "[tree]") {
 
-    const path common = "a/b";
-    const path p1 = common / "c";
-    const path p2 = common / "d";
+    const fs::path common = "a/b";
+    const fs::path p1 = common / "c";
+    const fs::path p2 = common / "d";
 
     lf::index index;
     CHECK( index.set(common, sync_mode::RECURSIVE) );
@@ -304,12 +304,42 @@ TEST_CASE("tree: must keep unspecified inside recursive and shallow", "[tree]") 
 
 }
 
+TEST_CASE("tree: data move", "[tree]") {
+
+    lf::index a = { 
+        sync_mode::RECURSIVE, {
+            {"a", {sync_mode::IGNORE}}, 
+            {"test.txt", {sync_mode::SHALLOW}}
+        }
+    };
+
+    lf::index b = std::move(a);
+    REQUIRE(a.entries.empty());
+    REQUIRE(b.data == sync_mode::RECURSIVE);
+    REQUIRE(b.entries.size() == 2);
+
+}
+
 TEST_CASE("tree: move", "[tree]") {
 
     lf::index index;
-    index.set("a/b/c.txt", sync_mode::SHALLOW);
+
+    fs::path src = fs::path("a") / "b" / "c";
+    fs::path dst = fs::path("x");
+
+    index.set(src.parent_path().parent_path(), sync_mode::RECURSIVE);
+    index.set(src.parent_path(), sync_mode::IGNORE);
+    index.set(src, sync_mode::SHALLOW);
+
+    CHECK( index.move(src.parent_path().parent_path(), dst) );
 
     // CHECK( index.move("a/b/c.txt", "x/y/z.txt") );
-    REQUIRE( index.get("a/b/c.txt") == sync_mode::NONE );
-    REQUIRE( index.get("x/y/z.txt") == sync_mode::SHALLOW );
+    REQUIRE( index.node(src) == nullptr );
+    
+    const auto node = index.node("x");
+    REQUIRE( node != nullptr );
+    REQUIRE( node->data == sync_mode::RECURSIVE );
+    REQUIRE( node->entries["b"].data == sync_mode::IGNORE );
+    REQUIRE( node->entries["b"].entries["c"].data == sync_mode::SHALLOW );
+
 }
