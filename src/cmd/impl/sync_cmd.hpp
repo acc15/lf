@@ -13,7 +13,7 @@ namespace lf {
     
     public:
         sync_cmd();
-        bool run(const opt_map& params) const override;
+        bool run(cmd_context& ctx) const override;
     };
 
 }

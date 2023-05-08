@@ -73,7 +73,7 @@ TEST_CASE("synchronizer: file added", "[synchronizer]") {
     
     const config config = make_sync(local);
     const auto [l, r] = make_paths(config, test_deep_path, local);
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
     index.set(test_deep_path, sync_mode::SHALLOW);
 
@@ -98,7 +98,7 @@ TEST_CASE("synchronizer: file deleted", "[synchronizer]") {
     const config config = make_sync(local);
     const auto [l, r] = make_paths(config, test_path, local);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     write_test_file(l);
@@ -124,7 +124,7 @@ TEST_CASE("synchronizer: file updated", "[synchronizer]") {
     const config config = make_sync(local);
     const auto [l, r] = make_paths(config, test_path, local);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     write_text(l, test_content);
@@ -149,8 +149,12 @@ TEST_CASE("synchronizer: file updated", "[synchronizer]") {
 TEST_CASE("synchronizer: file removed from index (ignored)", "[synchronizer]") {
     const auto config = make_sync();
     const auto [l, r] = make_paths(config, test_path);
-    lf::index index = { sync_mode::NONE, {{test_path.string(), {sync_mode::IGNORE}}}};  
-    lf::tracked_state state = lf::state { false, {{test_path.string(), {true}}} };
+    
+    lf::tracked_index index; 
+    index.set(test_path, sync_mode::IGNORE);
+    
+    lf::tracked_state state;
+    state.set(test_path, true);
 
     write_test_file(l);
     write_test_file(r);
@@ -175,15 +179,16 @@ TEST_CASE("synchronizer: can update file timestamp", "[synchronizer]") {
 TEST_CASE("synchronizer: local shallow dir to remote", "[synchronizer]") {
 
     config config = make_sync();
-    lf::index index;
+    
+    lf::tracked_index index;
+    index.set("a", sync_mode::SHALLOW);
+    index.set(fs::path("a") / "a.txt", sync_mode::IGNORE);
+
     lf::tracked_state state;
 
     write_test_file(config.local / "a" / "a.txt");
     write_test_file(config.local / "a" / "b.txt");
     write_test_file(config.local / "a" / "c.txt");
-
-    index.set("a", sync_mode::SHALLOW);
-    index.set(fs::path("a") / "a.txt", sync_mode::IGNORE);
 
     synchronizer s(config, index, state);
     s.run();
@@ -202,9 +207,9 @@ TEST_CASE("synchronizer: update shallow dir file", "[synchronizer]") {
 
     config config = make_sync();
     const auto [l, r] = make_paths(config, test_deep_path);
-    lf::index index;
+    
+    lf::tracked_index index;
     lf::tracked_state state;
-
 
     write_test_file(l);
     write_text(r, "abc\n");
@@ -224,7 +229,7 @@ TEST_CASE("synchronizer: update shallow dir file", "[synchronizer]") {
 TEST_CASE("synchronizer: delete shallow dir file", "[synchronizer]") {
 
     config config = make_sync();
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     const fs::path a = fs::path("dir") / "a.txt";
@@ -256,10 +261,10 @@ TEST_CASE("synchronizer: file to dir", "[synchronizer]") {
     bool local = GENERATE(true, false);
     INFO( test_direction(local) );
     
-    config config = make_sync(local);
+    const config config = make_sync(local);
     const auto [l, r] = make_paths(config, test_path, local);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     write_test_file(l);
@@ -285,7 +290,7 @@ TEST_CASE("synchronizer: dir to file", "[synchronizer]") {
     const config config = make_sync(local);
     const auto [l, r] = make_paths(config, test_path, local);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     write_test_file(l / "x.txt");
@@ -311,7 +316,7 @@ TEST_CASE("synchronizer: nested file must override file", "[synchronizer]") {
     const config config = make_sync(local);
     const auto [l, r] = make_paths(config, test_deep_path, local);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     write_test_file(l);
@@ -330,7 +335,7 @@ TEST_CASE("synchronizer: nested file must override file", "[synchronizer]") {
 TEST_CASE("synchronizer: must delete empty local and remote directories and remote files", "[synchronizer]") {
     
     const config config = make_sync();
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     const auto [l, r] = make_paths(config);
@@ -361,7 +366,7 @@ TEST_CASE("synchronizer: must keep local IGNORE file", "[synchronizer]") {
     const config config = make_sync();
     const auto [l, r] = make_paths(config, test_deep_path);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
     index.set(test_deep_path.parent_path(), sync_mode::RECURSIVE);
     index.set(test_deep_path, sync_mode::IGNORE);
@@ -385,7 +390,7 @@ TEST_CASE("synchronizer: must sync permissions", "[synchronizer]") {
     const config config = make_sync();
     const auto [l, r] = make_paths(config, test_path);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     index.set(test_path, sync_mode::SHALLOW);
@@ -415,7 +420,9 @@ TEST_CASE("synchronizer: not synced, but local and remote are same", "[synchroni
     config config = make_sync();
     const auto [l, r] = make_paths(config, test_path);
 
-    lf::index index = { sync_mode::NONE, { { test_path.string(), { sync_mode::SHALLOW } }} };
+    lf::tracked_index index;
+    index.set(test_path, sync_mode::SHALLOW);
+    
     lf::tracked_state state;
 
     write_text(l, test_content);
@@ -438,7 +445,7 @@ TEST_CASE("synchronizer: remote file deleted, index deleted, local synced - must
 
     write_test_file(l);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
     state.set(test_path, true);
 
@@ -459,7 +466,7 @@ TEST_CASE("synchronizer: remote dir, local synced file - must delete local file"
     fs::create_directories(r);
     write_test_file(l);
 
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
     state.set(test_path, true);
 
@@ -482,7 +489,7 @@ TEST_CASE("synchronizer: recursive, must keep local ignored dir", "[synchronizer
     const fs::path ignored_path = root_path / "b";
     const fs::path ignored_file = ignored_path /  "c.txt";
 
-    lf::index index;
+    lf::tracked_index index;
     index.set(root_path, sync_mode::RECURSIVE);
     index.set(ignored_path, sync_mode::IGNORE);
 
@@ -516,7 +523,7 @@ TEST_CASE("synchronizer: must inherit IGNORE mode if NONE in index", "[synchroni
     const fs::path intermediate_dir = root_dir / "b";
     const fs::path shallow_sync_file = intermediate_dir / "test.txt";
 
-    lf::index index;
+    lf::tracked_index index;
     index.set(root_dir, sync_mode::IGNORE);
     index.set(shallow_sync_file, sync_mode::SHALLOW);
 
@@ -545,7 +552,7 @@ TEST_CASE("synchronizer: must inherit RECURSIVE mode if NONE in index", "[synchr
     const fs::path ignore_dir = intermediate_dir / "c";
     const fs::path recursive_sync_file = intermediate_dir / "test.txt";
 
-    lf::index index;
+    lf::tracked_index index;
     index.set(root_dir, sync_mode::RECURSIVE);
     index.set(ignore_dir, sync_mode::IGNORE);
 

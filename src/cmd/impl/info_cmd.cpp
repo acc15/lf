@@ -15,12 +15,11 @@ namespace lf {
     ) {
     }
     
-    bool info_cmd::run(const opt_map& params) const {
-        const config cfg = config::load();
-        if (params.has("state")) {
-            print_tree<state>(cfg.state);
+    bool info_cmd::run(cmd_context& ctx) const {
+        if (ctx.opts.has("state")) {
+            std::cout << ctx.state.get_or_load().root;
         } else {
-            print_tree<index>(cfg.index);
+            std::cout << ctx.index.get_or_load().root;
         }
         return true;
     }

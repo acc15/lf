@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    synchronizer::synchronizer(const lf::config& config, const lf::index& index, tracked_state& state): 
+    synchronizer::synchronizer(const lf::config& config, tracked_index& index, tracked_state& state): 
         config(config), 
         index(index), 
         state(state)
@@ -17,7 +17,7 @@ namespace lf {
     }
 
     void synchronizer::run() {
-        queue = { sync_item { fs::path(), index.data, false } };
+        queue = { sync_item { fs::path(), index.root.data, false } };
         while (!queue.empty()) {
             const sync_item item = std::move(queue.back());
             queue.pop_back();

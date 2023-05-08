@@ -21,6 +21,18 @@ TEST_CASE("path: normalize_path", "[path]") {
     REQUIRE( normalize_path(fs::path("..") / this_dir / "a.txt") == cd / "a.txt" );
 }
 
+TEST_CASE("path: relative_path", "[path]") {
+
+    const fs::path root_path = fs::path("a");
+    const fs::path test_path = root_path / "b" / "c";
+
+    REQUIRE( relative_path("", "") == "" );
+    REQUIRE( relative_path(test_path, root_path) == fs::path("b") / "c" );
+    REQUIRE( relative_path(test_path, fs::path("x") / "y" / "z") == test_path );
+    
+}
+
+
 TEST_CASE("path: is_subpath", "[path]") {
     REQUIRE( is_subpath("a/b/c", "a/b") );
     REQUIRE_FALSE( is_subpath("a/b/c", "b") );

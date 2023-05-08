@@ -19,8 +19,8 @@ namespace lf {
         {T::name} -> std::convertible_to<std::string_view>;
     };
 
-    constexpr std::ios_base::openmode OPEN_READ_LOCK = std::ios_base::in | std::ios_base::out;
-    constexpr std::ios_base::openmode OPEN_READ_WRITE_LOCK = std::ios_base::in 
+    const std::ios_base::openmode OPEN_READ_LOCK = std::ios_base::in | std::ios_base::out;
+    const std::ios_base::openmode OPEN_READ_WRITE_LOCK = std::ios_base::in 
         | std::ios_base::out 
         | std::ios_base::app 
         | std::ios_base::ate;

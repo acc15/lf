@@ -6,6 +6,7 @@
 #include <ostream>
 
 #include "opts/opts.hpp"
+#include "cmd/cmd_context.hpp"
 
 namespace lf {
 
@@ -19,7 +20,7 @@ namespace lf {
         );
 
         virtual ~cmd() = default;
-        virtual bool run(const opt_map& opts) const = 0;
+        virtual bool run(cmd_context& ctx) const = 0;
 
         std::vector<std::string_view> names;
         std::string_view description;

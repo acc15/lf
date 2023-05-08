@@ -46,8 +46,6 @@ add_library(lf_core
     src/index/sync_mode.cpp
     src/index/index.hpp
     src/index/index.cpp
-    src/index/indexer.hpp
-    src/index/indexer.cpp
 
     # state
     src/state/state.hpp
@@ -175,6 +173,8 @@ add_executable(lf_test
     test/unicode/unicode.cpp
 
     test/tree/tree.cpp
+    test/tree/tree_loader.cpp
+
     test/opts/opts.cpp
 
     test/log/sink/rolling_file_info.cpp

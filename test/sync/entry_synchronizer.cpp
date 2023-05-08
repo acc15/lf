@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 TEST_CASE("entry_synchronizer: create_dir_if_not_exists", "[entry_synchronizer]") {
     
     config config;
-    lf::index index;
+    lf::tracked_index index;
     lf::tracked_state state;
 
     synchronizer s(config, index, state);

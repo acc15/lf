@@ -52,7 +52,16 @@ namespace lf {
 
         const cmd& cmd = *it->second;
         const opt_map opts = cmd.opts.parse(args.subspan(1));
-        return cmd.run(opts) ? 0 : 1;
+        const config cfg = config::load();
+
+        cmd_context ctx = { 
+            opts, 
+            cfg, 
+            tree_loader<lf::index>(cfg.index), 
+            tree_loader<lf::state>(cfg.state) 
+        };
+        
+        return cmd.run(ctx) ? 0 : 1;
     }
 
     std::ostream& operator<<(std::ostream& s, const cmd_registry& r) {

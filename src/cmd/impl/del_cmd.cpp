@@ -1,7 +1,6 @@
 #include <filesystem>
 
 #include "cmd/impl/del_cmd.hpp"
-#include "index/indexer.hpp"
 
 namespace fs = std::filesystem;
 
@@ -18,23 +17,23 @@ namespace lf {
     ) {
     }
 
-    bool del_cmd::run(const opt_map& params) const {
-        indexer indexer;
-        for (const auto p: params[""]) {
-            const auto path = indexer.resolve(p);
-            if (!path.has_value()) {
-                continue;
+    bool del_cmd::run(cmd_context& ctx) const {
+        
+        tracked_index& index = ctx.index.get_or_load();
+        for (const auto p: ctx.opts[""]) {
+            // TODO handle errors
+            const fs::path full_path = normalize_path(p);
+            const fs::path index_path = relative_path(full_path, ctx.config.local);
+            if (ctx.opts.has("force")) {
+                fs::remove_all(full_path);
             }
-            if (params.has("force")) {
-                fs::remove_all(path->abs);
-            }
-            if (params.has("soft")) {
-                indexer.set(path->index, sync_mode::IGNORE);
+            if (ctx.opts.has("soft")) {
+                index.set(index_path, sync_mode::IGNORE);
             } else {
-                indexer.remove(path->index);
+                index.remove(index_path);
             }
         }
-        return indexer.save_changes();
+        return true;
     }
 
 }

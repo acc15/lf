@@ -1,5 +1,4 @@
 #include "cmd/impl/add_cmd.hpp"
-#include "index/indexer.hpp"
 
 namespace lf {
 
@@ -15,11 +14,16 @@ namespace lf {
     ) {
     }
 
-    bool add_cmd::run(const opt_map& params) const {
-        indexer indexer;
-        indexer.set_batch(params["shallow"], sync_mode::SHALLOW);
-        indexer.set_batch(params["recursive"], sync_mode::RECURSIVE);
-        return indexer.save_changes();
+    bool add_cmd::run(cmd_context& ctx) const {
+        tracked_index& index = ctx.index.get_or_load();
+        // TODO handle errors
+        for (const auto shallow_path: ctx.opts["shallow"]) {
+            index.set(relative_path(normalize_path(shallow_path), ctx.config.local), sync_mode::SHALLOW);
+        }
+        for (const auto recursive_path: ctx.opts["recursive"]) {
+            index.set(relative_path(normalize_path(recursive_path), ctx.config.local), sync_mode::RECURSIVE);
+        }
+        return true;
     }
 
 }
