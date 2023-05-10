@@ -47,4 +47,32 @@ namespace lf {
         return buf.str();
     }
 
+    config make_test_config(const fs::path& suffix) {
+        const auto test_dir = create_temp_test_dir(suffix);
+        const auto local = test_dir / "local";
+        const auto remote = test_dir / "remote";
+        fs::create_directories(local);
+        fs::create_directories(remote);
+        return config {
+            .local = local,
+            .remote = remote,
+            .state = local / "lf.state",
+            .index = remote / "lf.index"
+        };
+    }
+
+    cmd_context make_test_cmd_context(
+        const config& cfg,
+        const opt_map::map_type& opts,         
+        const lf::index& index,
+        const lf::state& state
+    ) {
+        return cmd_context {
+            opt_map(opts), 
+            cfg, 
+            lazy_tree<lf::index>(cfg.index, index),
+            lazy_tree<lf::state>(cfg.state, state),
+        };
+    }
+
 }

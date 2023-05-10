@@ -11,6 +11,7 @@ namespace lf {
         using vec_type = std::vector<std::string_view>; 
         using map_type = std::unordered_map<std::string_view, vec_type>;
 
+        opt_map(const map_type& map);
         explicit opt_map(map_type&& map);
 
         bool has(std::string_view name) const;

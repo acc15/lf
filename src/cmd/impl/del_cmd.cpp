@@ -18,7 +18,6 @@ namespace lf {
     }
 
     bool del_cmd::run(cmd_context& ctx) const {
-        
         bool ok = true;
         for (const auto p: ctx.opts[""]) {
             const auto pi = make_rel_path_info(p, ctx.config.local);

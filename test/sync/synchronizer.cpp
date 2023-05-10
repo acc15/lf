@@ -12,23 +12,9 @@ namespace fs = std::filesystem;
 using namespace lf;
 
 config make_sync(std::optional<bool> local_to_remote = std::nullopt) {
-
-    fs::path dest_test_dir = create_temp_test_dir(local_to_remote.has_value() 
+    return make_test_config(local_to_remote.has_value() 
         ? (local_to_remote ? "l2r" : "r2l") 
         : fs::path());
-
-    fs::path local = dest_test_dir / "local";
-    fs::path remote = dest_test_dir / "remote";
-
-    fs::create_directories(local);
-    fs::create_directories(remote);
-
-    return {
-        .local = local,
-        .remote = remote,
-        .state = fs::path(),
-        .index = fs::path()
-    };
 }
 
 const fs::path& pick_path(const config& config, bool local) {

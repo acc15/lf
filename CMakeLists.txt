@@ -181,6 +181,7 @@ add_executable(lf_test
     test/log/sink/rolling_file_sink.cpp
     
     test/cmd/cmd.cpp
+    test/cmd/impl/del_cmd.cpp
 
     test/io/adv_fstream.cpp
     test/io/log_tester.hpp
