@@ -36,6 +36,29 @@ namespace lf {
         return subpath(pi, path.end());
     }
 
+    std::optional<rel_path_info> make_rel_path_info(const fs::path& path, const fs::path& base) {
+        fs::path abs;
+        try {
+            abs = absolute_path(path);
+        } catch (const fs::filesystem_error& ex) {
+            log.error() && log() 
+                << "unable to make absolute path from " << path 
+                << ", error: " << ex.what() 
+                << log::end;
+            return std::nullopt;
+        }
+        const auto rel = relative_path(abs, base);
+        if (!rel) {
+            log.error() && log()
+                << "path " << abs 
+                << " is outside of base directory " << base 
+                << log::end;
+            return std::nullopt;
+        }
+        return rel_path_info { abs, *rel };
+    }
+
+
     fs::path join_path(const fs::path& path, const fs::path& rel) {
         return rel.empty() ? path : path / rel;
     }
@@ -50,17 +73,17 @@ namespace lf {
         fs::last_write_time(dst, src_time);
     }
 
-    std::filesystem::filesystem_error make_fs_error(const std::string& what, const std::filesystem::path& path) {
+    fs::filesystem_error make_fs_error(const std::string& what, const fs::path& path) {
         std::error_code ec(errno, std::iostream_category());
-        return std::filesystem::filesystem_error(what, path, ec);
+        return fs::filesystem_error(what, path, ec);
     }
 
-    void throw_fs_error(const std::string& what, const std::filesystem::path& path) {
+    void throw_fs_error(const std::string& what, const fs::path& path) {
         throw make_fs_error(what, path);
     }
 
-    void throw_fs_error_if_exists(const std::string& what, const std::filesystem::path& path) {
-        std::filesystem::filesystem_error err = make_fs_error(what, path);
+    void throw_fs_error_if_exists(const std::string& what, const fs::path& path) {
+        fs::filesystem_error err = make_fs_error(what, path);
         if (err.code().value() != ENOENT) {
             throw err;
         }

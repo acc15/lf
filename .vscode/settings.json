@@ -3,7 +3,7 @@
         "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
     },
     "cmake.debugConfig": {
-        "args": ["[path]"]
+        "args": ["[lazy_tree]"]
     },
     "cmake.environment": {
         "LF_LEVEL": "INFO"

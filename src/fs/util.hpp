@@ -17,6 +17,16 @@ namespace lf {
         const std::filesystem::path& base
     );
 
+    struct rel_path_info {
+        std::filesystem::path abs;
+        std::filesystem::path rel;
+    };
+
+    std::optional<rel_path_info> make_rel_path_info(
+        const std::filesystem::path& path, 
+        const std::filesystem::path& base
+    );
+
     bool create_parent_dirs(const std::filesystem::path& path);
     std::filesystem::path join_path(const std::filesystem::path& path, const std::filesystem::path& rel);
     void copy_file_with_timestamp(const std::filesystem::path& src, const std::filesystem::path& dst);

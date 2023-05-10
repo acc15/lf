@@ -16,7 +16,8 @@ namespace lf {
     ) {}
 
     bool sync_cmd::run(cmd_context& ctx) const {
-        synchronizer(ctx.config, ctx.index.get_or_load(), ctx.state.get_or_load()).run();
+        synchronizer s(ctx.config, *ctx.index, *ctx.state);
+        s.run();
         return true;
     }
 

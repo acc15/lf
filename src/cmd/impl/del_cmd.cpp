@@ -19,24 +19,23 @@ namespace lf {
 
     bool del_cmd::run(cmd_context& ctx) const {
         
-        tracked_index& index = ctx.index.get_or_load();
+        bool ok = true;
         for (const auto p: ctx.opts[""]) {
-            // TODO handle errors
-            const auto full_path = absolute_path(p);
-            const auto index_path = relative_path(full_path, ctx.config.local);
-            if (!index_path.has_value()) {
+            const auto pi = make_rel_path_info(p, ctx.config.local);
+            if (!pi) {
+                ok = false;
                 continue;
             }
             if (ctx.opts.has("force")) {
-                fs::remove_all(full_path);
+                fs::remove_all(pi->abs);
             }
             if (ctx.opts.has("soft")) {
-                index.set(index_path.value(), sync_mode::IGNORE);
+                ctx.index->set(pi->rel, sync_mode::IGNORE);
             } else {
-                index.remove(index_path.value());
+                ctx.index->remove(pi->rel);
             }
         }
-        return true;
+        return ok;
     }
 
 }

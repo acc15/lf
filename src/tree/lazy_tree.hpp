@@ -35,16 +35,19 @@ namespace lf {
         lazy_tree(const std::filesystem::path& path, const Tree& init): path(path), value(init) {}
         ~lazy_tree() { save_if_changed(); }
  
-        tree_type& get_or_load() {
-            if (value.has_value()) {
-                return value.value();
+        tree_type& operator*() {
+            if (!value) {
+                value = tree_type {};
+                load_tree(value->root);
             }
-            value = tree_type {};
-            load_tree(value->root);
-            return value.value();
+            return *value;
         }
 
-        bool close() {
+        tree_type* operator->() {
+            return &operator*();
+        }
+
+        bool save_and_close() {
             bool saved = save_if_changed();
             file.close();
             return saved;

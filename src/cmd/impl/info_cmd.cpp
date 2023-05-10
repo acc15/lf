@@ -17,9 +17,9 @@ namespace lf {
     
     bool info_cmd::run(cmd_context& ctx) const {
         if (ctx.opts.has("state")) {
-            std::cout << ctx.state.get_or_load().root;
+            std::cout << ctx.state->root;
         } else {
-            std::cout << ctx.index.get_or_load().root;
+            std::cout << ctx.index->root;
         }
         return true;
     }
