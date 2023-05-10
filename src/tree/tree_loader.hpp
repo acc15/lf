@@ -6,6 +6,8 @@
 #include "io/adv_fstream.hpp"
 #include "tree/tracked_tree.hpp"
 
+
+// TODO rename lazy_tree
 namespace lf {
 
     template <serializable_tree_type Tree>
@@ -34,7 +36,7 @@ namespace lf {
         tree_loader(const std::filesystem::path& path): path(path) {}
         tree_loader(const std::filesystem::path& path, const Tree& init): path(path), value(init) {}
         ~tree_loader() { save_if_changed(); }
-
+ //TODO make as operator*, operator->
         tree_type& get_or_load() {
             if (value.has_value()) {
                 return value.value();
