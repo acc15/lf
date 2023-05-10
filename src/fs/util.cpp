@@ -73,6 +73,13 @@ namespace lf {
         fs::last_write_time(dst, src_time);
     }
 
+    bool move_path(const std::filesystem::path& src, const std::filesystem::path& dst) {
+        
+        const fs::path target = fs::is_directory(dst) ? dst / src.filename() : dst;
+        return false;
+
+    }
+
     fs::filesystem_error make_fs_error(const std::string& what, const fs::path& path) {
         std::error_code ec(errno, std::iostream_category());
         return fs::filesystem_error(what, path, ec);

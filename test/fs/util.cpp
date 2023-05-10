@@ -27,8 +27,8 @@ TEST_CASE("path: relative_path", "[path]") {
 
     REQUIRE( relative_path("", "") == "" );
     REQUIRE( relative_path(root_path / test_path, root_path) == test_path );
-    REQUIRE_FALSE( relative_path(test_path, fs::current_path()) == test_path );
-    REQUIRE_FALSE( relative_path(test_path, fs::path("x") / "y" / "z").has_value() );
+    REQUIRE_FALSE( relative_path(test_path, fs::current_path()) );
+    REQUIRE_FALSE( relative_path(test_path, fs::path("x") / "y" / "z") );
 }
 
 TEST_CASE("path: is_subpath", "[path]") {
