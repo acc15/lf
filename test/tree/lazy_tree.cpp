@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "tree/tree_loader.hpp"
+#include "tree/lazy_tree.hpp"
 #include "index/index.hpp"
 #include "test_util.hpp"
 
@@ -8,13 +8,13 @@ using namespace lf;
 
 namespace fs = std::filesystem;
 
-TEST_CASE("must not open file and use model when init provided", "[tree_loader]") {
-    tree_loader<lf::index> index("a.index", lf::index { sync_mode::RECURSIVE });
+TEST_CASE("lazy_tree: must not open file and use model when init provided", "[lazy_tree]") {
+    lazy_tree<lf::index> index("a.index", lf::index { sync_mode::RECURSIVE });
     REQUIRE( index.get_or_load().root.data == sync_mode::RECURSIVE );
     REQUIRE_FALSE( index.save_if_changed() );
 }
 
-TEST_CASE("must load index from file", "[tree_loader]") {
+TEST_CASE("lazy_tree: must load index from file", "[lazy_tree]") {
 
     const fs::path test_dir = create_temp_test_dir();
     const fs::path index_file = test_dir / "test.index";
@@ -30,7 +30,7 @@ TEST_CASE("must load index from file", "[tree_loader]") {
     expect.set(ignore_dir, sync_mode::IGNORE);
     save_file<tree_binary_format>(index_file, expect);
 
-    tree_loader<lf::index> load_index(index_file);
+    lazy_tree<lf::index> load_index(index_file);
 
     lf::index& actual = load_index.get_or_load().root;
     REQUIRE( actual.data == expect.data );
@@ -40,14 +40,14 @@ TEST_CASE("must load index from file", "[tree_loader]") {
 
 }
 
-TEST_CASE("must save index on change", "[tree_loader]") {
+TEST_CASE("lazy_tree: must save index on change", "[lazy_tree]") {
 
     const fs::path test_dir = create_temp_test_dir();
     const fs::path index_file = test_dir / "test.index";
 
     const fs::path recursive_dir = fs::path("a") / "b" / "c";
 
-    tree_loader<lf::index> load_index(index_file);
+    lazy_tree<lf::index> load_index(index_file);
     load_index.get_or_load().set(recursive_dir, sync_mode::RECURSIVE);
     REQUIRE( load_index.close() );
 

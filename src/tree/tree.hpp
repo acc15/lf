@@ -23,11 +23,7 @@ namespace lf {
         data_type data = {};
         map_type entries = {};
 
-        bool empty() const {
-            return entries.empty();
-        }
-
-        tree* node(const std::filesystem::path& path) {
+        tree* node(const std::filesystem::path& path = std::filesystem::path()) {
             tree* e = this;
             for (const auto& el: path) {
                 const auto it = e->entries.find(el.string());
@@ -39,12 +35,8 @@ namespace lf {
             return e;
         }
 
-        const tree* node(const std::filesystem::path& path) const {
+        const tree* node(const std::filesystem::path& path = std::filesystem::path()) const {
             return const_cast<tree*>(this)->node(path);
-        }
-
-        data_type get() const {
-            return data;
         }
 
         data_type get(const std::filesystem::path& path) const {
@@ -65,30 +57,12 @@ namespace lf {
                 removal = std::make_pair(&node->entries, it);
                 node = &it->second;
             }
-           
-            
             return false;
         }
 
-        bool set(const data_type& other, bool remove_children = false) {
-            bool modified = false;
-            if (data != other) {
-                data = other;
-                modified = true;
-            }
-            if (remove_children && !entries.empty()) {
-                entries.clear();
-                modified = true;
-            }
-            return modified;
-        }
-
         bool set(const std::filesystem::path& path, const T& new_data, bool remove_children = false) {
-            if (path.empty()) {
-                return set(new_data, remove_children);
-            }
-
             bool modified = false;
+
             tree* n = this;
             for (const std::filesystem::path& el: path) {
                 const auto r = n->entries.emplace(std::move(el.string()), tree {});
@@ -97,32 +71,40 @@ namespace lf {
                 }
                 n = &r.first->second;
             }
-            modified |= n->set(new_data, remove_children);
+            if (new_data != n->data) {
+                n->data = new_data;
+                modified = true;
+            }
+            if (remove_children && !n->entries.empty()) {
+                entries.clear();
+                modified = true;
+            }
             return modified;
         }
 
         bool remove(const std::filesystem::path& path, bool empty_only = false) {
-            if (path.empty()) {
-                return set(data_type {}, !empty_only);
-            }
 
-            tree* cur = this;
-            tree* removal = nullptr;
-            typename map_type::iterator remove_iter;
-            for (const std::filesystem::path& el: path) {
-                remove_iter = cur->entries.find(el.string());
-                if (remove_iter == cur->entries.end()) {
+            tree* n = this;
+
+            removal_pair removal = std::make_pair(nullptr, map_iter());
+            for (const auto& el: path) {
+                removal.first = &n->entries;
+                removal.second = n->entries.find(el.string());
+                if (removal.second == n->entries.end()) {
                     return false;
                 }
-                removal = cur;
-                cur = &remove_iter->second;
+                n = &removal.second->second;
             }
 
-            if (empty_only && !cur->entries.empty()) {
-                return cur->set(data_type {}, false);
+            if (empty_only && !n->entries.empty()) {
+                if (n->data == data_type{}) {
+                    return false;
+                }
+                n->data = data_type{};
+                return true;
             }
 
-            removal->entries.erase(remove_iter);
+            removal.first->erase(removal.second);
             return true;
         }
 

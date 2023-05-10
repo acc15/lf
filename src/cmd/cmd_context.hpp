@@ -4,15 +4,15 @@
 #include "config/config.hpp"
 #include "index/index.hpp"
 #include "state/state.hpp"
-#include "tree/tree_loader.hpp"
+#include "tree/lazy_tree.hpp"
 
 namespace lf {
 
     struct cmd_context {
         const opt_map opts;
         const lf::config config;
-        tree_loader<lf::index> index;
-        tree_loader<lf::state> state;
+        lazy_tree<lf::index> index;
+        lazy_tree<lf::state> state;
     };
 
 }

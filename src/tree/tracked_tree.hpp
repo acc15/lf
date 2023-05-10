@@ -21,20 +21,8 @@ namespace lf {
         tracked_tree(): root(), changed(false) {}
         tracked_tree(const tree_type& init): root(init), changed(false) {}
 
-        bool empty() const {
-            return root.empty();
-        }
-
-        const node_type* node() const {
-            return &root;
-        }
-
         const node_type* node(const std::filesystem::path& path) const {
             return root.node(path);
-        }
-
-        data_type get() const {
-            return root.data;
         }
 
         data_type get(const std::filesystem::path& path) const {
@@ -43,10 +31,6 @@ namespace lf {
 
         void remove(const std::filesystem::path& path, bool empty_only = false) {
             changed |= root.remove(path, empty_only);
-        }
-
-        void set(const data_type& value, bool remove_children = false) {
-            changed |= root.set(value, remove_children);
         }
 
         void set(const std::filesystem::path& path, const data_type& value, bool remove_children = false) {

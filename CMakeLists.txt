@@ -173,7 +173,7 @@ add_executable(lf_test
     test/unicode/unicode.cpp
 
     test/tree/tree.cpp
-    test/tree/tree_loader.cpp
+    test/tree/lazy_tree.cpp
 
     test/opts/opts.cpp
 

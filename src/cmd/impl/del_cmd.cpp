@@ -22,15 +22,18 @@ namespace lf {
         tracked_index& index = ctx.index.get_or_load();
         for (const auto p: ctx.opts[""]) {
             // TODO handle errors
-            const fs::path full_path = normalize_path(p);
-            const fs::path index_path = relative_path(full_path, ctx.config.local);
+            const auto full_path = absolute_path(p);
+            const auto index_path = relative_path(full_path, ctx.config.local);
+            if (!index_path.has_value()) {
+                continue;
+            }
             if (ctx.opts.has("force")) {
                 fs::remove_all(full_path);
             }
             if (ctx.opts.has("soft")) {
-                index.set(index_path, sync_mode::IGNORE);
+                index.set(index_path.value(), sync_mode::IGNORE);
             } else {
-                index.remove(index_path);
+                index.remove(index_path.value());
             }
         }
         return true;

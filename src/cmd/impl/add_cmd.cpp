@@ -18,10 +18,10 @@ namespace lf {
         tracked_index& index = ctx.index.get_or_load();
         // TODO handle errors
         for (const auto shallow_path: ctx.opts["shallow"]) {
-            index.set(relative_path(normalize_path(shallow_path), ctx.config.local), sync_mode::SHALLOW);
+            index.set(relative_path(absolute_path(shallow_path), ctx.config.local).value(), sync_mode::SHALLOW);
         }
         for (const auto recursive_path: ctx.opts["recursive"]) {
-            index.set(relative_path(normalize_path(recursive_path), ctx.config.local), sync_mode::RECURSIVE);
+            index.set(relative_path(absolute_path(recursive_path), ctx.config.local).value(), sync_mode::RECURSIVE);
         }
         return true;
     }

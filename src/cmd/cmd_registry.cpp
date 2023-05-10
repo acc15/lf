@@ -57,8 +57,8 @@ namespace lf {
         cmd_context ctx = { 
             opts, 
             cfg, 
-            tree_loader<lf::index>(cfg.index), 
-            tree_loader<lf::state>(cfg.state) 
+            lazy_tree<lf::index>(cfg.index), 
+            lazy_tree<lf::state>(cfg.state) 
         };
         
         return cmd.run(ctx) ? 0 : 1;

@@ -353,8 +353,8 @@ TEST_CASE("synchronizer: must delete empty local and remote directories and remo
     synchronizer s(config, index, state);
     s.run();
 
-    REQUIRE( state.empty() );
-    REQUIRE( index.empty() );
+    REQUIRE( state.root.entries.empty() );
+    REQUIRE( index.root.entries.empty() );
 
     REQUIRE( fs::is_empty(l) ); 
     REQUIRE( fs::is_empty(r) );

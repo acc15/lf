@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <optional>
 
 #include "fs/util.hpp"
 #include "log/log.hpp"
@@ -7,22 +8,32 @@ namespace fs = std::filesystem;
 
 namespace lf {
 
-    fs::path normalize_path(const fs::path& p) {
-        fs::path path = p.empty() ? fs::current_path() : fs::absolute(p).lexically_normal();
-        return path.has_parent_path() && path.filename().empty() ? path.parent_path() : path;
-    }
-
     bool is_subpath(const fs::path& path, const fs::path& base) {
         const auto mismatch_pair = std::mismatch(path.begin(), path.end(), base.begin(), base.end());
         return mismatch_pair.second == base.end();
     }
 
-    fs::path relative_path(const fs::path& path, const fs::path& base) {
-        fs::path rel_path = path.lexically_relative(base);
-        if (rel_path == ".") {
-            rel_path.clear();
+    fs::path absolute_path(const fs::path& p) {
+        fs::path path = p.empty() ? fs::current_path() : fs::absolute(p).lexically_normal();
+        return path.has_parent_path() && path.filename().empty() ? path.parent_path() : path;
+    }
+
+    fs::path subpath(fs::path::const_iterator begin, fs::path::const_iterator end) {
+        fs::path result;
+        for (;begin != end; ++begin) {
+            result /= *begin;
         }
-        return rel_path;
+        return result;
+    }
+
+    std::optional<fs::path> relative_path(const fs::path& path, const fs::path& base) {
+        auto pi = path.begin();
+        for (auto bi = base.begin(); bi != base.end(); bi++, pi++) {
+            if (pi == path.end() || *pi != *bi) {
+                return std::nullopt;
+            }
+        }
+        return subpath(pi, path.end());
     }
 
     fs::path join_path(const fs::path& path, const fs::path& rel) {

@@ -179,10 +179,10 @@ TEST_CASE("tree: deserialize must clear entries", "[tree]") {
 
 TEST_CASE("tree: set", "[tree]") {
     state tree;
-    CHECK_FALSE( tree.set(false) );
-    REQUIRE( tree.set(true) );
-    CHECK_FALSE( tree.set(true) );
-    REQUIRE( tree.set(false) );
+    CHECK_FALSE( tree.set(fs::path(), false) );
+    REQUIRE( tree.set(fs::path(), true) );
+    CHECK_FALSE( tree.set(fs::path(), true) );
+    REQUIRE( tree.set(fs::path(), false) );
 }
 
 TEST_CASE("tree: set must create node with default", "[tree]") {
