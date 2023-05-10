@@ -7,7 +7,7 @@ namespace fs = std::filesystem;
 namespace lf {
 
     del_cmd::del_cmd(): cmd(
-        { "d", "del", "delete" }, 
+        { "d", "del", "delete", "r", "rm", "remove" }, 
         "deletes specified paths from index",
         { 
             { "force", 'F', "also deletes files/directories if exists" },
@@ -20,18 +20,18 @@ namespace lf {
     bool del_cmd::run(cmd_context& ctx) const {
         bool ok = true;
         for (const auto p: ctx.opts[""]) {
-            const auto pi = make_rel_path_info(p, ctx.config.local);
+            const auto pi = normalize_rel(p, ctx.config.local);
             if (!pi) {
                 ok = false;
                 continue;
             }
             if (ctx.opts.has("force")) {
-                fs::remove_all(pi->abs);
+                fs::remove_all(pi->first);
             }
             if (ctx.opts.has("soft")) {
-                ctx.index->set(pi->rel, sync_mode::IGNORE);
+                ctx.index->set(pi->second, sync_mode::IGNORE);
             } else {
-                ctx.index->remove(pi->rel);
+                ctx.index->remove(pi->second);
             }
         }
         return ok;

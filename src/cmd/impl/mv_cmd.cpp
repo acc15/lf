@@ -21,25 +21,45 @@ namespace lf {
     }
 
     bool mv_cmd::run(cmd_context& ctx) const {
-        /*
         const opt_map::vec_type& paths = ctx.opts[""];
         if (paths.size() % 2 != 0) {
             log.error() && log() << "invalid count of arguments - only path pairs are accepted" << log::end;
             return false;
         }
 
+        bool ok = true;
         for (auto it = paths.begin(); it != paths.end();) {
-            const auto from = i.resolve(*it);
+            const auto from = *it;
             ++it;
-            const auto to = i.resolve(*it);
+
+            const auto to = *it;
             ++it;
-            if (!from.has_value() || !to.has_value()) {
+
+            const auto move_pair = normalize_move(from, to);
+            if (!move_pair) {
+                ok = false;
                 continue;
             }
-            // TODO implement
-        }*/
 
-        return true;
+            const auto from_pi = normalize_rel(move_pair->first, ctx.config.local);
+            const auto to_pi = normalize_rel(move_pair->second, ctx.config.local);
+            if (!from_pi || !to_pi) {
+                ok = false;
+                continue;
+            }
+
+            ok &= move(ctx, *from_pi, *to_pi);
+        }
+        return ok;
+    }
+
+    bool mv_cmd::move(cmd_context& ctx, const path_pair& from, const path_pair& to) const {
+        // a/b/c -> a/b/c/d/e
+        if (ctx.opts.has("force")) {
+            move_path(from.first, to.first);
+        }
+
+        return false;
     }
 
 }

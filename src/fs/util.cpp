@@ -36,7 +36,7 @@ namespace lf {
         return subpath(pi, path.end());
     }
 
-    std::optional<rel_path_info> make_rel_path_info(const fs::path& path, const fs::path& base) {
+    std::optional<path_pair> normalize_rel(const fs::path& path, const fs::path& base) {
         fs::path abs;
         try {
             abs = absolute_path(path);
@@ -55,9 +55,40 @@ namespace lf {
                 << log::end;
             return std::nullopt;
         }
-        return rel_path_info { abs, *rel };
+        return std::make_pair(abs, *rel);
     }
 
+    std::optional<path_pair> normalize_move(
+        const std::filesystem::path& from, 
+        const std::filesystem::path& to
+    ) {
+        auto from_abs = absolute_path(from);
+        auto to_abs = absolute_path(to);
+
+        if (fs::is_directory(to_abs)) {
+            to_abs /= from_abs.filename();
+        }
+
+        if (is_subpath(to_abs, from_abs)) {
+            log.error() && log() 
+                << "can't move " << from_abs 
+                << " to subdirectory of itself " << to_abs 
+                << log::end;
+            return std::nullopt;
+        }
+
+        bool from_is_dir = fs::is_directory(from_abs);
+        bool to_is_dir = fs::is_directory(to_abs);
+        if (from_is_dir != to_is_dir) {
+            log.error() && log() 
+                << "can't move " << (from_is_dir ? "directory" : "non-directory") << " " << from_abs 
+                << " to "        << (to_is_dir ? "directory" : "non-directory") << " " << to_abs
+                << log::end;
+            return std::nullopt;
+        }
+
+        return std::make_pair(from_abs, to_abs);
+    }
 
     fs::path join_path(const fs::path& path, const fs::path& rel) {
         return rel.empty() ? path : path / rel;

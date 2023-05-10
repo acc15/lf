@@ -22,9 +22,9 @@ namespace lf {
     bool add_cmd::add_paths_to_index(cmd_context& ctx, const char* opt_name, sync_mode mode) {
         bool ok = true;
         for (const auto p: ctx.opts[opt_name]) {
-            const auto pi = make_rel_path_info(p, ctx.config.local);
+            const auto pi = normalize_rel(p, ctx.config.local);
             if (pi) {
-                ctx.index->set(pi->rel, mode);
+                ctx.index->set(pi->second, mode);
             } else {
                 ok = false;
             }
