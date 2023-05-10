@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 const auto test_path = fs::path("a") / "b" / "test.txt";
 const auto test_path2 = fs::path("x") / "y" / "z";
 
-TEST_CASE("must add paths to index", "[add_cmd]") {
+TEST_CASE("add_cmd: must add paths to index", "[add_cmd]") {
     const auto cfg = make_test_config();
 
     const auto p1 = (cfg.local / test_path).string();

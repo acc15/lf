@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 const auto test_path = fs::path("a") / "b" / "test.txt";
 const auto test_path2 = fs::path("x") / "y" / "z";
 
-TEST_CASE("must remove path from index", "[del_cmd]") {
+TEST_CASE("del_cmd: must remove path from index", "[del_cmd]") {
     const auto cfg = make_test_config();
 
     const auto p1 = (cfg.local / test_path).string();
@@ -31,7 +31,7 @@ TEST_CASE("must remove path from index", "[del_cmd]") {
     REQUIRE_FALSE( ctx.state->changed );
 }
 
-TEST_CASE("must set IGNORE if soft delete specified", "[del_cmd]") {
+TEST_CASE("del_cmd: must set IGNORE if soft delete specified", "[del_cmd]") {
     const auto cfg = make_test_config();
     const auto p1 = (cfg.local / test_path).string();
 
@@ -46,7 +46,7 @@ TEST_CASE("must set IGNORE if soft delete specified", "[del_cmd]") {
     REQUIRE(ctx.index->get(test_path) == sync_mode::IGNORE);
 }
 
-TEST_CASE("must delete file if force specified", "[del_cmd]") {
+TEST_CASE("del_cmd: must delete file if force specified", "[del_cmd]") {
     const auto cfg = make_test_config();
     const auto abs_path = cfg.local / test_path;
     
