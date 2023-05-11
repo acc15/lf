@@ -1,10 +1,7 @@
-#include <algorithm>
-
 #include "log/log_tester.hpp"
 
 #include "log/log.hpp"
 #include "log/filter/log_level_filter.hpp"
-#include "log/sink/stream_log_sink.hpp"
 
 namespace lf {
 

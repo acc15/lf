@@ -1,8 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <string>
-#include <sstream>
 
 #include "log/sink/log_sink.hpp"
 #include "log/log_level.hpp"
