@@ -6,58 +6,50 @@
 using namespace lf;
 namespace fs = std::filesystem;
 
-const auto test_path = fs::path("a") / "b" / "test.txt";
-const auto test_path2 = fs::path("x") / "y" / "z";
-
 TEST_CASE("del_cmd: must remove path from index", "[del_cmd]") {
     const auto cfg = make_test_config();
-
-    const auto p1 = (cfg.local / test_path).string();
-    const auto p2 = (cfg.local / test_path2).string();
+    cd_changer cd = cfg.local;
     
     auto index = lf::index {};
-    index.set(test_path, sync_mode::SHALLOW);
+    index.set(test_path1, sync_mode::SHALLOW);
     index.set(test_path2, sync_mode::RECURSIVE);
 
     cmd_context ctx = make_test_cmd_context(cfg, {
-        { "", { p1, p2 } }
+        { "", { test_path1_str, test_path2_str } }
     }, index);
 
-    del_cmd().run(ctx);
-
+    REQUIRE( del_cmd().run(ctx) );
     REQUIRE( ctx.index->changed );
-    REQUIRE( ctx.index->node(test_path) == nullptr );
+    REQUIRE( ctx.index->node(test_path1) == nullptr );
     REQUIRE( ctx.index->node(test_path2) == nullptr );
     REQUIRE_FALSE( ctx.state->changed );
 }
 
 TEST_CASE("del_cmd: must set IGNORE if soft delete specified", "[del_cmd]") {
     const auto cfg = make_test_config();
-    const auto p1 = (cfg.local / test_path).string();
+    cd_changer cd = cfg.local;
 
     cmd_context ctx = make_test_cmd_context(cfg, {
-        { "", { p1 } },
+        { "", { test_path1_str } },
         { "soft", {} }
     });
 
-    del_cmd().run(ctx);
-
+    REQUIRE( del_cmd().run(ctx) );
     REQUIRE(ctx.index->changed);
-    REQUIRE(ctx.index->get(test_path) == sync_mode::IGNORE);
+    REQUIRE(ctx.index->get(test_path1) == sync_mode::IGNORE);
 }
 
 TEST_CASE("del_cmd: must delete file if force specified", "[del_cmd]") {
     const auto cfg = make_test_config();
-    const auto abs_path = cfg.local / test_path;
+    cd_changer cd = cfg.local;
+
+    write_text(test_path1, "test");
     
-    write_text(abs_path, "test");
-    
-    const auto p1 = abs_path.string();
     cmd_context ctx = make_test_cmd_context(cfg, {
-        { "", { p1 } },
+        { "", { test_path1_str } },
         { "force", {} }
     });
 
     del_cmd().run(ctx);
-    REQUIRE_FALSE(fs::exists(abs_path));
+    REQUIRE_FALSE(fs::exists(test_path1));
 }

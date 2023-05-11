@@ -26,7 +26,8 @@ namespace lf {
 
     std::optional<path_pair> check_move(
         const std::filesystem::path& from, 
-        const std::filesystem::path& to
+        const std::filesystem::path& to,
+        bool fs_checks = true
     );
 
     bool create_parent_dirs(const std::filesystem::path& path);

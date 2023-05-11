@@ -1,6 +1,5 @@
 #include <catch2/interfaces/catch_interfaces_capture.hpp>
 #include "test_util.hpp"
-#include "fs/util.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -17,8 +16,11 @@ namespace lf {
     const fs::path test_root_path = "/";
 #endif
 
-    const fs::path test_sample_path = fs::path("a") / "b" / "c";
-    const fs::path test_sample_path2 = fs::path("x") / "y" / "z";
+    const fs::path test_path1 = fs::path("a") / "b" / "c";
+    const fs::path test_path2 = fs::path("x") / "y" / "z";
+
+    const std::string test_path1_str = test_path1.string();
+    const std::string test_path2_str = test_path2.string();
 
     cd_changer::cd_changer(const std::filesystem::path& p): restore_path(fs::current_path()) {
         fs::current_path(p);

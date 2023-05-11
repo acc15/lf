@@ -59,43 +59,48 @@ namespace lf {
         return std::make_pair(abs, *rel);
     }
 
-    std::optional<path_pair> check_move(
-        const std::filesystem::path& from, 
-        const std::filesystem::path& to
-    ) {
-        auto from_abs = absolute_path(from);
-        auto to_abs = absolute_path(to);
-        if (is_subpath(to_abs, from_abs)) {
-            log.error() && log() 
-                << "can't move " << from_abs 
-                << " to subdirectory of itself " << to_abs 
-                << log::end;
-            return std::nullopt;
+    bool check_move_fs(const fs::path& from, const fs::path& to) {
+        if (from == fs::current_path()) {
+            log.error() && log() << "can't move current directory " << from << log::end;
+            return false;
         }
 
-        auto from_type = fs::status(from_abs).type();
+        auto from_type = fs::status(from).type();
         if (from_type == fs::file_type::not_found) {
-            log.error() && log()
-                << "path " << from_abs << " doesn't exists, nothing to move"
-                << log::end;
-            return std::nullopt;
+            log.error() && log() << "path " << from << " doesn't exists, nothing to move" << log::end;
+            return false;
         }
 
-        if (fs::is_directory(to_abs)) {
-            to_abs /= from_abs.filename();
-        }
-
-        auto to_type = fs::status(to_abs).type();
+        auto to_type = fs::status(to).type();
         if (to_type != fs::file_type::not_found && 
             (from_type == fs::file_type::directory) != (to_type == fs::file_type::directory)
         ) {
             log.error() && log() 
-                << "can't move " << from_type << " " << from_abs 
-                << " to "        << to_type << " " << to_abs
+                << "can't move " << from_type << " " << from 
+                << " to "        << to_type << " " << to
                 << log::end;
+            return false;
+        }
+        return true;
+    }
+
+    std::optional<path_pair> check_move(
+        const fs::path& from, 
+        const fs::path& to,
+        bool fs_checks
+    ) {
+        auto from_abs = absolute_path(from);
+        auto to_abs = absolute_path(to);
+        if (is_subpath(to_abs, from_abs)) {
+            log.error() && log() << "can't move " << from_abs << " to subdirectory of itself " << to_abs << log::end;
             return std::nullopt;
         }
-
+        if (fs::is_directory(to_abs)) {
+            to_abs /= from_abs.filename();
+        }
+        if (fs_checks && !check_move_fs(from_abs, to_abs)) {
+            return std::nullopt;
+        }
         return std::make_pair(from_abs, to_abs);
     }
 

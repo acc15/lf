@@ -12,8 +12,10 @@ namespace lf {
 
     extern const std::filesystem::path test_dir_path;
     extern const std::filesystem::path test_root_path;
-    extern const std::filesystem::path test_sample_path;
-    extern const std::filesystem::path test_sample_path2;
+    extern const std::filesystem::path test_path1;
+    extern const std::filesystem::path test_path2;
+    extern const std::string test_path1_str;
+    extern const std::string test_path2_str;
 
     class cd_changer {
         std::filesystem::path restore_path;

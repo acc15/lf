@@ -55,70 +55,76 @@ TEST_CASE("path: join_path", "[path]") {
     REQUIRE( join_path("abc", "xyz") == fs::path("abc") / "xyz" );
 }
 
+TEST_CASE("path: check_move current_path to anywhere", "[path]") {
+    lf::log_tester t;
+    REQUIRE( !check_move(fs::current_path(), fs::current_path().parent_path()) );
+    REQUIRE( t.contains("current directory") );
+}
+
 TEST_CASE("path: check_move same path", "[path]") {
     lf::log_tester t;
-    REQUIRE( !check_move(test_sample_path, test_sample_path) );
+    REQUIRE( !check_move(test_path1, test_path1) );
     REQUIRE( t.contains("itself") );
 }
 
 TEST_CASE("path: check_move to itself", "[path]") {
     lf::log_tester t;
-    REQUIRE( !check_move(test_sample_path, test_sample_path / "d") );
+    REQUIRE( !check_move(test_path1, test_path1 / "d") );
     REQUIRE( t.contains("itself") );
 }
 
 TEST_CASE("path: check_move non-existent", "[path]") {
     lf::log_tester t;
-    REQUIRE( !check_move(test_sample_path, test_sample_path2) );
+    REQUIRE( !check_move(test_path1, test_path2) );
     REQUIRE( t.contains("nothing to move") );
 }
 
 TEST_CASE("path: check_move file to non-existent", "[path]") {
     lf::cd_changer cd = create_temp_test_dir();
-    write_text(test_sample_path, "abc");
+    write_text(test_path1, "abc");
 
-    const auto result = check_move(test_sample_path, test_sample_path2);
+    const auto result = check_move(test_path1, test_path2);
     REQUIRE( result );
-    REQUIRE( result->first == fs::current_path() / test_sample_path );
-    REQUIRE( result->second == fs::current_path() / test_sample_path2 );
+    REQUIRE( result->first == fs::current_path() / test_path1 );
+    REQUIRE( result->second == fs::current_path() / test_path2 );
 }
 
 TEST_CASE("path: check_move dir to non-existent", "[path]") {
     lf::cd_changer cd = create_temp_test_dir();
-    fs::create_directories(test_sample_path);
+    fs::create_directories(test_path1);
 
-    const auto result = check_move(test_sample_path, test_sample_path2);
+    const auto result = check_move(test_path1, test_path2);
     REQUIRE( result );
-    REQUIRE( result->first == fs::current_path() / test_sample_path );
-    REQUIRE( result->second == fs::current_path() / test_sample_path2 );
+    REQUIRE( result->first == fs::current_path() / test_path1 );
+    REQUIRE( result->second == fs::current_path() / test_path2 );
 }
 
 TEST_CASE("path: check_move file to dir", "[path]") {
     lf::cd_changer cd = create_temp_test_dir();
-    write_text(test_sample_path, "abc");
-    fs::create_directories(test_sample_path2);
+    write_text(test_path1, "abc");
+    fs::create_directories(test_path2);
 
-    const auto result = check_move(test_sample_path, test_sample_path2);
+    const auto result = check_move(test_path1, test_path2);
     REQUIRE( result );
-    REQUIRE( result->first == fs::current_path() / test_sample_path );
-    REQUIRE( result->second == fs::current_path() / test_sample_path2 / test_sample_path.filename() );
+    REQUIRE( result->first == fs::current_path() / test_path1 );
+    REQUIRE( result->second == fs::current_path() / test_path2 / test_path1.filename() );
 }
 
 TEST_CASE("path: check_move file over dir", "[path]") {
     lf::log_tester t;
     lf::cd_changer cd = create_temp_test_dir();
-    write_text(test_sample_path, "abc");
-    fs::create_directories(test_sample_path2 / test_sample_path.filename());
-    REQUIRE_FALSE( check_move(test_sample_path, test_sample_path2) );
+    write_text(test_path1, "abc");
+    fs::create_directories(test_path2 / test_path1.filename());
+    REQUIRE_FALSE( check_move(test_path1, test_path2) );
     REQUIRE( t.contains("can't move") );
 }
 
 TEST_CASE("path: check_move dir over file", "[path]") {
     lf::log_tester t;
     lf::cd_changer cd = create_temp_test_dir();
-    fs::create_directories(test_sample_path);
-    write_text(test_sample_path2, "abc");
-    REQUIRE_FALSE( check_move(test_sample_path, test_sample_path2) );
+    fs::create_directories(test_path1);
+    write_text(test_path2, "abc");
+    REQUIRE_FALSE( check_move(test_path1, test_path2) );
     REQUIRE( t.contains("can't move") );
 }
 

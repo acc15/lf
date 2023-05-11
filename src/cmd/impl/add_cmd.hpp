@@ -3,7 +3,8 @@
 namespace lf {
 
     class add_cmd: public cmd {
-        static bool add_paths_to_index(cmd_context& ctx, const char* opt_name, sync_mode mode);
+        static bool add_paths(cmd_context& ctx, sync_mode mode, const char* opt_name);
+        static bool add_path(cmd_context& ctx, sync_mode mode, std::string_view path);
     
     public:
         explicit add_cmd();
