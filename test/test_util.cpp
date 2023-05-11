@@ -17,6 +17,17 @@ namespace lf {
     const fs::path test_root_path = "/";
 #endif
 
+    const fs::path test_sample_path = fs::path("a") / "b" / "c";
+    const fs::path test_sample_path2 = fs::path("x") / "y" / "z";
+
+    cd_changer::cd_changer(const std::filesystem::path& p): restore_path(fs::current_path()) {
+        fs::current_path(p);
+    }
+
+    cd_changer::~cd_changer() {
+        fs::current_path(restore_path);
+    }
+
     fs::path create_temp_test_dir(const fs::path& suffix) {
         fs::path p = fs::temp_directory_path() / "lf_test" / Catch::getResultCapture().getCurrentTestName();
         if (!suffix.empty()) {

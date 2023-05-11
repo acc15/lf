@@ -12,6 +12,16 @@ namespace lf {
 
     extern const std::filesystem::path test_dir_path;
     extern const std::filesystem::path test_root_path;
+    extern const std::filesystem::path test_sample_path;
+    extern const std::filesystem::path test_sample_path2;
+
+    class cd_changer {
+        std::filesystem::path restore_path;
+    public:
+        cd_changer(const std::filesystem::path& p);
+        ~cd_changer();
+    };
+
     std::string test_root_str(std::string_view p); 
     std::filesystem::path create_temp_test_dir(const std::filesystem::path& suffix = std::filesystem::path());
     void write_text(const std::filesystem::path& path, const std::string& text);

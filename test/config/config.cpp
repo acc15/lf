@@ -8,7 +8,7 @@
 #include "io/format.hpp"
 #include "io/joiner.hpp"
 
-#include "io/log_tester.hpp"
+#include "log/log_tester.hpp"
 #include "test_util.hpp"
 
 using namespace lf;
@@ -49,9 +49,7 @@ TEST_CASE("config: parse", "[config]") {
 TEST_CASE("config: parse partial", "[config]") {
     log_tester t(INFO);
     auto p = test_parse("index=test.index\n");
-    
-    const auto msg = t.str();
-    REQUIRE(msg.find("remote") != std::string::npos);
-    REQUIRE(msg.find("local") != std::string::npos);
+    REQUIRE(t.contains("remote"));
+    REQUIRE(t.contains("local"));
 }
 

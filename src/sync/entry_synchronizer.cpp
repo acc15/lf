@@ -1,7 +1,7 @@
 #include "sync/entry_synchronizer.hpp"
 
 #include "io/time.hpp"
-#include "io/file_type.hpp"
+#include "fs/file_type.hpp"
 #include "fs/util.hpp"
 
 namespace fs = std::filesystem;

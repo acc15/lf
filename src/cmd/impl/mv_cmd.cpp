@@ -35,7 +35,7 @@ namespace lf {
             const auto to = *it;
             ++it;
 
-            const auto move_pair = normalize_move(from, to);
+            const auto move_pair = check_move(from, to);
             if (!move_pair) {
                 ok = false;
                 continue;

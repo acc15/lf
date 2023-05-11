@@ -10,7 +10,7 @@
 #include "tree/print.hpp"
 #include "tree/binary.hpp"
 
-#include "io/log_tester.hpp"
+#include "log/log_tester.hpp"
 
 using namespace lf;
 
@@ -142,7 +142,7 @@ TEST_CASE("tree: deserialize with wrong signature", "[tree]") {
 
     state d;
     REQUIRE_FALSE( ss >> read_as<tree_binary_format>(d) );
-    REQUIRE( t.str().find("invalid file signature") != std::string::npos );
+    REQUIRE( t.contains("invalid file signature") );
 }
 
 TEST_CASE("tree: deserialize must fail on empty stream", "[tree]") {

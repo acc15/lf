@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <optional>
 
+#include "fs/file_type.hpp"
 #include "fs/util.hpp"
 #include "log/log.hpp"
 
@@ -58,17 +59,12 @@ namespace lf {
         return std::make_pair(abs, *rel);
     }
 
-    std::optional<path_pair> normalize_move(
+    std::optional<path_pair> check_move(
         const std::filesystem::path& from, 
         const std::filesystem::path& to
     ) {
         auto from_abs = absolute_path(from);
         auto to_abs = absolute_path(to);
-
-        if (fs::is_directory(to_abs)) {
-            to_abs /= from_abs.filename();
-        }
-
         if (is_subpath(to_abs, from_abs)) {
             log.error() && log() 
                 << "can't move " << from_abs 
@@ -77,12 +73,25 @@ namespace lf {
             return std::nullopt;
         }
 
-        bool from_is_dir = fs::is_directory(from_abs);
-        bool to_is_dir = fs::is_directory(to_abs);
-        if (from_is_dir != to_is_dir) {
+        auto from_type = fs::status(from_abs).type();
+        if (from_type == fs::file_type::not_found) {
+            log.error() && log()
+                << "path " << from_abs << " doesn't exists, nothing to move"
+                << log::end;
+            return std::nullopt;
+        }
+
+        if (fs::is_directory(to_abs)) {
+            to_abs /= from_abs.filename();
+        }
+
+        auto to_type = fs::status(to_abs).type();
+        if (to_type != fs::file_type::not_found && 
+            (from_type == fs::file_type::directory) != (to_type == fs::file_type::directory)
+        ) {
             log.error() && log() 
-                << "can't move " << (from_is_dir ? "directory" : "non-directory") << " " << from_abs 
-                << " to "        << (to_is_dir ? "directory" : "non-directory") << " " << to_abs
+                << "can't move " << from_type << " " << from_abs 
+                << " to "        << to_type << " " << to_abs
                 << log::end;
             return std::nullopt;
         }
@@ -105,10 +114,8 @@ namespace lf {
     }
 
     bool move_path(const std::filesystem::path& src, const std::filesystem::path& dst) {
-        
         const fs::path target = fs::is_directory(dst) ? dst / src.filename() : dst;
         return false;
-
     }
 
     fs::filesystem_error make_fs_error(const std::string& what, const fs::path& path) {

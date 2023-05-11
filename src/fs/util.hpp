@@ -24,7 +24,7 @@ namespace lf {
         const std::filesystem::path& base
     );
 
-    std::optional<path_pair> normalize_move(
+    std::optional<path_pair> check_move(
         const std::filesystem::path& from, 
         const std::filesystem::path& to
     );

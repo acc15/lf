@@ -110,8 +110,6 @@ add_library(lf_core
     src/io/format.hpp
     src/io/time.cpp
     src/io/time.hpp
-    src/io/file_type.cpp
-    src/io/file_type.hpp
     src/io/util.hpp
     src/io/util.cpp
 
@@ -127,6 +125,8 @@ add_library(lf_core
     src/fs/util.cpp
     src/fs/time.hpp 
     src/fs/time.cpp
+    src/fs/file_type.cpp
+    src/fs/file_type.hpp
     src/fs/serialization.hpp
     src/fs/os_path.cpp
     src/fs/os_path.hpp
@@ -179,14 +179,14 @@ add_executable(lf_test
 
     test/log/sink/rolling_file_info.cpp
     test/log/sink/rolling_file_sink.cpp
+    test/log/log_tester.hpp
+    test/log/log_tester.cpp
     
     test/cmd/cmd.cpp
     test/cmd/impl/add_cmd.cpp
     test/cmd/impl/del_cmd.cpp
 
     test/io/adv_fstream.cpp
-    test/io/log_tester.hpp
-    test/io/log_tester.cpp
     test/io/time.cpp
     test/io/openmode.cpp
 

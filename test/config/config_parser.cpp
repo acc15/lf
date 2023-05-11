@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "config/config_parser.hpp"
-#include "io/log_tester.hpp"
+#include "log/log_tester.hpp"
 
 struct config_item {
     std::size_t line;
@@ -73,6 +73,6 @@ TEST_CASE("config_parser: parse", "[config_parser]") {
 TEST_CASE("config_parser empty key", "[config_parser]") {
     lf::log_tester t(lf::INFO);
     test_parse_config("=");
-    REQUIRE_THAT(t.str(), Catch::Matchers::ContainsSubstring("empty key"));
+    REQUIRE(t.contains("empty key"));
 }
 
