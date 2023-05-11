@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "fs/util.hpp"
 
@@ -128,3 +129,41 @@ TEST_CASE("path: check_move dir over file", "[path]") {
     REQUIRE( t.contains("can't move") );
 }
 
+TEST_CASE("path: move_path file to file", "[path]") {
+    lf::cd_changer cd = create_temp_test_dir();
+    write_text(test_path1, "abc");
+    write_text(test_path2, "xyz");
+
+    move_path(test_path1, test_path2);
+    REQUIRE( !fs::exists(test_path1) );
+    REQUIRE( read_text(test_path2) == "abc" );
+}
+
+TEST_CASE("path: move_path file to dir", "[path]") {
+    const bool dest_exist = GENERATE(false, true);
+    lf::cd_changer cd = create_temp_test_dir();
+    write_text(test_path1, "abc");
+
+    if (dest_exist) {
+        fs::create_directories(test_path2.parent_path());
+    }
+
+    move_path(test_path1, test_path2);
+    REQUIRE( !fs::exists(test_path1) );
+    REQUIRE( read_text(test_path2) == "abc" );
+}
+
+TEST_CASE("path: move_path dir to dir", "[path]") {
+    const bool dest_exist = GENERATE(false, true);
+    lf::cd_changer cd = create_temp_test_dir();
+    write_text(test_path1, "abc");
+
+    if (dest_exist) {
+        fs::create_directories(test_path2.parent_path());
+    }
+
+    move_path(test_path1.parent_path(), test_path2);
+    REQUIRE( !fs::exists(test_path1) );
+    REQUIRE( fs::is_directory(test_path2) );
+    REQUIRE( read_text(test_path2 / test_path1.filename()) == "abc" );
+}
