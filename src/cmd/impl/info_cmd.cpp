@@ -1,9 +1,5 @@
 #include "cmd/impl/info_cmd.hpp"
 
-#include "config/config.hpp"
-#include "state/state.hpp"
-#include "index/index.hpp"
-
 namespace lf {
 
     info_cmd::info_cmd(): cmd(

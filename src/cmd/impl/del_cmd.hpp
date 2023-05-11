@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../cmd.hpp"
+#include "cmd/cmd.hpp"
 
 namespace lf {
     class del_cmd: public cmd {
