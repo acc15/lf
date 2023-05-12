@@ -4,7 +4,7 @@
 
 namespace lf {
 
-    template <serializable_tree_type Tree>
+    template <tree_type Tree>
     class tracked_tree {
     public:
 

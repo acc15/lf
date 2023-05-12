@@ -5,8 +5,6 @@
 
 #include "log/log.hpp"
 
-namespace fs = std::filesystem;
-
 namespace lf {
 
     mv_cmd::mv_cmd() : cmd(
