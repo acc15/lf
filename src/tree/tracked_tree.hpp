@@ -37,6 +37,10 @@ namespace lf {
             changed |= root.set(path, value, remove_children);
         }
 
+        void move(const std::filesystem::path& src, const std::filesystem::path& dst) {
+            changed |= root.move(src, dst);
+        }
+
     };
 
 }

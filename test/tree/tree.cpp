@@ -282,6 +282,15 @@ TEST_CASE("tree: remove if empty must set default value", "[tree]") {
 
 }
 
+TEST_CASE("tree: remove root", "[tree]") {
+    const fs::path root = fs::path();
+    
+    state tree;
+    tree.set(root, true);
+    REQUIRE( tree.remove(root) );
+    REQUIRE_FALSE( tree.get(root) );
+}
+
 TEST_CASE("tree: must keep unspecified inside recursive and shallow", "[tree]") {
 
     const fs::path common = "a/b";

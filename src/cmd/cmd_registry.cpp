@@ -17,14 +17,14 @@ namespace lf {
 
     const sync_cmd _sync;
     const add_cmd _add;
-    // const mv_cmd _mv;
+    const mv_cmd _mv;
     const del_cmd _del;
     const info_cmd _info;
 
     const cmd* const cmd_registry::list[] = { 
         &_sync, 
         &_add, 
-        // &_mv,
+        &_mv,
         &_del,
         &_info
     };

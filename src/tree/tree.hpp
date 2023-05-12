@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <map>
 #include <concepts>
+#include <optional>
 
 namespace lf {
 
@@ -11,13 +12,13 @@ namespace lf {
     concept tree_data_type = std::default_initializable<T> && std::equality_comparable<T>;
 
     template <tree_data_type T>
-    struct tree {
-        
+    class tree {
+    public:
         using data_type = T;
         using map_type = std::map<std::string, tree>;
         using entry_ptr = typename map_type::const_pointer;
         using map_iter = typename map_type::iterator;
-        using removal_pair = std::pair<map_type*, map_iter>;
+        using rm_pair = std::pair<map_type*, map_iter>;
         using node_type = tree;
 
         data_type data = {};
@@ -45,66 +46,94 @@ namespace lf {
         }
 
         bool move(const std::filesystem::path& src, const std::filesystem::path& dst) {
-            namespace fs = std::filesystem;
-
-            removal_pair removal;
-            node_type* node = this;
-            for (const fs::path& el: src) {
-                const auto it = node->entries.find(el.string());
-                if (it == node->entries.end()) {
-                    return false;
-                }
-                removal = std::make_pair(&node->entries, it);
-                node = &it->second;
+            if (src.empty()) {
+                return false;
             }
-            return false;
+            
+            auto rm = find_rm_pair(src);
+            if (!rm) {
+                return false;
+            }
+
+            bool modified = false;
+            auto& src_node = node_from_rm_pair(*rm);
+            auto& dst_node = create_node(dst, modified);
+            dst_node = std::move(src_node);
+            modified |= erase_node(*rm);
+            return modified;
         }
 
         bool set(const std::filesystem::path& path, const T& new_data, bool remove_children = false) {
             bool modified = false;
+            auto& n = create_node(path, modified);
+            modified |= n.set_if_different(new_data);
+            modified |= (remove_children && n.clear_not_empty());
+            return modified;
+        }
 
-            tree* n = this;
+        bool remove(const std::filesystem::path& path, bool empty_only = false) {
+            auto rm = find_rm_pair(path);
+            if (!rm) {
+                return false;
+            }
+
+            auto& n = node_from_rm_pair(*rm);
+            if (rm->first == nullptr || (empty_only && !n.entries.empty())) {
+                return n.set_if_different(data_type{});
+            }
+            return erase_node(*rm);
+        }
+
+    private:
+        node_type& create_node(const std::filesystem::path& path, bool& modified) {
+            node_type* n = this;
             for (const std::filesystem::path& el: path) {
-                const auto r = n->entries.emplace(std::move(el.string()), tree {});
+                const auto r = n->entries.emplace(std::move(el.string()), node_type {});
                 if (r.second) {
                     modified = true;
                 }
                 n = &r.first->second;
             }
-            if (new_data != n->data) {
-                n->data = new_data;
-                modified = true;
-            }
-            if (remove_children && !n->entries.empty()) {
-                entries.clear();
-                modified = true;
-            }
-            return modified;
+            return *n;
         }
 
-        bool remove(const std::filesystem::path& path, bool empty_only = false) {
-
-            tree* n = this;
-
-            removal_pair removal = std::make_pair(nullptr, map_iter());
+        std::optional<rm_pair> find_rm_pair(const std::filesystem::path& path) {
+            rm_pair rm;
             for (const auto& el: path) {
-                removal.first = &n->entries;
-                removal.second = n->entries.find(el.string());
-                if (removal.second == n->entries.end()) {
-                    return false;
+                auto& n = node_from_rm_pair(rm).entries;
+                rm = std::make_pair(&n, n.find(el.string()));
+                if (rm.second == rm.first->end()) {
+                    return std::nullopt;
                 }
-                n = &removal.second->second;
             }
+            return rm;
+        }
 
-            if (empty_only && !n->entries.empty()) {
-                if (n->data == data_type{}) {
-                    return false;
-                }
-                n->data = data_type{};
-                return true;
+        node_type& node_from_rm_pair(const rm_pair& pair) {
+            return pair.first == nullptr ? *this : pair.second->second;
+        }
+
+        bool erase_node(rm_pair& pair) {
+            if (pair.first == nullptr) {
+                return false;
             }
+            pair.first->erase(pair.second);
+            return true;
+        }
 
-            removal.first->erase(removal.second);
+        bool clear_not_empty() {
+            if (entries.empty()) {
+                return false;
+            }
+            entries.clear();
+            return true;
+        }
+
+        bool set_if_different(const data_type& val) {
+            if (data == val) {
+                return false;
+            }
+            data = val;
             return true;
         }
 

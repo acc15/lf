@@ -58,25 +58,25 @@ TEST_CASE("path: join_path", "[path]") {
 
 TEST_CASE("path: check_move current_path to anywhere", "[path]") {
     lf::log_tester t;
-    REQUIRE( !check_move(fs::current_path(), fs::current_path().parent_path()) );
+    REQUIRE( !check_move(fs::current_path(), fs::current_path().parent_path(), true) );
     REQUIRE( t.contains("current directory") );
 }
 
 TEST_CASE("path: check_move same path", "[path]") {
     lf::log_tester t;
-    REQUIRE( !check_move(test_path1, test_path1) );
+    REQUIRE( !check_move(test_path1, test_path1, true) );
     REQUIRE( t.contains("itself") );
 }
 
 TEST_CASE("path: check_move to itself", "[path]") {
     lf::log_tester t;
-    REQUIRE( !check_move(test_path1, test_path1 / "d") );
+    REQUIRE( !check_move(test_path1, test_path1 / "d", true) );
     REQUIRE( t.contains("itself") );
 }
 
 TEST_CASE("path: check_move non-existent", "[path]") {
     lf::log_tester t;
-    REQUIRE( !check_move(test_path1, test_path2) );
+    REQUIRE( !check_move(test_path1, test_path2, true) );
     REQUIRE( t.contains("nothing to move") );
 }
 
@@ -84,7 +84,7 @@ TEST_CASE("path: check_move file to non-existent", "[path]") {
     lf::cd_changer cd = create_temp_test_dir();
     write_text(test_path1, "abc");
 
-    const auto result = check_move(test_path1, test_path2);
+    const auto result = check_move(test_path1, test_path2, true);
     REQUIRE( result );
     REQUIRE( result->first == fs::current_path() / test_path1 );
     REQUIRE( result->second == fs::current_path() / test_path2 );
@@ -94,7 +94,7 @@ TEST_CASE("path: check_move dir to non-existent", "[path]") {
     lf::cd_changer cd = create_temp_test_dir();
     fs::create_directories(test_path1);
 
-    const auto result = check_move(test_path1, test_path2);
+    const auto result = check_move(test_path1, test_path2, true);
     REQUIRE( result );
     REQUIRE( result->first == fs::current_path() / test_path1 );
     REQUIRE( result->second == fs::current_path() / test_path2 );
@@ -105,7 +105,7 @@ TEST_CASE("path: check_move file to dir", "[path]") {
     write_text(test_path1, "abc");
     fs::create_directories(test_path2);
 
-    const auto result = check_move(test_path1, test_path2);
+    const auto result = check_move(test_path1, test_path2, true);
     REQUIRE( result );
     REQUIRE( result->first == fs::current_path() / test_path1 );
     REQUIRE( result->second == fs::current_path() / test_path2 / test_path1.filename() );
@@ -116,7 +116,7 @@ TEST_CASE("path: check_move file over dir", "[path]") {
     lf::cd_changer cd = create_temp_test_dir();
     write_text(test_path1, "abc");
     fs::create_directories(test_path2 / test_path1.filename());
-    REQUIRE_FALSE( check_move(test_path1, test_path2) );
+    REQUIRE_FALSE( check_move(test_path1, test_path2, true) );
     REQUIRE( t.contains("can't move") );
 }
 
@@ -125,7 +125,7 @@ TEST_CASE("path: check_move dir over file", "[path]") {
     lf::cd_changer cd = create_temp_test_dir();
     fs::create_directories(test_path1);
     write_text(test_path2, "abc");
-    REQUIRE_FALSE( check_move(test_path1, test_path2) );
+    REQUIRE_FALSE( check_move(test_path1, test_path2, true) );
     REQUIRE( t.contains("can't move") );
 }
 
