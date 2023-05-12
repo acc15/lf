@@ -11,7 +11,7 @@ namespace lf {
         { "m", "move", "mv" }, 
         "moves file/directory to another path",
         {
-            opt { "index", 'I', "dont move files - update index only" },
+            opt { "index", 'I', "don't move files - update index only" },
             opt { "", '\0', "path to source file or directory", "source", 1, 1 },
             opt { "", '\0', "path to target file or directory", "target", 1, 1 },
         }

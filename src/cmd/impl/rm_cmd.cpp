@@ -1,23 +1,23 @@
 #include <filesystem>
 
-#include "cmd/impl/del_cmd.hpp"
+#include "cmd/impl/rm_cmd.hpp"
 
 namespace fs = std::filesystem;
 
 namespace lf {
 
-    del_cmd::del_cmd(): cmd(
-        { "d", "del", "delete", "r", "rm", "remove" }, 
-        "deletes specified paths from index",
+    rm_cmd::rm_cmd(): cmd(
+        { "r", "rm", "remove" }, 
+        "removes specified paths from index",
         { 
-            { "force", 'F', "also deletes files/directories if exists" },
+            { "force", 'F', "also delete file/directory if exists" },
             { "soft", 'S', "soft delete - marks path as IGNORED" },
             { "", 0, "paths to remove", "paths", 0, opt::UNBOUNDED }
         }
     ) {
     }
 
-    bool del_cmd::run(cmd_context& ctx) const {
+    bool rm_cmd::run(cmd_context& ctx) const {
         bool ok = true;
         for (const auto p: ctx.opts[""]) {
             const auto pi = normalize_rel(p, ctx.config.local);

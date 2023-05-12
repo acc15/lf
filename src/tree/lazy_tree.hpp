@@ -27,7 +27,6 @@ namespace lf {
                 // new empty file, skip loading
                 return;
             }
-            
             file.seekg(0);
             load_file<tree_binary_format>(path, file, tree);
         }
@@ -56,12 +55,11 @@ namespace lf {
         }
 
         bool save_if_changed() {
-            if (!file.is_open() || !value.has_value() || !value->changed) {
+            if (!file.is_open() || !value || !value->changed) {
                 return false;
             }
             file.truncate();
             save_file<tree_binary_format, Tree>(path, file, value->root);
-
             value->changed = false;
             return true;
         }

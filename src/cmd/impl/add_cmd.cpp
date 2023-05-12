@@ -10,7 +10,7 @@ namespace lf {
         {
             { "shallow", 'S', "add paths with SHALLOW mode", "paths", 0, opt::UNBOUNDED },
             { "recursive", 'R', "add paths with RECURSIVE mode", "dirpaths", 0, opt::UNBOUNDED },
-            { "index", 'I', "don't perform filesystem check, just add paths to index" },
+            { "index", 'I', "don't check paths, just update index" },
             { "", '\0', "same as --shallow", "paths", 0, opt::UNBOUNDED },
         },
         "shallow"
