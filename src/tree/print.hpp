@@ -1,10 +1,10 @@
 #pragma once
 
-#include "tree/tree.hpp"
-#include "io/format.hpp"
-
 #include <vector>
 #include <ostream>
+
+#include "tree/tree.hpp"
+#include "io/format.hpp"
 
 namespace lf {
 

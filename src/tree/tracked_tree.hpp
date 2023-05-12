@@ -1,8 +1,6 @@
 #pragma once
 
-#include "log/log.hpp"
-#include "fs/serialization.hpp"
-#include "tree/binary.hpp"
+#include "tree/tree.hpp"
 
 namespace lf {
 

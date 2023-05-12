@@ -5,6 +5,8 @@
 
 #include "io/adv_fstream.hpp"
 #include "tree/tracked_tree.hpp"
+#include "tree/binary.hpp"
+#include "fs/serialization.hpp"
 
 namespace lf {
 

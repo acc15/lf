@@ -14,12 +14,6 @@ namespace lf {
 
     struct tree_binary_format: format<true> {};
 
-    template <typename Tree>
-    concept serializable_tree_type = tree_type<Tree> && requires {
-        { Tree::file_signature } -> std::convertible_to<const char*>;
-        { Tree::file_version } -> std::convertible_to<std::uint8_t>;
-    };
-
     template <serializable_tree_type Tree>
     struct tree_binary {
 
