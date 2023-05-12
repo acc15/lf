@@ -1,8 +1,6 @@
 #include "cmd/cmd_registry.hpp"
 
 #include <ostream>
-#include <sstream>
-#include <iostream>
 
 #include "io/joiner.hpp"
 #include "log/log_config.hpp"
