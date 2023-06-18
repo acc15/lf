@@ -7,6 +7,8 @@
 #include <locale>
 #include <set>
 
+#include <unicode/unicode.hpp>
+
 #include "test_util.hpp"
 
 using namespace lf;
@@ -45,4 +47,13 @@ TEST_CASE("unicode: list utf8 file", "[unicode]") {
     }
 
     REQUIRE( actual_lines == expect_lines );
+}
+
+
+TEST_CASE("unicode: length", "[unicode]") {
+
+    std::string str = "Привет";
+    REQUIRE( utf8_traits::length(str) == 6 );
+    REQUIRE( utf8_traits::bytes(str) == 12 );
+
 }

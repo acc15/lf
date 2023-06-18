@@ -31,6 +31,8 @@ else()
 endif()
 
 find_package(Catch2 REQUIRED)
+find_package(utf8cpp REQUIRED)
+
 include_directories(src)
 
 add_library(lf_core  
@@ -155,7 +157,8 @@ add_library(lf_core
     src/cmd/impl/rm_cmd.cpp 
     src/cmd/impl/info_cmd.hpp 
     src/cmd/impl/info_cmd.cpp 
- )
+)
+target_link_libraries(lf_core PRIVATE utf8::cpp)
 
 add_executable(lf 
     ${executable_src}
@@ -203,7 +206,6 @@ add_executable(lf_test
     test/sync/synchronizer.cpp
     test/sync/entry_synchronizer.cpp
 )
-
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
 

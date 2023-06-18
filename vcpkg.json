@@ -2,6 +2,7 @@
     "name": "lf",
     "version-string": "latest",
     "dependencies": [
-        "catch2"
+        "catch2",
+        "utfcpp"
     ]
 }
