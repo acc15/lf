@@ -51,22 +51,14 @@ TEST_CASE("unicode: list utf8 file", "[unicode]") {
 
 std::string test_unicode_str = "Привет";
 
-TEST_CASE("unicode: length", "[unicode][utf8]") {
-    REQUIRE( utf8_traits::length(test_unicode_str) == 6 );
-}
-
-TEST_CASE("unicode: bytes", "[unicode][utf8]") {
-    REQUIRE( utf8_traits::bytes(test_unicode_str) == 12 );
-}
-
 TEST_CASE("unicode: iterator", "[unicode][utf8]") {
     auto it = test_unicode_str.begin();
-    REQUIRE( utf8_traits::next(it, test_unicode_str.end()) == U'П' );
-    REQUIRE( utf8_traits::next(it, test_unicode_str.end()) == U'р' );
-    REQUIRE( utf8_traits::next(it, test_unicode_str.end()) == U'и' );
-    REQUIRE( utf8_traits::next(it, test_unicode_str.end()) == U'в' );
-    REQUIRE( utf8_traits::next(it, test_unicode_str.end()) == U'е' );
-    REQUIRE( utf8_traits::next(it, test_unicode_str.end()) == U'т' );
+    REQUIRE( utf8_encoding::next(it) == U'П' );
+    REQUIRE( utf8_encoding::next(it) == U'р' );
+    REQUIRE( utf8_encoding::next(it) == U'и' );
+    REQUIRE( utf8_encoding::next(it) == U'в' );
+    REQUIRE( utf8_encoding::next(it) == U'е' );
+    REQUIRE( utf8_encoding::next(it) == U'т' );
     
     REQUIRE( it == test_unicode_str.end() );
 }

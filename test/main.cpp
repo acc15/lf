@@ -3,6 +3,6 @@
 #include "util/console.hpp"
 
 int main(int argc, char* argv[]) {
-	lf::console_init();
+	// lf::console_init();
 	return Catch::Session().run(argc, argv);
 }

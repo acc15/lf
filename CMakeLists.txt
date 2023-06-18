@@ -205,6 +205,9 @@ add_executable(lf_test
 
     test/sync/synchronizer.cpp
     test/sync/entry_synchronizer.cpp
+
+    test/glob/glob.cpp
+    test/glob/predicate.cpp
 )
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
