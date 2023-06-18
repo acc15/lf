@@ -18,4 +18,4 @@ out/
 CMakeLists.txt.user
 CMakeCache.txt
 
-./vcpkg_installed
+vcpkg_installed/
