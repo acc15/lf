@@ -11,12 +11,18 @@ namespace lf {
             return true;
         }
 
-        bool matches(streambuf& buf, size_t repetition, bool is_last) const override {
+        bool matches(streambuf* buf, size_t repetition, bool is_last) const override {
             if (is_last) {
-                buf.pubseekoff(0, std::ios_base::end); // consume all chars past the end of stream
+                return buf->pubseekoff(0, std::ios_base::end, std::ios_base::in) != -1;
+            }
+            if (repetition == 0) {
                 return true;
             }
-            return buf.pubseekoff(repetition, std::ios_base::cur) != -1;
+            for(istreambuf_iterator iter(buf), end; iter != end && repetition > 0;) {
+                Encoding::next(iter);
+                --repetition;
+            }
+            return repetition == 0;
         }
     };
 

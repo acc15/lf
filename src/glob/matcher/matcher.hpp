@@ -11,7 +11,7 @@ namespace lf {
             return false;
         }
 
-        virtual bool matches(streambuf& buf, size_t repetition, bool is_last) const = 0;
+        virtual bool matches(streambuf* buf, size_t repetition, bool is_last) const = 0;
     };
 
 }

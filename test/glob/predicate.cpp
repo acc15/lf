@@ -2,7 +2,7 @@
 
 #include <glob/glob.hpp>
 #include <encoding/utf8.hpp>
-#include <util/container.hpp>
+#include "../test_util.hpp"
 
 using namespace lf;
 

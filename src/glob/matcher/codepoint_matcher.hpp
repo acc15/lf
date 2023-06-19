@@ -8,9 +8,10 @@ namespace lf {
     class glob<Encoding>::codepoint_matcher: public glob<Encoding>::matcher {
         predicate_ptr predicate;
     public:
-        bool matches(streambuf& buf, size_t, bool) const override {
+        codepoint_matcher(predicate_ptr&& predicate): predicate(std::move(predicate)) {}
+        bool matches(streambuf* buf, size_t, bool) const override {
             istreambuf_iterator iter(buf), end;
-            return iter != end && predicate->matches(encoding::next(iter, end));
+            return iter != end && predicate->test(encoding::next(iter));
         }
     };
 

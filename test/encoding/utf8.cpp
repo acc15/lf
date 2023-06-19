@@ -13,9 +13,9 @@
 
 using namespace lf;
 
-const std::filesystem::path unicode_dir = test_dir_path / "unicode" / "testdir";
+const std::filesystem::path unicode_dir = test_dir_path / "encoding" / "testdir";
 
-TEST_CASE("unicode env", "[unicode]") {   
+TEST_CASE("utf8: utf8 env", "[utf8]") {   
     const char* expect_env = "русский текст";
 #ifdef _WIN32
     _putenv_s("UNICODE_TEST", expect_env);
@@ -26,7 +26,7 @@ TEST_CASE("unicode env", "[unicode]") {
     REQUIRE( std::strcmp(actual_env, expect_env) == 0 );
 }
 
-TEST_CASE("unicode: list dir", "[unicode]") {
+TEST_CASE("utf8: list dir", "[utf8]") {
     std::set<std::string> actual_names;
     for (const auto& e : std::filesystem::directory_iterator(unicode_dir)) {
         actual_names.insert(e.path().filename().string());
@@ -36,7 +36,7 @@ TEST_CASE("unicode: list dir", "[unicode]") {
     REQUIRE( actual_names == expect_names );
 }
 
-TEST_CASE("unicode: list utf8 file", "[unicode]") {
+TEST_CASE("utf8: list utf8 file lines", "[utf8]") {
     std::vector<std::string> expect_lines = { "Русский текст" };
     std::vector<std::string> actual_lines;
 
@@ -49,10 +49,10 @@ TEST_CASE("unicode: list utf8 file", "[unicode]") {
     REQUIRE( actual_lines == expect_lines );
 }
 
-std::string test_unicode_str = "Привет";
+TEST_CASE("utf8: iterator", "[utf8]") {
+    std::string str = "Привет";
 
-TEST_CASE("unicode: iterator", "[unicode][utf8]") {
-    auto it = test_unicode_str.begin();
+    auto it = str.begin();
     REQUIRE( utf8_encoding::next(it) == U'П' );
     REQUIRE( utf8_encoding::next(it) == U'р' );
     REQUIRE( utf8_encoding::next(it) == U'и' );
@@ -60,5 +60,5 @@ TEST_CASE("unicode: iterator", "[unicode][utf8]") {
     REQUIRE( utf8_encoding::next(it) == U'е' );
     REQUIRE( utf8_encoding::next(it) == U'т' );
     
-    REQUIRE( it == test_unicode_str.end() );
+    REQUIRE( it == str.end() );
 }

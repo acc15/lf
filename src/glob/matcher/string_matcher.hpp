@@ -8,7 +8,8 @@ namespace lf {
     class glob<Encoding>::string_matcher: public glob<Encoding>::matcher {
         string str;
     public:
-        bool matches(streambuf& buf, size_t, bool) const override {
+        string_matcher(std::string_view str): str(str) {}
+        bool matches(streambuf* buf, size_t, bool) const override {
             return std::mismatch(
                 str.begin(), str.end(), 
                 istreambuf_iterator(buf), istreambuf_iterator()
