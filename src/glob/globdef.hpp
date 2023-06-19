@@ -29,29 +29,16 @@ namespace lf {
         class not_predicate;
         class any_predicate;
 
-        using predicate_ptr = std::unique_ptr<const predicate>;
-        using predicate_vector = std::vector<predicate_ptr>;
-
         class matcher;
         class star_matcher;
         class codepoint_matcher;
         class string_matcher;
 
+        using predicate_ptr = std::unique_ptr<const predicate>;
+        using predicate_vector = std::vector<predicate_ptr>;
+
         using matcher_ptr = std::unique_ptr<const matcher>;
         using matcher_vector = std::vector<matcher_ptr>;
-
-
-        /*
-        class string_matcher: public matcher {
-            string str;
-        public:
-            bool matches(streambuf& buf, size_t, bool) const override {
-                return std::mismatch(
-                    str.begin(), str.end(), 
-                    istreambuf_iterator(buf), istreambuf_iterator()
-                ).first == str.end();
-            }
-        };*/
 
     };
 
