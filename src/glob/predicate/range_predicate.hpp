@@ -1,16 +1,16 @@
 #pragma once
 
-#include "dynamic_predicate.hpp"
+#include "predicate.hpp"
 
 namespace lf {
 
-    template <typename T>
-    class range_predicate: public dynamic_predicate<T> {
-        T min;
-        T max;
+    template <encoding_type T>
+    class glob<T>::range_predicate: public glob<T>::predicate {
+        codepoint min;
+        codepoint max;
     public:
-        range_predicate(const T& min, const T& max): min(min), max(max) {}
-        bool test(const T& v) const override {
+        range_predicate(const codepoint& min, const codepoint& max): min(min), max(max) {}
+        bool test(const codepoint& v) const override {
             return v >= min && v <= max;
         }
     };

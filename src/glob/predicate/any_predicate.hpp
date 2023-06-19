@@ -1,13 +1,13 @@
 #pragma once
 
-#include "dynamic_predicate.hpp"
+#include "predicate.hpp"
 
 namespace lf {
 
-    template <typename T>
-    class any_predicate: public dynamic_predicate<T> {
+    template <encoding_type Encoding>
+    class glob<Encoding>::any_predicate: public glob<Encoding>::predicate {
     public:
-        bool test(const T&) const override {
+        bool test(const codepoint&) const override {
             return true;
         }
     };
