@@ -173,7 +173,7 @@ add_executable(lf_test
     test/main.cpp
     test/test_util.hpp
     test/test_util.cpp
-    test/unicode/unicode.cpp
+    test/encoding/utf8.cpp
 
     test/tree/tree.cpp
     test/tree/lazy_tree.cpp
@@ -208,6 +208,7 @@ add_executable(lf_test
 
     test/glob/glob.cpp
     test/glob/predicate.cpp
+    test/glob/matcher.cpp
 )
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)

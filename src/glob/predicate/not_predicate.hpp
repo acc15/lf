@@ -8,9 +8,9 @@ namespace lf {
 
     template <typename T>
     class not_predicate: public dynamic_predicate<T> {
-        dynamic_predicate_ptr<T> predicate;
+        std::unique_ptr<const dynamic_predicate<T>> predicate;
     public:
-        not_predicate(dynamic_predicate_ptr<T> predicate): predicate(std::move(predicate)) {}
+        not_predicate(std::unique_ptr<const dynamic_predicate<T>>&& predicate): predicate(std::move(predicate)) {}
         bool test(const T& v) const override {
             return !predicate->test(v);
         }

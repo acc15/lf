@@ -12,6 +12,9 @@
 #include "predicate/not_predicate.hpp"
 #include "predicate/any_predicate.hpp"
 
+#include "matcher/matcher.hpp"
+#include "matcher/star_matcher.hpp"
+
 namespace lf {
 
     template <typename Encoding> 
@@ -28,8 +31,8 @@ namespace lf {
         using istreambuf_iterator = std::istreambuf_iterator<char_type, char_traits>;
         using istream = std::basic_istream<char_type, char_traits>;
 
-        using codepoint_predicate = dynamic_predicate<codepoint>;
-        using predicate_ptr = dynamic_predicate_ptr<codepoint>;
+        using predicate = dynamic_predicate<codepoint>;
+        using predicate_ptr = std::unique_ptr<const predicate>;
         using predicate_vector = std::vector<predicate_ptr>;
         using set_predicate = lf::set_predicate<codepoint>;
         using range_predicate = lf::range_predicate<codepoint>;
@@ -37,30 +40,13 @@ namespace lf {
         using not_predicate = lf::not_predicate<codepoint>;
         using any_predicate = lf::any_predicate<codepoint>;
 
-        class matcher {
-        public:
-            virtual bool is_repetitive() const {
-                return false;
-            }
+        using matcher = lf::matcher<encoding>;
+        using matcher_ptr = std::unique_ptr<const matcher>;
+        using matcher_vector = std::vector<matcher_ptr>;
+        using star_matcher = lf::star_matcher<encoding>;
 
-            virtual bool matches(streambuf& buf, size_t repetition, bool is_last) const = 0;
-        };
 
-        class star_matcher: public matcher {
-        public:
-            bool is_repetitive() const override {
-                return true;
-            }
-
-            bool matches(streambuf& buf, size_t repetition, bool is_last) const override {
-                if (is_last) {
-                    buf.pubseekoff(0, std::ios_base::end); // consume all chars past the end of stream
-                    return true;
-                }
-                return buf.pubseekoff(repetition, std::ios_base::cur) != -1;
-            }
-        };
-
+        /*
         class codepoint_matcher: public matcher {
             std::unique_ptr<codepoint_predicate> predicate;
         public:
@@ -79,7 +65,7 @@ namespace lf {
                     istreambuf_iterator(buf), istreambuf_iterator()
                 ).first == str.end();
             }
-        };
+        };*/
 
     };
 

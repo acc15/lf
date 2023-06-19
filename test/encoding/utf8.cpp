@@ -7,7 +7,7 @@
 #include <locale>
 #include <set>
 
-#include <unicode/unicode.hpp>
+#include <encoding/utf8.hpp>
 
 #include "test_util.hpp"
 

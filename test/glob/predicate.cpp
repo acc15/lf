@@ -1,11 +1,12 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <unicode/unicode.hpp>
-
 #include <glob/glob.hpp>
+#include <encoding/utf8.hpp>
 #include <util/container.hpp>
 
-using g = lf::glob<lf::utf8_encoding>;
+using namespace lf;
+
+using g = glob<utf8_encoding>;
 
 TEST_CASE("dynamic_predicate: set", "[dynamic_predicate]") {
     auto p = std::make_unique<g::set_predicate>(std::unordered_set<g::codepoint> { 'a', 'b', 'd' });

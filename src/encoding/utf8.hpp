@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string>
+#include "encoding.hpp"
+
 #include <utf8cpp/utf8.h>
 
 namespace lf {
