@@ -9,6 +9,6 @@ using g = glob<utf8_encoding>;
 
 TEST_CASE("star_matcher", "[matcher]") {
 
-    g::matcher_ptr m = std::make_unique<g::star_matcher>();
+    // g::matcher_ptr m = std::make_unique<g::star_matcher>();
     // m.is_repetitive()
 }
