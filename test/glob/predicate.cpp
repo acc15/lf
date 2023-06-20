@@ -51,3 +51,24 @@ TEST_CASE("glob::predicate: or", "[glob][glob::predicate]") {
     REQUIRE( p->test('5') );
     REQUIRE_FALSE( p->test('6') );
 }
+
+TEST_CASE("glob::predicate: class", "[glob][glob::predicate]") {
+    g::predicate_ptr p = std::make_unique<g::class_predicate>(std::map<g::codepoint, g::codepoint> {
+        { U'0', U'0' },
+        { U'4', U'4' },
+        { U'5', U'5' },
+        { U'A', U'Z' },
+        { U'a', U'z' }
+    });
+    REQUIRE_FALSE( p->test('.') );
+    REQUIRE( p->test('d') );
+    REQUIRE( p->test('E') );
+    REQUIRE( p->test('0') );
+    REQUIRE_FALSE( p->test('1') );
+    REQUIRE( p->test('4') );
+    REQUIRE( p->test('5') );
+    REQUIRE_FALSE( p->test('6') );
+    REQUIRE_FALSE( p->test('~') );
+    REQUIRE_FALSE( p->test('_') );
+}
+

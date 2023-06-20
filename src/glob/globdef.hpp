@@ -28,6 +28,7 @@ namespace lf {
         class or_predicate;
         class not_predicate;
         class any_predicate;
+        class class_predicate;
 
         class matcher;
         class star_matcher;

@@ -7,6 +7,7 @@
 #include "predicate/or_predicate.hpp"
 #include "predicate/range_predicate.hpp"
 #include "predicate/set_predicate.hpp"
+#include "predicate/class_predicate.hpp"
 
 #include "matcher/matcher.hpp"
 #include "matcher/star_matcher.hpp"
