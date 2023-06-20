@@ -72,3 +72,21 @@ TEST_CASE("glob::predicate: class", "[glob][glob::predicate]") {
     REQUIRE_FALSE( p->test('_') );
 }
 
+TEST_CASE("glob::predicate: class add single", "[glob][glob::predicate]") {
+    g::class_predicate p;
+    p.add(U'B');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'B', U'B'}});
+
+    p.add(U'D');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'B', U'B'}, {U'D', U'D'}});
+
+    p.add(U'C');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'B', U'D'}});
+
+    p.add(U'E');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'B', U'E'}});
+
+    p.add(U'A');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'A', U'E'}});
+
+}
