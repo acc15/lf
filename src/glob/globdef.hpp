@@ -9,8 +9,8 @@
 namespace lf {
 
     template <encoding_type Encoding> 
-    struct glob {
-
+    class glob {
+    public:
         using encoding = Encoding;
         using char_type = typename encoding::char_type;
         using char_traits = typename encoding::char_traits;
@@ -22,24 +22,28 @@ namespace lf {
         using istreambuf_iterator = std::istreambuf_iterator<char_type, char_traits>;
         using istream = std::basic_istream<char_type, char_traits>;
 
-        class predicate;
-        class set_predicate;
-        class range_predicate;
-        class or_predicate;
-        class not_predicate;
-        class any_predicate;
-        class class_predicate;
+        using pos_type = typename char_traits::pos_type;
 
         class matcher;
         class star_matcher;
-        class codepoint_matcher;
+        class char_matcher;
         class string_matcher;
-
-        using predicate_ptr = std::unique_ptr<const predicate>;
-        using predicate_vector = std::vector<predicate_ptr>;
 
         using matcher_ptr = std::unique_ptr<const matcher>;
         using matcher_vector = std::vector<matcher_ptr>;
+
+    private:
+        matcher_vector matchers;
+
+    public:
+        bool matches(streambuf& buf) const {
+            std::vector<std::pair<pos_type, size_t>> repetition_stack;
+            return buf.sgetc() == char_traits::eof();
+        }
+
+        static glob parse(std::string_view view) {
+            return glob();
+        }
 
     };
 

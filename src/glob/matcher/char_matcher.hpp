@@ -1,14 +1,12 @@
 #pragma once
 
+#include "matcher.hpp"
 #include <map>
-#include <optional>
-
-#include "predicate.hpp"
 
 namespace lf {
 
     template <encoding_type Encoding>
-    class glob<Encoding>::class_predicate: public glob<Encoding>::predicate {
+    class glob<Encoding>::char_matcher: public glob<Encoding>::matcher {
     public:
         using map_type = std::map<codepoint, codepoint>;
         using map_iter = typename map_type::iterator;
@@ -17,7 +15,7 @@ namespace lf {
         map_type map;
         bool negate;
 
-        class_predicate(
+        char_matcher(
             const map_type& map = {}, 
             bool negate = false
         ): map(map), negate(negate) {}
@@ -34,10 +32,15 @@ namespace lf {
             add_minmax(v, v);
         }
 
-        bool test(const codepoint& v) const override {
+        bool test(const codepoint& v) const {
             const map_citer it = map.upper_bound(v);
             const bool in_range = it != map.begin() && v <= std::prev(it)->second;
             return in_range != negate;
+        }
+
+        bool matches(streambuf* buf, size_t, bool) const override {
+            istreambuf_iterator iter(buf), end;
+            return iter != end && test(encoding::next(iter));
         }
 
     private:
@@ -48,8 +51,6 @@ namespace lf {
                 : map.insert(min_next, { min, max });
 
             const map_iter max_next = map.upper_bound(max);
-            
-            map_iter max_iter;
             if (max_next != map.end() && max + 1 == max_next->first) {
                 min_iter->second = max_next->second;
                 map.erase(min_next, std::next(max_next));

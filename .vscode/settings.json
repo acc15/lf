@@ -3,7 +3,7 @@
         "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
     },
     "cmake.debugConfig": {
-        "args": ["[glob::predicate]"]
+        "args": ["[glob::matcher]"]
     },
     "cmake.environment": {
         "LF_LEVEL": "INFO"

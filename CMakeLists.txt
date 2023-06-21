@@ -207,7 +207,6 @@ add_executable(lf_test
     test/sync/entry_synchronizer.cpp
 
     test/glob/glob.cpp
-    test/glob/predicate.cpp
     test/glob/matcher.cpp
 )
 target_include_directories(lf_test PRIVATE test)

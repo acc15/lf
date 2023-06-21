@@ -1,10 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include <sstream>
 #include <glob/glob.hpp>
 #include <encoding/utf8.hpp>
-
-#include "../test_util.hpp"
 
 using namespace lf;
 
@@ -58,38 +57,98 @@ TEST_CASE("glob::matcher: star_matcher", "[glob][glob::matcher]") {
     }
 }
 
-TEST_CASE("glob::matcher: codepoint_matcher", "[glob][glob::matcher]") {
+TEST_CASE("glob::matcher: char_matcher test", "[glob][glob::matcher]") {
+    const bool negate = GENERATE(false, true);
+    g::char_matcher p(g::char_matcher::map_type {
+        { U'0', U'0' },
+        { U'4', U'4' },
+        { U'5', U'5' },
+        { U'A', U'Z' },
+        { U'a', U'z' }
+    }, negate);
 
-    g::matcher_ptr m = std::make_unique<g::codepoint_matcher>(
-        std::make_unique<g::or_predicate>(
-            make_unique_container<g::predicate_vector>(
-                std::make_unique<g::range_predicate>(U'А', U'Я'),
-                std::make_unique<g::range_predicate>(U'a', U'z')
-            )
-        )
-    );
+    REQUIRE( p.test('.') == negate );
+    REQUIRE( p.test('d') != negate );
+    REQUIRE( p.test('E') != negate );
+    REQUIRE( p.test('0') != negate );
+    REQUIRE( p.test('1') == negate );
+    REQUIRE( p.test('4') != negate );
+    REQUIRE( p.test('5') != negate );
+    REQUIRE( p.test('6') == negate );
+    REQUIRE( p.test('~') == negate );
+    REQUIRE( p.test('_') == negate );
+}
+
+TEST_CASE("glob::matcher: char_matcher add single", "[glob][glob::matcher]") {
+    g::char_matcher p;
+    p.add(U'B');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'B'}});
+
+    p.add(U'B');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'B'}});
+
+    p.add(U'D');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'B'}, {U'D', U'D'}});
+
+    p.add(U'C');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'D'}});
+
+    p.add(U'E');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'E'}});
+
+    p.add(U'A');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'A', U'E'}});
+}
+
+TEST_CASE("glob::matcher: char_matcher add range", "[glob][glob::matcher]") {
+    g::char_matcher p;
+    p.add(U'B', U'D');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'D'}});
+
+    p.add(U'B', U'D');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'D'}});
+
+    p.add(U'F', U'H');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'D'}, {U'F', U'H'}});
+
+    p.add(U'G', U'I');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'D'}, {U'F', U'I'}});
+
+    p.add(U'A', U'B');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'A', U'D'}, {U'F', U'I'}});
+
+    p.add(U'B', U'H');
+    REQUIRE(p.map == g::char_matcher::map_type {{U'A', U'I'}});
+}
+
+TEST_CASE("glob::matcher: char_matcher", "[glob][glob::matcher]") {
+
+    g::char_matcher m(g::char_matcher::map_type {
+        {U'А', U'Я'},
+        {U'a', U'z'}
+    });
 
     SECTION("must match utf8 codepoint") {
         match_tester t("ДА");
-        REQUIRE( m->matches(t.buf, 0, false) );
+        REQUIRE( m.matches(t.buf, 0, false) );
         REQUIRE( t.pos() == 2 );
     }
 
     SECTION("must match ansi codepoint") {
         match_tester t("yes");
-        REQUIRE( m->matches(t.buf, 0, false) );
+        REQUIRE( m.matches(t.buf, 0, false) );
         REQUIRE( t.pos() == 1 );
     }
 
     SECTION("dont match digit") {
         match_tester t("15");
-        REQUIRE_FALSE( m->matches(t.buf, 0, false) );
+        REQUIRE_FALSE( m.matches(t.buf, 0, false) );
         REQUIRE( t.pos() == 1 );
     }
 
     SECTION("dont match empty") {
         match_tester t("");
-        REQUIRE_FALSE( m->matches(t.buf, 0, false) );
+        REQUIRE_FALSE( m.matches(t.buf, 0, false) );
         REQUIRE( t.pos() == 0 );
     }
 
