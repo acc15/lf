@@ -5,45 +5,28 @@
 
 #include <sstream>
 
-using namespace lf;
+#include "../test_util.hpp"
+#include "match_tester.hpp"
 
-#define PP(expr) std::cout << #expr << ": " << (expr) << std::endl
+using namespace lf;
 
 using g = glob<utf8_encoding>;
 
-/*
-TEST_CASE("test", "[glob]") {
-    
-    std::stringstream ss("abc");
-    std::streambuf* buf = ss.rdbuf();
+TEST_CASE("glob: matches", "[glob]") {
 
-    using iob = std::ios_base;
+    g glob(make_unique_container<g::matcher_vector>(
+        std::make_unique<g::char_matcher>(true),
+        std::make_unique<g::char_matcher>(false, g::char_matcher::map_type {{U'A', U'Z'}}),
+        std::make_unique<g::star_matcher>(),
+        std::make_unique<g::string_matcher>(".txt")
+    ));
 
-    PP(buf->sbumpc());
-    PP(buf->sbumpc());
-    PP(buf->sbumpc());
-    PP(buf->sbumpc());
+    match_tester t1("ЭZany12.txt");
+    REQUIRE( glob.matches(t1.buf) );
+    REQUIRE( t1.pos() == t1.size() );
 
-    PP(buf->pubseekpos(0, iob::in));
+    match_tester t2("ZnotnextZ.txt");
+    REQUIRE_FALSE( glob.matches(t2.buf) );
+    REQUIRE( t2.pos() == 2 );
 
-    PP(buf->pubseekoff(0, iob::cur, iob::in));
-    PP(buf->sbumpc());
-    PP(buf->pubseekoff(0, iob::cur, iob::in));
-    PP(buf->sbumpc());
-    PP(buf->pubseekoff(0, iob::cur, iob::in));
-    PP(buf->sbumpc());
-    PP(buf->pubseekoff(0, iob::cur, iob::in));
-    PP(buf->sbumpc());
-    PP(buf->pubseekoff(0, iob::cur, iob::in));
-    PP(buf->sgetc());
-
-    char bb[10];
-    PP(buf->pubseekpos(0, iob::in));
-    PP(buf->sgetn(bb, 10));
-    PP(bb);
-    PP(buf->pubseekoff(0, iob::cur, iob::in));
-
-    PP(buf->pubseekpos(100, iob::in));
-    PP(buf->pubseekoff(0, iob::cur, iob::in));
-
-}*/
+}

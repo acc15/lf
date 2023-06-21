@@ -5,33 +5,13 @@
 #include <glob/glob.hpp>
 #include <encoding/utf8.hpp>
 
+#include "match_tester.hpp"
+
 using namespace lf;
 
 using g = glob<utf8_encoding>;
 
-class match_tester {
-public:
-
-    using stringstream = std::basic_stringstream<g::char_type, g::char_traits>;
-    
-    stringstream stream;
-    g::streambuf* buf;
-
-    match_tester(const g::string& string): stream(string), buf(stream.rdbuf()) {
-    }
-
-    std::size_t pos() const {
-        return static_cast<std::size_t>(buf->pubseekoff(0, std::ios_base::cur, std::ios_base::in));
-    }
-
-    std::size_t size() const {
-        return stream.view().size();
-    }
-
-};
-
-
-TEST_CASE("glob::matcher: star_matcher", "[glob][glob::matcher]") {
+TEST_CASE("glob::matcher: star_matcher", "[glob::matcher]") {
 
     match_tester t("A тест");
     g::matcher_ptr m = std::make_unique<g::star_matcher>();
@@ -57,15 +37,15 @@ TEST_CASE("glob::matcher: star_matcher", "[glob][glob::matcher]") {
     }
 }
 
-TEST_CASE("glob::matcher: char_matcher test", "[glob][glob::matcher]") {
+TEST_CASE("glob::matcher: char_matcher test", "[glob::matcher]") {
     const bool negate = GENERATE(false, true);
-    g::char_matcher p(g::char_matcher::map_type {
+    g::char_matcher p(negate, g::char_matcher::map_type {
         { U'0', U'0' },
         { U'4', U'4' },
         { U'5', U'5' },
         { U'A', U'Z' },
         { U'a', U'z' }
-    }, negate);
+    });
 
     REQUIRE( p.test('.') == negate );
     REQUIRE( p.test('d') != negate );
@@ -79,7 +59,7 @@ TEST_CASE("glob::matcher: char_matcher test", "[glob][glob::matcher]") {
     REQUIRE( p.test('_') == negate );
 }
 
-TEST_CASE("glob::matcher: char_matcher add single", "[glob][glob::matcher]") {
+TEST_CASE("glob::matcher: char_matcher add single", "[glob::matcher]") {
     g::char_matcher p;
     p.add(U'B');
     REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'B'}});
@@ -100,7 +80,7 @@ TEST_CASE("glob::matcher: char_matcher add single", "[glob][glob::matcher]") {
     REQUIRE(p.map == g::char_matcher::map_type {{U'A', U'E'}});
 }
 
-TEST_CASE("glob::matcher: char_matcher add range", "[glob][glob::matcher]") {
+TEST_CASE("glob::matcher: char_matcher add range", "[glob::matcher]") {
     g::char_matcher p;
     p.add(U'B', U'D');
     REQUIRE(p.map == g::char_matcher::map_type {{U'B', U'D'}});
@@ -121,9 +101,9 @@ TEST_CASE("glob::matcher: char_matcher add range", "[glob][glob::matcher]") {
     REQUIRE(p.map == g::char_matcher::map_type {{U'A', U'I'}});
 }
 
-TEST_CASE("glob::matcher: char_matcher", "[glob][glob::matcher]") {
+TEST_CASE("glob::matcher: char_matcher", "[glob::matcher]") {
 
-    g::char_matcher m(g::char_matcher::map_type {
+    g::char_matcher m(false, g::char_matcher::map_type {
         {U'А', U'Я'},
         {U'a', U'z'}
     });
@@ -154,7 +134,7 @@ TEST_CASE("glob::matcher: char_matcher", "[glob][glob::matcher]") {
 
 }
 
-TEST_CASE("glob::matcher: string_matcher", "[glob][glob::matcher]") {
+TEST_CASE("glob::matcher: string_matcher", "[glob::matcher]") {
 
     g::string str = "тест";
     g::matcher_ptr m = std::make_unique<g::string_matcher>(str);

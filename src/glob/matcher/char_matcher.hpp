@@ -16,8 +16,8 @@ namespace lf {
         bool negate;
 
         char_matcher(
-            const map_type& map = {}, 
-            bool negate = false
+            bool negate = false,
+            const map_type& map = {}
         ): map(map), negate(negate) {}
 
         void add(const codepoint& first, const codepoint& second) {

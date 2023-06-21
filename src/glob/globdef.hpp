@@ -36,9 +36,12 @@ namespace lf {
         matcher_vector matchers;
 
     public:
-        bool matches(streambuf& buf) const {
+        glob(matcher_vector&& matchers = {}): matchers(std::move(matchers)) {}
+
+        bool matches(streambuf* buf) const {
             std::vector<std::pair<pos_type, size_t>> repetition_stack;
-            return buf.sgetc() == char_traits::eof();
+
+            return buf->sgetc() == char_traits::eof();
         }
 
         static glob parse(std::string_view view) {

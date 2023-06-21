@@ -206,6 +206,9 @@ add_executable(lf_test
     test/sync/synchronizer.cpp
     test/sync/entry_synchronizer.cpp
 
+    test/glob/match_tester.hpp
+    test/glob/match_tester.cpp
+
     test/glob/glob.cpp
     test/glob/matcher.cpp
 )
