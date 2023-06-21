@@ -88,5 +88,23 @@ TEST_CASE("glob::predicate: class add single", "[glob][glob::predicate]") {
 
     p.add(U'A');
     REQUIRE(p.map == g::class_predicate::map_type {{U'A', U'E'}});
+}
+
+TEST_CASE("glob::predicate: class add range", "[glob][glob::predicate]") {
+    g::class_predicate p;
+    p.add(U'B', U'D');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'B', U'D'}});
+
+    p.add(U'F', U'H');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'B', U'D'}, {U'F', U'H'}});
+
+    p.add(U'G', U'I');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'B', U'D'}, {U'F', U'I'}});
+
+    p.add(U'A', U'B');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'A', U'D'}, {U'F', U'I'}});
+
+    p.add(U'B', U'H');
+    REQUIRE(p.map == g::class_predicate::map_type {{U'A', U'I'}});
 
 }
