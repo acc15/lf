@@ -24,7 +24,15 @@ namespace lf {
 
         using pos_type = typename char_traits::pos_type;
 
-        class matcher;
+        class matcher {
+        public:
+            virtual bool is_repetitive() const {
+                return false;
+            }
+
+            virtual bool matches(streambuf* buf, size_t repetition, bool is_last) const = 0;
+        };
+
         class star_matcher;
         class char_matcher;
         class string_matcher;
