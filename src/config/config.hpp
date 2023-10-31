@@ -22,10 +22,9 @@ namespace lf {
         std::filesystem::path state = "lf.state";
         std::filesystem::path index = "lf.index";
 
+        static config parse(std::istream& stream);
         static config load();
 
     };
-
-    std::istream& operator>>(std::istream& s, with_format<config_format, config> dest);
 
 }

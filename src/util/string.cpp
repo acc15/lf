@@ -22,17 +22,17 @@ namespace lf {
     }
 
     template <std::input_iterator I, std::sentinel_for<I> S>
-    size_t count_first_spaces(const I first, const S last) {
+    size_t count_leading_whitespaces(const I first, const S last) {
         return std::distance(first, std::find_if_not(first, last, &is_whitespace));
     }
 
     std::string_view rtrim(std::string_view str) {
-        str.remove_suffix(count_first_spaces(str.rbegin(), str.rend()));
+        str.remove_suffix(count_leading_whitespaces(str.rbegin(), str.rend()));
         return str;
     }
 
     std::string_view ltrim(std::string_view str) {
-        str.remove_prefix(count_first_spaces(str.begin(), str.end()));
+        str.remove_prefix(count_leading_whitespaces(str.begin(), str.end()));
         return str;
     }
 

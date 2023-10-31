@@ -22,10 +22,7 @@ void cmp_config(const config& l, const config& r) {
 
 config test_parse(const std::string& yaml) {
     std::stringstream ss(yaml);
-
-    config cfg;
-    ss >> read_as<config_format>(cfg);
-    return cfg;
+    return config::parse(ss);
 }
 
 TEST_CASE("config: parse", "[config]") {
@@ -46,10 +43,7 @@ TEST_CASE("config: parse", "[config]") {
 
 }
 
-TEST_CASE("config: parse partial", "[config]") {
-    log_tester t(INFO);
-    auto p = test_parse("index=test.index\n");
-    REQUIRE(t.contains("remote"));
-    REQUIRE(t.contains("local"));
+TEST_CASE("config: parse invalid", "[config]") {
+    REQUIRE_THROWS( test_parse("index=test.index\n") );
 }
 

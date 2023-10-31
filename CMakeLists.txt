@@ -56,7 +56,6 @@ add_library(lf_core
     # config
     src/config/config.hpp
     src/config/config.cpp
-    src/config/config_parser.hpp
 
     # util
     src/util/string.hpp
@@ -193,7 +192,6 @@ add_executable(lf_test
     test/io/time.cpp
     test/io/openmode.cpp
 
-    test/config/config_parser.cpp
     test/config/config.cpp
     
     test/fs/util.cpp
