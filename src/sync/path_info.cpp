@@ -10,8 +10,8 @@ namespace lf {
         name(local ? "local" : "remote"),
         root(root_path),
         item(item_path),
-        path(join_path(root_path, item_path)),
-        status(std::filesystem::status(path)), 
+        full_path(join_path(root_path, item_path)),
+        status(std::filesystem::status(full_path)), 
         type(status.type()),
         time{}
     {
@@ -22,7 +22,7 @@ namespace lf {
     }
 
     void path_info::init_time() {
-        time = ntfs_last_write_time(path);
+        time = ntfs_last_write_time(full_path);
     }
 
 }

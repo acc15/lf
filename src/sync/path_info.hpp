@@ -9,7 +9,7 @@ namespace lf {
         const char* name;
         std::filesystem::path root;
         std::filesystem::path item;
-        std::filesystem::path path;
+        std::filesystem::path full_path;
         std::filesystem::file_status status;
         std::filesystem::file_type type;
         std::filesystem::file_time_type time;

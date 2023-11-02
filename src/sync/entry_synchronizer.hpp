@@ -16,7 +16,7 @@ namespace lf {
         path_info local;
         path_info remote;
 
-        log_level max_level;
+        log_level max_log_level;
         std::stringstream out;
 
     public:

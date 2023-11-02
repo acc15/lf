@@ -16,7 +16,7 @@ namespace lf {
         item(item),
         local(true, sync.config.local, item.path),
         remote(false, sync.config.remote, item.path),
-        max_level(TRACE)
+        max_log_level(TRACE)
     {
     }
 
@@ -29,7 +29,7 @@ namespace lf {
     }
 
     log_level entry_synchronizer::level() const {
-        return max_level;
+        return max_log_level;
     }
 
     void entry_synchronizer::run() {
@@ -115,7 +115,7 @@ namespace lf {
 
     void entry_synchronizer::sync_del(const path_info& src, const path_info& dst) {
         log(INFO) << "was deleted in " << dst.name << ", deleting in " << src.name;
-        fs::remove_all(src.path);
+        fs::remove_all(src.full_path);
         s.state.remove(item.path);
     }
 
@@ -169,7 +169,7 @@ namespace lf {
         log(DEBUG) << "using " << src.name << " because " << format_date_time(src.time) << " > " << format_date_time(dst.time);
         if (src.type == fs::file_type::directory || dst.type == fs::file_type::directory) {
             log(INFO) << "deleting " << dst.name << " " << dst.type;
-            fs::remove_all(dst.path);
+            fs::remove_all(dst.full_path);
         }
         sync_new(src, dst);
     }
@@ -187,11 +187,11 @@ namespace lf {
         for (; cur.type != fs::file_type::directory && it != b; --it, cur = cur.parent()) {
             if (cur.type != fs::file_type::not_found) {
                 log(INFO) << "deleted " << cur.name << " " << cur.type << " " << cur.item;
-                fs::remove(cur.path);
+                fs::remove(cur.full_path);
             }
         }
 
-        fs::path cur_path = cur.path;
+        fs::path cur_path = cur.full_path;
         for (; it != e; ++it) {
             cur_path /= *it;
             if (!fs::create_directory(cur_path)) {
@@ -204,7 +204,7 @@ namespace lf {
     }
 
     bool entry_synchronizer::delete_empty_dir_or_file(const path_info& p) {
-        if (p.type == not_found || (p.type == directory && !fs::is_empty(p.path))) {
+        if (p.type == not_found || (p.type == directory && !fs::is_empty(p.full_path))) {
             return false;
         }
         delete_path(p);
@@ -214,7 +214,7 @@ namespace lf {
     void entry_synchronizer::delete_path(const path_info& p) {
         if (p.type != not_found) {
             log(INFO) << "deleting " << p.name << " " << p.type;
-            fs::remove(p.path);
+            fs::remove(p.full_path);
         } else {
             log(TRACE) << p.name << " not exists";
         }
@@ -224,7 +224,7 @@ namespace lf {
         if (i.type != fs::file_type::directory) {
             return;
         }
-        for (auto p: fs::directory_iterator(i.path)) {
+        for (auto p: fs::directory_iterator(i.full_path)) {
             if (p.is_directory() && item.mode != sync_mode::RECURSIVE) {
                 continue;
             }
@@ -274,12 +274,12 @@ namespace lf {
     void entry_synchronizer::copy_file(const path_info& src, const path_info& dst) {
         create_dir_if_not_exists(dst.parent());
         log(INFO) << "copying file from " << src.name << " to " << dst.name;
-        copy_file_with_timestamp(src.path, dst.path);
+        copy_file_with_timestamp(src.full_path, dst.full_path);
         s.state.set(item.path, true, true);
     }
 
     std::ostream& entry_synchronizer::log(log_level level) {
-        max_level = std::max(level, max_level);
+        max_log_level = std::max(level, max_log_level);
         if (!out.view().empty()) {
             out << ", ";
         }
