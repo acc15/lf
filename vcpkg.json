@@ -2,7 +2,6 @@
     "name": "lf",
     "version-string": "latest",
     "dependencies": [
-        "libp7client",
         "catch2",
         "utfcpp"
     ]
