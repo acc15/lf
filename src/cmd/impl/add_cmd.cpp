@@ -31,7 +31,7 @@ namespace lf {
     }
 
     bool add_cmd::add_path(cmd_context& ctx, sync_mode mode, std::string_view path) {
-        const auto pi = normalize_rel(path, ctx.config.local);
+        const auto pi = normalize_rel(path, ctx.config.left);
         if (!pi) {
             return false;
         }

@@ -20,7 +20,7 @@ namespace lf {
     bool rm_cmd::run(cmd_context& ctx) const {
         bool ok = true;
         for (const auto p: ctx.opts[""]) {
-            const auto pi = normalize_rel(p, ctx.config.local);
+            const auto pi = normalize_rel(p, ctx.config.left);
             if (!pi) {
                 ok = false;
                 continue;

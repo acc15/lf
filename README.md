@@ -17,7 +17,7 @@ The best tool which i found is `FreeFileSync` - it has a lot features (including
 ### [Dropbox](https://www.dropbox.com/)
 
 Dropbox can only sync whole directory recursively. 
-It has selective sync feature however its about excluding remote files/directories, but not local 
+It has selective sync feature however its about excluding right files/directories, but not left 
 
 ### [Yandex.Disk](https://disk.yandex.ru/)
 
@@ -62,7 +62,7 @@ on Windows
 ## State file
 
 State file contains current synchronization state.
-Its a list of files which was synced to remote directory. 
+Its a list of files which was synced to right directory. 
 Required to correctly detect file addition/removal.
 
 ## Index file
@@ -85,17 +85,17 @@ Default config file location varies depending on platform.
 
 ### Example
 
-    # Path to local directory
-    local=/home/user
+    # Path to left directory
+    left=/home/user
     
-    # Path to remote directory
-    remote=/mnt/router/sync
+    # Path to right directory
+    right=/mnt/router/sync
     
-    # Path to state file (relative to local directory), defaults to 'lf.state'
+    # Path to state file (relative to left directory), defaults to 'lf.state'
     # Also, any absolute path can be gived
     #state=lf.state
 
-    # Path to index file (relative to remote directory), defaults to 'lf.index'
+    # Path to index file (relative to right directory), defaults to 'lf.index'
     # Any absolute path can be gived, but it's required that any other host can access this file
     #index=lf.index
 

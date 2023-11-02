@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 TEST_CASE("add_cmd: must skip non-existent paths to index", "[add_cmd]") {
     const auto cfg = make_test_config();
-    cd_changer cd = cfg.local;
+    cd_changer cd = cfg.left;
 
     cmd_context ctx = make_test_cmd_context(cfg, {
         { "shallow", { test_path1_str } },
@@ -22,7 +22,7 @@ TEST_CASE("add_cmd: must skip non-existent paths to index", "[add_cmd]") {
 
 TEST_CASE("add_cmd: must add non-existent file to index when index flag set", "[add_cmd]") {
     const auto cfg = make_test_config();
-    cd_changer cd = cfg.local;
+    cd_changer cd = cfg.left;
 
     cmd_context ctx = make_test_cmd_context(cfg, { { "shallow", { test_path1_str } }, { "index", {} } });
 
@@ -34,7 +34,7 @@ TEST_CASE("add_cmd: must add non-existent file to index when index flag set", "[
 
 TEST_CASE("add_cmd: must add existent file", "[add_cmd]") {
     const auto cfg = make_test_config();
-    cd_changer cd = cfg.local;
+    cd_changer cd = cfg.left;
 
     write_text(test_path1, "abc");
     cmd_context ctx = make_test_cmd_context(cfg, { { "shallow", { test_path1_str } } });
@@ -47,7 +47,7 @@ TEST_CASE("add_cmd: must add existent file", "[add_cmd]") {
 
 TEST_CASE("add_cmd: must avoid adding file with recursive mode", "[add_cmd]") {
     const auto cfg = make_test_config();
-    cd_changer cd = cfg.local;
+    cd_changer cd = cfg.left;
 
     write_text(test_path1, "abc");
     cmd_context ctx = make_test_cmd_context(cfg, { { "recursive", { test_path1_str } } });
@@ -59,7 +59,7 @@ TEST_CASE("add_cmd: must avoid adding file with recursive mode", "[add_cmd]") {
 
 TEST_CASE("add_cmd: must add dir with recursive mode", "[add_cmd]") {
     const auto cfg = make_test_config();
-    cd_changer cd = cfg.local;
+    cd_changer cd = cfg.left;
 
     fs::create_directories(test_path1);    
     cmd_context ctx = make_test_cmd_context(cfg, { { "recursive", { test_path1_str } } });

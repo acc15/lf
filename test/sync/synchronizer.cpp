@@ -11,14 +11,14 @@
 namespace fs = std::filesystem;
 using namespace lf;
 
-config make_sync(std::optional<bool> local_to_remote = std::nullopt) {
-    return make_test_config(local_to_remote.has_value() 
-        ? (local_to_remote ? "l2r" : "r2l") 
+config make_sync(std::optional<bool> left_to_right = std::nullopt) {
+    return make_test_config(left_to_right.has_value() 
+        ? (left_to_right ? "l2r" : "r2l") 
         : fs::path());
 }
 
-const fs::path& pick_path(const config& config, bool local) {
-    return local ? config.local : config.remote;
+const fs::path& pick_path(const config& config, bool is_left) {
+    return is_left ? config.left : config.right;
 }
 
 std::pair<fs::path, fs::path> make_paths(
@@ -29,8 +29,8 @@ std::pair<fs::path, fs::path> make_paths(
     return std::make_pair(pick_path(config, !swap) / path, pick_path(config, swap) / path);
 }
 
-const char* test_direction(bool local) {
-    return local ? "local to remote" : "remote to local";
+const char* test_direction(bool is_left) {
+    return is_left ? "left to right" : "right to left";
 }
 
 fs::file_time_type plus50ms_last_write_time(const std::filesystem::path& dst, const std::filesystem::path& src) {
@@ -54,11 +54,11 @@ void write_test_file(const fs::path& path) {
 
 TEST_CASE("synchronizer: file added", "[synchronizer]") {
 
-    const bool local = GENERATE(true, false);
-    INFO( test_direction(local) );
+    const bool is_left = GENERATE(true, false);
+    INFO( test_direction(is_left) );
     
-    const config config = make_sync(local);
-    const auto [l, r] = make_paths(config, test_deep_path, local);
+    const config config = make_sync(is_left);
+    const auto [l, r] = make_paths(config, test_deep_path, is_left);
     lf::tracked_index index;
     lf::tracked_state state;
     index.set(test_deep_path, sync_mode::SHALLOW);
@@ -78,11 +78,11 @@ TEST_CASE("synchronizer: file added", "[synchronizer]") {
 
 TEST_CASE("synchronizer: file deleted", "[synchronizer]") {
     
-    const bool local = GENERATE(true, false);
-    INFO( test_direction(local) );
+    const bool is_left = GENERATE(true, false);
+    INFO( test_direction(is_left) );
     
-    const config config = make_sync(local);
-    const auto [l, r] = make_paths(config, test_path, local);
+    const config config = make_sync(is_left);
+    const auto [l, r] = make_paths(config, test_path, is_left);
 
     lf::tracked_index index;
     lf::tracked_state state;
@@ -104,11 +104,11 @@ TEST_CASE("synchronizer: file deleted", "[synchronizer]") {
 
 TEST_CASE("synchronizer: file updated", "[synchronizer]") {
 
-    bool local = GENERATE(true, false);
-    INFO( test_direction(local) );
+    bool is_left = GENERATE(true, false);
+    INFO( test_direction(is_left) );
     
-    const config config = make_sync(local);
-    const auto [l, r] = make_paths(config, test_path, local);
+    const config config = make_sync(is_left);
+    const auto [l, r] = make_paths(config, test_path, is_left);
 
     lf::tracked_index index;
     lf::tracked_state state;
@@ -156,13 +156,13 @@ TEST_CASE("synchronizer: file removed from index (ignored)", "[synchronizer]") {
 TEST_CASE("synchronizer: can update file timestamp", "[synchronizer]") {
     
     const auto config = make_sync();
-    write_test_file(config.local / test_path);
-    write_test_file(config.remote / test_path);
-    plus50ms_last_write_time(config.local / test_path, config.remote / test_path);
+    write_test_file(config.left / test_path);
+    write_test_file(config.right / test_path);
+    plus50ms_last_write_time(config.left / test_path, config.right / test_path);
 
 }
 
-TEST_CASE("synchronizer: local shallow dir to remote", "[synchronizer]") {
+TEST_CASE("synchronizer: left shallow dir to right", "[synchronizer]") {
 
     config config = make_sync();
     
@@ -172,16 +172,16 @@ TEST_CASE("synchronizer: local shallow dir to remote", "[synchronizer]") {
 
     lf::tracked_state state;
 
-    write_test_file(config.local / "a" / "a.txt");
-    write_test_file(config.local / "a" / "b.txt");
-    write_test_file(config.local / "a" / "c.txt");
+    write_test_file(config.left / "a" / "a.txt");
+    write_test_file(config.left / "a" / "b.txt");
+    write_test_file(config.left / "a" / "c.txt");
 
     synchronizer s(config, index, state);
     s.run();
 
-    REQUIRE_FALSE( fs::exists(config.remote / "a" / "a.txt") ); // ignored
-    REQUIRE(read_text(config.remote / "a" / "b.txt") == test_content );
-    REQUIRE(read_text(config.remote / "a" / "c.txt") == test_content );
+    REQUIRE_FALSE( fs::exists(config.right / "a" / "a.txt") ); // ignored
+    REQUIRE(read_text(config.right / "a" / "b.txt") == test_content );
+    REQUIRE(read_text(config.right / "a" / "c.txt") == test_content );
 
     REQUIRE_FALSE( s.state.get(fs::path("a") / "a.txt") );
     REQUIRE( s.state.get(fs::path("a") / "b.txt") );
@@ -221,9 +221,9 @@ TEST_CASE("synchronizer: delete shallow dir file", "[synchronizer]") {
     const fs::path a = fs::path("dir") / "a.txt";
     const fs::path b = fs::path("dir") / "b.txt";
 
-    write_test_file(config.local / a);
-    write_test_file(config.remote / a);
-    write_test_file(config.remote / b);
+    write_test_file(config.left / a);
+    write_test_file(config.right / a);
+    write_test_file(config.right / b);
 
     index.set(a.parent_path(), sync_mode::SHALLOW);
     state.set(a, true);
@@ -232,8 +232,8 @@ TEST_CASE("synchronizer: delete shallow dir file", "[synchronizer]") {
     synchronizer s(config, index, state);
     s.run();
 
-    REQUIRE( fs::exists(config.remote / a ));
-    REQUIRE_FALSE( fs::exists(config.remote / b ));
+    REQUIRE( fs::exists(config.right / a ));
+    REQUIRE_FALSE( fs::exists(config.right / b ));
 
     REQUIRE( index.get("dir") == sync_mode::SHALLOW );
     REQUIRE( state.get(a.parent_path()) );
@@ -244,11 +244,11 @@ TEST_CASE("synchronizer: delete shallow dir file", "[synchronizer]") {
 
 TEST_CASE("synchronizer: file to dir", "[synchronizer]") {
 
-    bool local = GENERATE(true, false);
-    INFO( test_direction(local) );
+    bool is_left = GENERATE(true, false);
+    INFO( test_direction(is_left) );
     
-    const config config = make_sync(local);
-    const auto [l, r] = make_paths(config, test_path, local);
+    const config config = make_sync(is_left);
+    const auto [l, r] = make_paths(config, test_path, is_left);
 
     lf::tracked_index index;
     lf::tracked_state state;
@@ -270,11 +270,11 @@ TEST_CASE("synchronizer: file to dir", "[synchronizer]") {
 
 TEST_CASE("synchronizer: dir to file", "[synchronizer]") {
 
-    bool local = GENERATE(true, false);
-    INFO( test_direction(local) );
+    bool is_left = GENERATE(true, false);
+    INFO( test_direction(is_left) );
     
-    const config config = make_sync(local);
-    const auto [l, r] = make_paths(config, test_path, local);
+    const config config = make_sync(is_left);
+    const auto [l, r] = make_paths(config, test_path, is_left);
 
     lf::tracked_index index;
     lf::tracked_state state;
@@ -296,11 +296,11 @@ TEST_CASE("synchronizer: dir to file", "[synchronizer]") {
 
 TEST_CASE("synchronizer: nested file must override file", "[synchronizer]") {
     
-    bool local = GENERATE(true, false);
-    INFO( test_direction(local) );
+    bool is_left = GENERATE(true, false);
+    INFO( test_direction(is_left) );
 
-    const config config = make_sync(local);
-    const auto [l, r] = make_paths(config, test_deep_path, local);
+    const config config = make_sync(is_left);
+    const auto [l, r] = make_paths(config, test_deep_path, is_left);
 
     lf::tracked_index index;
     lf::tracked_state state;
@@ -318,7 +318,7 @@ TEST_CASE("synchronizer: nested file must override file", "[synchronizer]") {
 
 }
 
-TEST_CASE("synchronizer: must delete empty local and remote directories and remote files", "[synchronizer]") {
+TEST_CASE("synchronizer: must delete empty left and right directories and right files", "[synchronizer]") {
     
     const config config = make_sync();
     lf::tracked_index index;
@@ -330,7 +330,7 @@ TEST_CASE("synchronizer: must delete empty local and remote directories and remo
     const fs::path cleanup_dir = keep_dir / "b";
     const fs::path path = cleanup_dir / test_path;
 
-    // file present in remote, but dir "test" removed in local
+    // file present in right, but dir "test" removed in left
     fs::create_directory(l / keep_dir);
     write_test_file(r / path);
 
@@ -347,7 +347,7 @@ TEST_CASE("synchronizer: must delete empty local and remote directories and remo
 
 }
 
-TEST_CASE("synchronizer: must keep local IGNORE file", "[synchronizer]") {
+TEST_CASE("synchronizer: must keep left IGNORE file", "[synchronizer]") {
     
     const config config = make_sync();
     const auto [l, r] = make_paths(config, test_deep_path);
@@ -401,7 +401,7 @@ TEST_CASE("synchronizer: must sync permissions", "[synchronizer]") {
 
 }
 
-TEST_CASE("synchronizer: not synced, but local and remote are same", "[synchronizer]") {
+TEST_CASE("synchronizer: not synced, but left and right are same", "[synchronizer]") {
 
     config config = make_sync();
     const auto [l, r] = make_paths(config, test_path);
@@ -424,7 +424,7 @@ TEST_CASE("synchronizer: not synced, but local and remote are same", "[synchroni
 
 }
 
-TEST_CASE("synchronizer: remote file deleted, index deleted, local synced - must delete local", "[synchronizer]") {
+TEST_CASE("synchronizer: right file deleted, index deleted, left synced - must delete left", "[synchronizer]") {
 
     config config = make_sync();
     const auto [l, r] = make_paths(config, test_path);
@@ -444,7 +444,7 @@ TEST_CASE("synchronizer: remote file deleted, index deleted, local synced - must
 
 }
 
-TEST_CASE("synchronizer: remote dir, local synced file - must delete local file", "[synchronizer]") {
+TEST_CASE("synchronizer: right dir, left synced file - must delete left file", "[synchronizer]") {
 
     config config = make_sync();
     const auto [l, r] = make_paths(config, test_path);
@@ -465,7 +465,7 @@ TEST_CASE("synchronizer: remote dir, local synced file - must delete local file"
 
 }
 
-TEST_CASE("synchronizer: recursive, must keep local ignored dir", "[synchronizer]") {
+TEST_CASE("synchronizer: recursive, must keep left ignored dir", "[synchronizer]") {
 
     config config = make_sync();
     const auto [l, r] = make_paths(config);

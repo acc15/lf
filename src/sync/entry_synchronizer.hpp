@@ -13,8 +13,8 @@ namespace lf {
 
         synchronizer& s;
         const sync_item& item;
-        path_info local;
-        path_info remote;
+        path_info left;
+        path_info right;
 
         log_level max_log_level;
         std::stringstream out;

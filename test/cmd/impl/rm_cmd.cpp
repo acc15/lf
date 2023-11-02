@@ -8,7 +8,7 @@ namespace fs = std::filesystem;
 
 TEST_CASE("rm_cmd: must remove path from index", "[rm_cmd]") {
     const auto cfg = make_test_config();
-    cd_changer cd = cfg.local;
+    cd_changer cd = cfg.left;
     
     auto index = lf::index {};
     index.set(test_path1, sync_mode::SHALLOW);
@@ -27,7 +27,7 @@ TEST_CASE("rm_cmd: must remove path from index", "[rm_cmd]") {
 
 TEST_CASE("rm_cmd: must set IGNORE if soft delete specified", "[rm_cmd]") {
     const auto cfg = make_test_config();
-    cd_changer cd = cfg.local;
+    cd_changer cd = cfg.left;
 
     cmd_context ctx = make_test_cmd_context(cfg, {
         { "", { test_path1_str } },
@@ -41,7 +41,7 @@ TEST_CASE("rm_cmd: must set IGNORE if soft delete specified", "[rm_cmd]") {
 
 TEST_CASE("rm_cmd: must delete file if force specified", "[rm_cmd]") {
     const auto cfg = make_test_config();
-    cd_changer cd = cfg.local;
+    cd_changer cd = cfg.left;
 
     write_text(test_path1, "test");
     

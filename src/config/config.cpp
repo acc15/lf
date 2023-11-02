@@ -17,13 +17,6 @@ namespace lf {
     const char* const config::name = "config";
     const char* const config::env_name = "LF_CONFIG";
 
-    const std::unordered_map<std::string_view, void (*)(config&, std::string_view)> binder_map = {
-        { "local",  [](config& c, std::string_view v) { c.local = v; } },
-        { "remote", [](config& c, std::string_view v) { c.remote = v; } },
-        { "index",  [](config& c, std::string_view v) { c.index = v; } },
-        { "state",  [](config& c, std::string_view v) { c.state = v; } }
-    };
-
     bool check_config_path_specified(const std::filesystem::path& p, const char* key) {
         if (p.empty()) {
             log.error() && log() << key << " path isn't specified" << log::end;
@@ -53,11 +46,11 @@ namespace lf {
     }
 
     void validate_and_set_default(config& cfg) {
-        if (!cfg.local.is_absolute()) {
-            throw std::logic_error(format_stream() << "config local path must be absolute path: " << cfg.local);
+        if (!cfg.left.is_absolute()) {
+            throw std::logic_error(format_stream() << "config left path must be absolute path: " << cfg.left);
         }
-        if (!cfg.remote.is_absolute()) {
-            throw std::logic_error(format_stream() << "config remote path must be absolute path: " << cfg.remote);
+        if (!cfg.right.is_absolute()) {
+            throw std::logic_error(format_stream() << "config right path must be absolute path: " << cfg.right);
         }
         if (cfg.index.empty()) {
             throw std::logic_error(format_stream() << "config index path can't be empty");
@@ -66,10 +59,10 @@ namespace lf {
             throw std::logic_error(format_stream() << "config state path can't be empty");
         }
         if (!cfg.index.is_absolute()) {
-            cfg.index = cfg.remote / cfg.index;
+            cfg.index = cfg.right / cfg.index;
         }
         if (!cfg.state.is_absolute()) {
-            cfg.state = cfg.local / cfg.state;
+            cfg.state = cfg.left / cfg.state;
         }
     }
 
@@ -96,10 +89,10 @@ namespace lf {
             }
 
             const auto value = ltrim(sv.substr(eq_pos + 1));
-            if (key == "local") {
-                cfg.local = value;
-            } else if (key == "remote") {
-                cfg.remote = value;
+            if (key == "left") {
+                cfg.left = value;
+            } else if (key == "right") {
+                cfg.right = value;
             } else if (key == "index") {
                 cfg.index = value;
             } else if (key == "state") {

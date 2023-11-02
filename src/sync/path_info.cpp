@@ -5,9 +5,9 @@
 
 namespace lf {
 
-    path_info::path_info(bool local, const std::filesystem::path& root_path, const std::filesystem::path& item_path):
-        local(local),
-        name(local ? "local" : "remote"),
+    path_info::path_info(bool is_left, const std::filesystem::path& root_path, const std::filesystem::path& item_path):
+        is_left(is_left),
+        name(is_left ? "left" : "right"),
         root(root_path),
         item(item_path),
         full_path(join_path(root_path, item_path)),
@@ -18,7 +18,7 @@ namespace lf {
     }
 
     path_info path_info::parent() const {
-        return path_info(local, root, item.parent_path());
+        return path_info(is_left, root, item.parent_path());
     }
 
     void path_info::init_time() {

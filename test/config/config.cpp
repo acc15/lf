@@ -14,8 +14,8 @@
 using namespace lf;
 
 void cmp_config(const config& l, const config& r) {
-    CHECK( l.local == r.local );
-    CHECK( l.remote == r.remote );
+    CHECK( l.left == r.left );
+    CHECK( l.right == r.right );
     CHECK( l.index == r.index );
     CHECK( l.state == r.state );
 }
@@ -28,17 +28,17 @@ config test_parse(const std::string& yaml) {
 TEST_CASE("config: parse", "[config]") {
 
     const std::string text = 
-        "local=" + test_root_str("local/home") + "\n"
-        "remote=" + test_root_str("remote/home") + "\n"
+        "left=" + test_root_str("left/home") + "\n"
+        "right=" + test_root_str("right/home") + "\n"
         "state=.config/lf/home.state\n"
         "index=home.index\n";
 
     auto p = test_parse(text);
     cmp_config(p, config {
-        .local = test_root_path / "local/home", 
-        .remote = test_root_path / "remote/home",
-        .state = test_root_path / "local/home/.config/lf/home.state", 
-        .index = test_root_path / "remote/home/home.index"
+        .left = test_root_path / "left/home", 
+        .right = test_root_path / "right/home",
+        .state = test_root_path / "left/home/.config/lf/home.state", 
+        .index = test_root_path / "right/home/home.index"
     });
 
 }

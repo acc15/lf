@@ -46,8 +46,8 @@ namespace lf {
             return false;
         }
 
-        const auto from_pi = normalize_rel(move_pair->first, ctx.config.local);
-        const auto to_pi = normalize_rel(move_pair->second, ctx.config.local);
+        const auto from_pi = normalize_rel(move_pair->first, ctx.config.left);
+        const auto to_pi = normalize_rel(move_pair->second, ctx.config.left);
         if (!from_pi || !to_pi) {
             return false;
         } 

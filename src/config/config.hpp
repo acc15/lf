@@ -17,8 +17,8 @@ namespace lf {
         static std::filesystem::path get_path();
         static std::filesystem::path get_default_path();
         
-        std::filesystem::path local;
-        std::filesystem::path remote;
+        std::filesystem::path left;
+        std::filesystem::path right;
         std::filesystem::path state = "lf.state";
         std::filesystem::path index = "lf.index";
 

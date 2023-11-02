@@ -62,15 +62,15 @@ namespace lf {
 
     config make_test_config(const fs::path& suffix) {
         const auto test_dir = create_temp_test_dir(suffix);
-        const auto local = test_dir / "local";
-        const auto remote = test_dir / "remote";
-        fs::create_directories(local);
-        fs::create_directories(remote);
+        const auto left = test_dir / "left";
+        const auto right = test_dir / "right";
+        fs::create_directories(left);
+        fs::create_directories(right);
         return config {
-            .local = local,
-            .remote = remote,
-            .state = local / "lf.state",
-            .index = remote / "lf.index"
+            .left = left,
+            .right = right,
+            .state = left / "lf.state",
+            .index = right / "lf.index"
         };
     }
 

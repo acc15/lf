@@ -14,8 +14,8 @@ namespace lf {
     entry_synchronizer::entry_synchronizer(synchronizer& sync, const sync_item& item):
         s(sync),
         item(item),
-        local(true, sync.config.local, item.path),
-        remote(false, sync.config.remote, item.path),
+        left(true, sync.config.left, item.path),
+        right(false, sync.config.right, item.path),
         max_log_level(TRACE)
     {
     }
@@ -47,16 +47,16 @@ namespace lf {
         if (item.path.empty()) {
             return;
         }
-        if (item.mode == sync_mode::NONE && (local.type == directory || s.state.get(item.path))) {
-            delete_empty_dir_or_file(local);
+        if (item.mode == sync_mode::NONE && (left.type == directory || s.state.get(item.path))) {
+            delete_empty_dir_or_file(left);
         }
-        delete_empty_dir_or_file(remote);
+        delete_empty_dir_or_file(right);
         s.state.remove(item.path, true);
     }
 
     void entry_synchronizer::process() {
         log(TRACE) << "processing";
-        if (remote.type == directory || local.type == directory) {
+        if (right.type == directory || left.type == directory) {
             process_dir();
         } else {
             process_other();
@@ -64,7 +64,7 @@ namespace lf {
     }
 
     void entry_synchronizer::process_other() {
-        delete_path(remote);
+        delete_path(right);
         if (!s.state.get(item.path)) {
             log(DEBUG) << "not synced";
             return;
@@ -72,7 +72,7 @@ namespace lf {
         if (item.mode == sync_mode::IGNORE) {
             log(DEBUG) << "ignored";
         } else {
-            delete_path(local);
+            delete_path(left);
         }
         s.state.remove(item.path);
     }
@@ -91,14 +91,14 @@ namespace lf {
     }
 
     void entry_synchronizer::sync() {
-        if (local.type == not_found && remote.type == not_found) {
+        if (left.type == not_found && right.type == not_found) {
             log(INFO) << "no file or directory exists on both sides";
             s.state.remove(item.path);
-        } else if (remote.type == not_found) {
-            sync_not_found(local, remote);
-        } else if (local.type == not_found) {
-            sync_not_found(remote, local);
-        } else if (local.type == directory && remote.type == directory) {
+        } else if (right.type == not_found) {
+            sync_not_found(left, right);
+        } else if (left.type == not_found) {
+            sync_not_found(right, left);
+        } else if (left.type == directory && right.type == directory) {
             sync_dirs();
         } else {
             sync_with_timestamps();
@@ -129,13 +129,13 @@ namespace lf {
 
     void entry_synchronizer::sync_dirs() {
         log(TRACE) << "syncing directory";
-        create_dir_if_not_exists(local);
-        create_dir_if_not_exists(remote);
+        create_dir_if_not_exists(left);
+        create_dir_if_not_exists(right);
 
         queue_map map;
         add_state_names(map);
-        add_dir_entries(local, map);
-        add_dir_entries(remote, map);
+        add_dir_entries(left, map);
+        add_dir_entries(right, map);
         add_index_names(map);
 
         queue(map);
@@ -143,24 +143,24 @@ namespace lf {
     }
 
     void entry_synchronizer::sync_with_timestamps() {
-        local.init_time();
-        remote.init_time();
-        if (local.time == remote.time) {
+        left.init_time();
+        right.init_time();
+        if (left.time == right.time) {
             sync_same_time();
-        } else if (local.time > remote.time) {
-            sync_other(local, remote);
+        } else if (left.time > right.time) {
+            sync_other(left, right);
         } else {
-            sync_other(remote, local);
+            sync_other(right, left);
         }
     }
 
     void entry_synchronizer::sync_same_time() {
-        if (local.type == remote.type) {
-            log(DEBUG) << "synced, both entries has same modification time (" << format_date_time(local.time) << ") and same type: " << local.type;
+        if (left.type == right.type) {
+            log(DEBUG) << "synced, both entries has same modification time (" << format_date_time(left.time) << ") and same type: " << left.type;
             s.state.set(item.path, true, true);
         } else {
-            log(WARN) << "CONFLICT, both entries has same modification time (" << format_date_time(local.time) 
-                << "), but different types, local is " << local.type << ", remote is " << remote.type;
+            log(WARN) << "CONFLICT, both entries has same modification time (" << format_date_time(left.time) 
+                << "), but different types, left is " << left.type << ", right is " << right.type;
             s.state.remove(item.path);
         }
     }
