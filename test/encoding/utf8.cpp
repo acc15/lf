@@ -7,7 +7,7 @@
 #include <locale>
 #include <set>
 
-#include <encoding/utf8.hpp>
+#include <utf8/unchecked.h>
 
 #include "test_util.hpp"
 
@@ -53,12 +53,12 @@ TEST_CASE("utf8: iterator", "[utf8]") {
     std::string str = "Привет";
 
     auto it = str.begin();
-    REQUIRE( utf8_encoding::next(it) == U'П' );
-    REQUIRE( utf8_encoding::next(it) == U'р' );
-    REQUIRE( utf8_encoding::next(it) == U'и' );
-    REQUIRE( utf8_encoding::next(it) == U'в' );
-    REQUIRE( utf8_encoding::next(it) == U'е' );
-    REQUIRE( utf8_encoding::next(it) == U'т' );
+    REQUIRE( utf8::unchecked::next(it) == U'П' );
+    REQUIRE( utf8::unchecked::next(it) == U'р' );
+    REQUIRE( utf8::unchecked::next(it) == U'и' );
+    REQUIRE( utf8::unchecked::next(it) == U'в' );
+    REQUIRE( utf8::unchecked::next(it) == U'е' );
+    REQUIRE( utf8::unchecked::next(it) == U'т' );
     
     REQUIRE( it == str.end() );
 }

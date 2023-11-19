@@ -102,8 +102,16 @@ add_library(lf_core
     src/cmd/impl/mv_cmd.cpp 
     src/cmd/impl/rm_cmd.cpp 
     src/cmd/impl/info_cmd.cpp 
+
+    # glob
+    src/glob/matcher/glob_matcher.cpp
+    src/glob/matcher/char_matcher.cpp
+    src/glob/matcher/string_matcher.cpp
+    src/glob/matcher/star_matcher.cpp
+    src/glob/glob.cpp
+
 )
-target_link_libraries(lf_core PRIVATE utf8::cpp ${P7_LIBRARY})
+target_link_libraries(lf_core utf8::cpp)
 
 add_executable(lf 
     ${executable_src}
@@ -117,7 +125,6 @@ add_executable(lf_test
     ${executable_src}
     test/main.cpp
     test/test_util.cpp
-    test/encoding/utf8.cpp
 
     test/tree/tree.cpp
     test/tree/lazy_tree.cpp
@@ -148,11 +155,7 @@ add_executable(lf_test
     test/sync/synchronizer.cpp
     test/sync/entry_synchronizer.cpp
 
-    test/glob/match_tester.hpp
-    test/glob/match_tester.cpp
-
     test/glob/glob.cpp
-    test/glob/matcher.cpp
 )
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
