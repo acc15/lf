@@ -9,7 +9,7 @@ namespace lf {
 
 class char_matcher: public glob_matcher {
 public:
-    using codepoint = utf8::uint32_t;
+    using codepoint = utf8::utfchar32_t;
     using range_map = std::map<codepoint, codepoint>;
 
 private:
