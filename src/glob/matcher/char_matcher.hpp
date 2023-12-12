@@ -16,6 +16,7 @@ private:
     range_map ranges;
     bool negate;
 
+    range_map::iterator make_min_iter(const range_map::iterator& next, const codepoint& min, const codepoint& max);
     void add_minmax(const codepoint& min, const codepoint& max);
 
 public:

@@ -31,11 +31,23 @@ bool char_matcher::matches(std::streambuf* buf, size_t, bool) const {
     return iter != end && test(utf8::unchecked::next(iter));
 }
 
+char_matcher::range_map::iterator char_matcher::make_min_iter(
+    const range_map::iterator& next, 
+    const codepoint& min, 
+    const codepoint& max
+) {
+    if (next != ranges.begin()) {
+        const range_map::iterator prev = std::prev(next);
+        if (prev->second + 1 >= min) {
+            return prev;
+        }
+    }
+    return ranges.insert(next, { min, max });
+}
+
 void char_matcher::add_minmax(const codepoint& min, const codepoint& max) {
     const auto min_next = ranges.upper_bound(min);
-    const auto min_iter = (min_next != ranges.begin() && std::prev(min_next)->second + 1 >= min)
-        ? std::prev(min_next)
-        : ranges.insert(min_next, { min, max });
+    const auto min_iter = make_min_iter(min_next, min, max);
 
     const auto max_next = ranges.upper_bound(max);
     if (max_next != ranges.end() && max + 1 == max_next->first) {
