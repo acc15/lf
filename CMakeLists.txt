@@ -105,7 +105,8 @@ add_library(lf_core
 
     # glob
     src/glob/matcher/glob_matcher.cpp
-    src/glob/matcher/char_matcher.cpp
+    src/glob/matcher/any_matcher.cpp
+    src/glob/matcher/range_matcher.cpp
     src/glob/matcher/string_matcher.cpp
     src/glob/matcher/star_matcher.cpp
     src/glob/glob.cpp

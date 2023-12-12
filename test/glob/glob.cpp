@@ -3,7 +3,8 @@
 #include <sstream>
 
 #include "glob/glob.hpp"
-#include "glob/matcher/char_matcher.hpp"
+#include "glob/matcher/any_matcher.hpp"
+#include "glob/matcher/range_matcher.hpp"
 #include "glob/matcher/star_matcher.hpp"
 #include "glob/matcher/string_matcher.hpp"
 #include "../test_util.hpp"
@@ -33,8 +34,8 @@ public:
 TEST_CASE("glob: matches", "[glob]") {
 
     glob g(make_unique_container<glob::matcher_vector>(
-        std::make_unique<char_matcher>(char_matcher::range_map {}, true), // any char match
-        std::make_unique<char_matcher>(char_matcher::range_map {{U'A', U'Z'}}, false), // A-Z
+        std::make_unique<any_matcher>(),
+        std::make_unique<range_matcher>(range_matcher::range_map {{U'A', U'Z'}}, false), // A-Z
         std::make_unique<star_matcher>(), // zero or more chars
         std::make_unique<string_matcher>(".txt") // .txt
     ));
