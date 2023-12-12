@@ -24,7 +24,6 @@ namespace lf {
     public:
         glob(matcher_vector&& matchers = {});
         bool matches(std::streambuf* buf) const;
-        static glob parse(std::string_view view);
     };
 
 }

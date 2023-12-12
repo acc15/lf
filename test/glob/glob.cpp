@@ -7,7 +7,7 @@
 #include "glob/matcher/range_matcher.hpp"
 #include "glob/matcher/star_matcher.hpp"
 #include "glob/matcher/string_matcher.hpp"
-#include "../test_util.hpp"
+#include "test_util.hpp"
 
 using namespace lf;
 

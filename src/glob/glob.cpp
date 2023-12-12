@@ -44,8 +44,4 @@ bool glob::matches(std::streambuf* buf) const {
     return buf->sgetc() == std::char_traits<char>::eof();
 }
 
-glob glob::parse(std::string_view view) {
-    return glob();
-}
-
 }

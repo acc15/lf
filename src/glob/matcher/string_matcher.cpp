@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include "string_matcher.hpp"
+#include "glob/matcher/string_matcher.hpp"
 
 namespace lf {
 

@@ -1,6 +1,6 @@
 #include <utf8/unchecked.h>
 
-#include "star_matcher.hpp"
+#include "glob/matcher/star_matcher.hpp"
 
 namespace lf {
 
