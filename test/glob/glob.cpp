@@ -59,24 +59,30 @@ struct glob_match_visitor {
     const bool last;
 
     bool operator()(const glob::any&) {
-        if (begin != end) {
-            utf8::unchecked::next(begin);
-            return true;
+        if (begin == end) {
+            return false;
         }
-        return false;
+        utf8::unchecked::next(begin);
+        return true;
     }
 
-    bool operator()(const glob::range&) {
-        return false;
+    bool operator()(const glob::range& r) {
+        if (begin == end) {
+            return false;
+        }
+        const utf8::utfchar32_t cp = utf8::unchecked::next(begin);
+        const auto it = r.map.upper_bound(cp);
+        const bool in_range = it != r.map.begin() && cp <= std::prev(it)->second;
+        return in_range != r.inverse;
     }
 
     bool operator()(const glob::string& str) {
         const auto p = std::mismatch(str.begin(), str.end(), begin, end);
-        if (p.first == str.end()) {
-            begin = p.second;
-            return true;
+        if (p.first != str.end()) {
+            return false;
         }
-        return false;
+        begin = p.second;
+        return true;
     }
 
     bool operator()(const glob::star&) {
