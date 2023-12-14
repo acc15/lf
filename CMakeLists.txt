@@ -3,7 +3,7 @@ cmake_policy(SET CMP0092 NEW) # Disable /W3 flag for MSVC by default
 
 project(lf LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_program(cppcheck NAMES cppcheck)
