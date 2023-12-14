@@ -1,47 +1,69 @@
+#include <utf8/unchecked.h>
+
 #include "glob/glob.hpp"
+#include "glob/match.hpp"
 
 namespace lf {
 
-glob::glob(matcher_vector&& matchers): matchers(std::move(matchers)) {}
+template <typename SequenceIter>
+struct glob_match_visitor {
 
-bool glob::matches(std::streambuf* buf) const {
-    std::vector<repetition_info> rep;
+    SequenceIter& begin;
+    const SequenceIter& end;
+    size_t repetition;
+    const bool last;
 
-    size_t i = 0;
-    while (i < matchers.size()) {
-        const glob_matcher& m = *matchers[i];
-
-        size_t repetition = 0;
-        if (m.is_repetitive()) {
-            if (!rep.empty() && rep.back().index == i) {
-                repetition = rep.back().repetition;
-            } else {
-                std::streampos pos = buf->pubseekoff(0, std::ios_base::cur, std::ios_base::in);
-                rep.push_back(repetition_info { pos, i, repetition });
-            }
-        }
-        
-        const bool is_last = i == (matchers.size() - 1);
-        if (m.matches(buf, repetition, is_last)) {
-            ++i;
-            continue;
-        }
-
-        if (rep.empty()) {
+    bool operator()(const glob::any&) {
+        if (begin == end) {
             return false;
         }
-
-        if (m.is_repetitive()) {
-            rep.pop_back();
-        }
-
-        repetition_info& r = rep.back();
-        buf->pubseekpos(r.position, std::ios_base::in);
-        i = r.index;
-        ++r.repetition;
-
+        utf8::unchecked::next(begin);
+        return true;
     }
-    return buf->sgetc() == std::char_traits<char>::eof();
+
+    bool operator()(const glob::range& r) {
+        if (begin == end) {
+            return false;
+        }
+        const utf8::utfchar32_t cp = utf8::unchecked::next(begin);
+        const auto it = r.map.upper_bound(cp);
+        const bool in_range = it != r.map.begin() && cp <= std::prev(it)->second;
+        return in_range != r.inverse;
+    }
+
+    bool operator()(const glob::string& str) {
+        const auto p = std::mismatch(str.begin(), str.end(), begin, end);
+        if (p.first != str.end()) {
+            return false;
+        }
+        begin = p.second;
+        return true;
+    }
+
+    bool operator()(const glob::star&) {
+        if (last) {
+            begin = end;
+        } else {
+            for (; begin != end && repetition > 0; utf8::unchecked::next(begin), --repetition);
+        }
+        return repetition == 0;
+    }
+};
+
+glob::range::range(const std::initializer_list<std::pair<const codepoint, codepoint>>& map_init): 
+    map(map_init), 
+    inverse(false) {
+}
+
+glob::glob(const std::initializer_list<element>& v): elements(v) {
+}
+
+bool glob::matches(std::string_view sv) const {
+    return retryable_match(elements, sv, [](const glob::element& e) {
+        return std::visit([](auto&& v) { return std::is_same_v<std::decay_t<decltype(v)>, glob::star>; }, e);
+    }, [](const glob::element& e, auto& begin, const auto& end, size_t repetition, bool last) {
+        return std::visit(glob_match_visitor {begin, end, repetition, last}, e);
+    });
 }
 
 }

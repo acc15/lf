@@ -1,13 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <memory>
 #include <map>
 #include <variant>
-
 #include <utf8/core.h>
-
-#include "matcher/glob_matcher.hpp"
 
 namespace lf {
 
@@ -18,30 +14,21 @@ namespace lf {
         struct star {};
         struct any {};
         struct range {
-            bool inverse;
             std::map<codepoint, codepoint> map;
+            bool inverse;
+
+            range(const std::initializer_list<std::pair<const codepoint, codepoint>>& map_init);
         };
         using string = std::string;
 
         using element = std::variant<star, any, range, string>;
-        using elements = std::vector<element>;
+        using element_vector = std::vector<element>;
 
-        using matcher_ptr = std::unique_ptr<const glob_matcher>;
-        using matcher_vector = std::vector<matcher_ptr>;
+        element_vector elements;
 
-    private:
-        matcher_vector matchers;
+        glob(const std::initializer_list<element>& v);
 
-        struct repetition_info {
-            std::streampos position;
-            size_t index;
-            size_t repetition;
-        };
-
-
-    public:
-        glob(matcher_vector&& matchers = {});
-        bool matches(std::streambuf* buf) const;
+        bool matches(std::string_view sv) const;
     };
 
 }
