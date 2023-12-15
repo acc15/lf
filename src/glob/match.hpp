@@ -3,18 +3,19 @@
 #include <concepts>
 #include <cstddef>
 #include <vector>
+#include <ranges>
 
 namespace lf {
 
 template <
-    typename Elements,
-    typename Sequence,
-    std::invocable<typename Elements::const_reference> RetryableFn,
+    std::ranges::range Elements,
+    std::ranges::range Sequence,
+    std::invocable<std::ranges::range_const_reference_t<const Elements>> RetryableFn,
     std::invocable<
-        typename Elements::const_reference, 
-        typename Sequence::const_iterator&, 
-        const typename Sequence::const_iterator&,
-        size_t,
+        std::ranges::range_const_reference_t<const Elements>, 
+        std::ranges::const_iterator_t<const Sequence>&,
+        const std::ranges::const_sentinel_t<const Sequence>&, 
+        std::size_t,
         bool
     > MatchFn
 >
@@ -25,8 +26,9 @@ bool retryable_match(
     const MatchFn& try_match
 ) {
 
-    using elem_iter = typename Elements::const_iterator;
-    using seq_iter = typename Sequence::const_iterator;
+    using elem_iter = std::ranges::const_iterator_t<const Elements>;
+    using seq_iter = std::ranges::const_iterator_t<const Sequence>;
+    
     struct retry_info {
         elem_iter e_it;
         seq_iter s_it;

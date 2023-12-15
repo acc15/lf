@@ -31,7 +31,7 @@ struct glob_match_visitor {
         return in_range != r.inverse;
     }
 
-    bool operator()(const glob::string& str) {
+    bool operator()(const std::string& str) {
         const auto p = std::mismatch(str.begin(), str.end(), begin, end);
         if (p.first != str.end()) {
             return false;
@@ -60,7 +60,7 @@ glob::glob(const std::initializer_list<element>& v): elements(v) {
 
 bool glob::matches(std::string_view sv) const {
     return retryable_match(elements, sv, [](const glob::element& e) {
-        return std::visit([](auto&& v) { return std::is_same_v<std::decay_t<decltype(v)>, glob::star>; }, e);
+        return std::visit(star_retryable_visitor{}, e);
     }, [](const glob::element& e, auto& begin, const auto& end, size_t repetition, bool last) {
         return std::visit(glob_match_visitor {begin, end, repetition, last}, e);
     });

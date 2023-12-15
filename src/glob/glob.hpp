@@ -19,10 +19,15 @@ namespace lf {
 
             range(const std::initializer_list<std::pair<const codepoint, codepoint>>& map_init);
         };
-        using string = std::string;
 
-        using element = std::variant<star, any, range, string>;
+        using element = std::variant<star, any, range, std::string>;
         using element_vector = std::vector<element>;
+
+        struct star_retryable_visitor {
+            template<typename T>
+            bool operator()(const T&) { return false; }
+            bool operator()(const star&) { return true; }
+        };
 
         element_vector elements;
 

@@ -110,6 +110,7 @@ add_library(lf_core
     src/glob/matcher/string_matcher.cpp
     src/glob/matcher/star_matcher.cpp
     src/glob/glob.cpp
+    src/glob/glob_path.cpp
 
 )
 target_link_libraries(lf_core utf8::cpp)
@@ -157,6 +158,7 @@ add_executable(lf_test
     test/sync/entry_synchronizer.cpp
 
     test/glob/glob.cpp
+    test/glob/glob_path.cpp
 )
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)
