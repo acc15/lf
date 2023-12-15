@@ -2,7 +2,10 @@
 
 #include "glob/glob.hpp"
 
+#include <iostream>
+
 using namespace lf;
+
 
 TEST_CASE("glob: matches", "[glob]") {
 
@@ -41,3 +44,32 @@ TEST_CASE("glob: matches", "[glob]") {
 
 }
 
+
+TEST_CASE("glob: performance", "[glob_path]") {
+
+
+    for (size_t iter = 0; iter < 20; iter++) {
+
+        glob g;
+        for (size_t i = 0; i < iter; i++) {
+            g.elements.push_back("a");
+            g.elements.push_back(glob::star{});
+        }
+        g.elements.push_back("b");
+
+        std::string str;
+        for (size_t i = 0; i < iter; i++) {
+            str.push_back('a');
+        }
+
+        const auto t_start = std::chrono::high_resolution_clock::now();
+        CHECK_FALSE( g.matches(str) );
+        const auto t_end = std::chrono::high_resolution_clock::now();
+
+        std::cout << iter <<  " stars: took "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() 
+            << "ms" << std::endl;
+    
+    }
+
+}

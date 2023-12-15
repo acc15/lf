@@ -7,16 +7,21 @@
 
 namespace lf {
 
+template <std::ranges::range Sequence>
+struct match_struct {
+    std::ranges::const_iterator_t<const Sequence>& cur;
+    const std::ranges::const_sentinel_t<const Sequence>& end;
+    std::size_t retry;
+    const bool last;
+};
+
 template <
     std::ranges::range Elements,
     std::ranges::range Sequence,
     std::invocable<std::ranges::range_const_reference_t<const Elements>> RetryableFn,
     std::invocable<
         std::ranges::range_const_reference_t<const Elements>, 
-        std::ranges::const_iterator_t<const Sequence>&,
-        const std::ranges::const_sentinel_t<const Sequence>&, 
-        std::size_t,
-        bool
+        match_struct<Sequence>&
     > MatchFn
 >
 bool retryable_match(
@@ -54,7 +59,9 @@ bool retryable_match(
             
             const size_t retry = retryable ? retries.back().retry : 0;
             const bool last = (e_cur + 1 == e_end);
-            if (try_match(*e_cur, s_cur, s_end, retry, last)) {
+            
+            match_struct<Sequence> m = { s_cur, s_end, retry, last };
+            if (try_match(*e_cur, m)) {
                 ++e_cur;
                 continue;
             }

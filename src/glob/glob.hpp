@@ -31,6 +31,7 @@ namespace lf {
 
         element_vector elements;
 
+        glob() = default;
         glob(const std::initializer_list<element>& v);
 
         bool matches(std::string_view sv) const;

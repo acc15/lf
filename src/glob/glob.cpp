@@ -5,48 +5,45 @@
 
 namespace lf {
 
-template <typename SequenceIter>
-struct glob_match_visitor {
+template <std::ranges::range Sequence>
+struct match_visitor {
 
-    SequenceIter& begin;
-    const SequenceIter& end;
-    size_t repetition;
-    const bool last;
+    match_struct<Sequence>& m;
 
     bool operator()(const glob::any&) {
-        if (begin == end) {
+        if (m.cur == m.end) {
             return false;
         }
-        utf8::unchecked::next(begin);
+        utf8::unchecked::next(m.cur);
         return true;
     }
 
     bool operator()(const glob::range& r) {
-        if (begin == end) {
+        if (m.cur == m.end) {
             return false;
         }
-        const utf8::utfchar32_t cp = utf8::unchecked::next(begin);
+        const utf8::utfchar32_t cp = utf8::unchecked::next(m.cur);
         const auto it = r.map.upper_bound(cp);
         const bool in_range = it != r.map.begin() && cp <= std::prev(it)->second;
         return in_range != r.inverse;
     }
 
     bool operator()(const std::string& str) {
-        const auto p = std::mismatch(str.begin(), str.end(), begin, end);
+        const auto p = std::mismatch(str.begin(), str.end(), m.cur, m.end);
         if (p.first != str.end()) {
             return false;
         }
-        begin = p.second;
+        m.cur = p.second;
         return true;
     }
 
     bool operator()(const glob::star&) {
-        if (last) {
-            begin = end;
+        if (m.last) {
+            m.cur = m.end;
         } else {
-            for (; begin != end && repetition > 0; utf8::unchecked::next(begin), --repetition);
+            for (; m.cur != m.end && m.retry > 0; utf8::unchecked::next(m.cur), --m.retry);
         }
-        return repetition == 0;
+        return m.retry == 0;
     }
 };
 
@@ -61,8 +58,8 @@ glob::glob(const std::initializer_list<element>& v): elements(v) {
 bool glob::matches(std::string_view sv) const {
     return retryable_match(elements, sv, [](const glob::element& e) {
         return std::visit(star_retryable_visitor{}, e);
-    }, [](const glob::element& e, auto& begin, const auto& end, size_t repetition, bool last) {
-        return std::visit(glob_match_visitor {begin, end, repetition, last}, e);
+    }, [](const glob::element& e, match_struct<std::string_view>& m) {
+        return std::visit(match_visitor {m}, e);
     });
 }
 
