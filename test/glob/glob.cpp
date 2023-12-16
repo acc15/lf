@@ -1,6 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/benchmark/catch_benchmark.hpp>
 
 #include "glob/glob.hpp"
+
+
 
 #include <iostream>
 
@@ -45,8 +48,7 @@ TEST_CASE("glob: matches", "[glob]") {
 }
 
 
-TEST_CASE("glob: performance", "[glob_path]") {
-
+TEST_CASE("glob: match performance", "[glob]") {
 
     for (size_t iter = 0; iter < 20; iter++) {
 
@@ -57,18 +59,15 @@ TEST_CASE("glob: performance", "[glob_path]") {
         }
         g.elements.push_back("b");
 
-        std::string str;
-        for (size_t i = 0; i < iter; i++) {
-            str.push_back('a');
-        }
+        std::string str(iter, 'a');
 
         const auto t_start = std::chrono::high_resolution_clock::now();
         CHECK_FALSE( g.matches(str) );
         const auto t_end = std::chrono::high_resolution_clock::now();
 
         std::cout << iter <<  " stars: took "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() 
-            << "ms" << std::endl;
+            << std::chrono::duration_cast<std::chrono::nanoseconds>(t_end - t_start).count() 
+            << "ns" << std::endl;
     
     }
 

@@ -53,8 +53,8 @@ public:
 
     template<std::ranges::range PathLike>
     bool matches(const PathLike& path) {
-        return retryable_match(elements, path, [](auto&& v) {
-            return std::visit(glob::star_retryable_visitor{}, v);
+        return glob_match(elements, path, [](const auto& e) {
+            return std::visit([](const auto& v) { return std::is_same_v<std::decay_t<decltype(v)>, glob::star>; }, e);
         }, [](const glob_path::element& e, match_struct<PathLike>& m) {
             return std::visit(match_visitor {m}, e);
         });

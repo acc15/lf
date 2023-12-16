@@ -56,8 +56,8 @@ glob::glob(const std::initializer_list<element>& v): elements(v) {
 }
 
 bool glob::matches(std::string_view sv) const {
-    return retryable_match(elements, sv, [](const glob::element& e) {
-        return std::visit(star_retryable_visitor{}, e);
+    return glob_match(elements, sv, [](const glob::element& e) {
+        return std::visit([](const auto& v) { return std::is_same_v<std::decay_t<decltype(v)>, glob::star>; }, e);
     }, [](const glob::element& e, match_struct<std::string_view>& m) {
         return std::visit(match_visitor {m}, e);
     });

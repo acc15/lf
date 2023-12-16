@@ -2,9 +2,6 @@
 
 #include "glob/glob_path.hpp"
 
-#include <iostream>
-#include <ranges>
-
 using namespace lf;
 
 namespace fs = std::filesystem;

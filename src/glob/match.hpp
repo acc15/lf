@@ -24,10 +24,10 @@ template <
         match_struct<Sequence>&
     > MatchFn
 >
-bool retryable_match(
+bool glob_match(
     const Elements& elements, 
     const Sequence& sequence, 
-    const RetryableFn& is_retryable,
+    const RetryableFn& is_star,
     const MatchFn& try_match
 ) {
 
@@ -52,7 +52,7 @@ bool retryable_match(
 
         if (e_cur != e_end) {
 
-            const bool retryable = is_retryable(*e_cur);
+            const bool retryable = is_star(*e_cur);
             if (retryable && (retries.empty() || retries.back().e_it != e_cur)) {
                 retries.push_back(retry_info { e_cur, s_cur, 0 });
             }
