@@ -16,27 +16,24 @@ class glob_path {
         match_struct<Sequence>& m;
 
         bool operator()(const globstar&) {
-            if (m.cur == m.end) {
-                return false;
-            }
             ++m.cur;
             return true;
         }
 
         bool operator()(const std::string& s) {
-            if (m.cur == m.end || *m.cur != s) {
-                return false;
+            if (*m.cur == s) {
+                ++m.cur;
+                return true;
             }
-            ++m.cur;
-            return true;
+            return false;
         }
 
         bool operator()(const glob& g) {
-            if (m.cur == m.end || !g.matches(*m.cur)) {
-                return false;
+            if (g.matches(*m.cur)) {
+                ++m.cur;
+                return true;
             }
-            ++m.cur;
-            return true;
+            return false;
         }
         
     };

@@ -46,8 +46,8 @@ bool glob_match(
 
     while (e_cur != e_end) {
 
-        const auto e_ns_begin = std::find_if_not(e_cur, e_end, &is_globstar<elem>);
-        const auto e_ns_end = std::find_if(e_ns_begin, e_end, &is_globstar<elem>);
+        const elem_iter e_ns_begin = std::find_if_not(e_cur, e_end, &is_globstar<elem>);
+        const elem_iter e_ns_end = std::find_if(e_ns_begin, e_end, &is_globstar<elem>);
 
         const bool has_star = e_ns_begin != e_cur;
         const bool last_chunk = e_ns_end == e_end;
@@ -58,9 +58,12 @@ bool glob_match(
 
         match_struct<Sequence> m = { s_cur, s_end };
         while (true) {
-            const auto s_restore_cur = s_cur;
+            const seq_iter s_restore_cur = s_cur;
 
-            bool ns_match = std::all_of(e_ns_begin, e_ns_end, [&m, &try_match](const auto& e) { return try_match(e, m); });
+            bool ns_match = std::all_of(e_ns_begin, e_ns_end, [&m, &try_match](const auto& e) { 
+                return m.cur != m.end && try_match(e, m);
+            });
+
             if (!has_star) {
                 if (!ns_match) {
                     return false;
@@ -68,12 +71,15 @@ bool glob_match(
                 break;
             }
             
-            if (ns_match && (!last_chunk || s_cur == s_end)) {
-                break;
+            if (ns_match) {
+                if (!last_chunk || s_cur == s_end) {
+                    break;
+                }
+                continue;
             }
 
             s_cur = s_restore_cur;
-            if (!try_match(*e_cur, m)) {
+            if (s_cur == s_end || !try_match(*e_cur, m)) {
                 return false;
             }
 

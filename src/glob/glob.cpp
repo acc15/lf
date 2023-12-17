@@ -15,17 +15,11 @@ struct match_visitor {
     }
 
     bool operator()(const glob::any&) {
-        if (m.cur == m.end) {
-            return false;
-        }
         utf8::unchecked::next(m.cur);
         return true;
     }
 
     bool operator()(const glob::range& r) {
-        if (m.cur == m.end) {
-            return false;
-        }
         const utf8::utfchar32_t cp = utf8::unchecked::next(m.cur);
         const auto it = r.map.upper_bound(cp);
         const bool in_range = it != r.map.begin() && cp <= std::prev(it)->second;
@@ -34,11 +28,8 @@ struct match_visitor {
 
     bool operator()(const std::string& str) {
         const auto p = std::mismatch(str.begin(), str.end(), m.cur, m.end);
-        if (p.first != str.end()) {
-            return false;
-        }
         m.cur = p.second;
-        return true;
+        return p.first == str.end();
     }
 
 };
