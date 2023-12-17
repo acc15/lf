@@ -4,23 +4,21 @@
 #include <map>
 #include <variant>
 #include <utf8/core.h>
+#include "glob/match.hpp"
 
 namespace lf {
 
     class glob {
     public:
-        using codepoint = utf8::utfchar32_t;
-        
-        struct star {};
         struct any {};
         struct range {
-            std::map<codepoint, codepoint> map;
+            std::map<utf8::utfchar32_t, utf8::utfchar32_t> map;
             bool inverse;
 
-            range(const std::initializer_list<std::pair<const codepoint, codepoint>>& map_init);
+            range(const std::initializer_list<std::pair<const utf8::utfchar32_t, utf8::utfchar32_t>>& map_init);
         };
 
-        using element = std::variant<star, any, range, std::string>;
+        using element = std::variant<globstar, any, range, std::string>;
         using element_vector = std::vector<element>;
 
         element_vector elements;

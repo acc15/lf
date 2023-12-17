@@ -37,17 +37,19 @@ struct match_visitor {
         return true;
     }
 
-    bool operator()(const glob::star&) {
+    bool operator()(const globstar&) {
         if (m.last) {
             m.cur = m.end;
+        } else if (m.cur != m.end) {
+            utf8::unchecked::next(m.cur);
         } else {
-            for (; m.cur != m.end && m.retry > 0; utf8::unchecked::next(m.cur), --m.retry);
+            return false;
         }
-        return m.retry == 0;
+        return true;
     }
 };
 
-glob::range::range(const std::initializer_list<std::pair<const codepoint, codepoint>>& map_init): 
+glob::range::range(const std::initializer_list<std::pair<const utf8::utfchar32_t, utf8::utfchar32_t>>& map_init): 
     map(map_init), 
     inverse(false) {
 }
@@ -56,9 +58,7 @@ glob::glob(const std::initializer_list<element>& v): elements(v) {
 }
 
 bool glob::matches(std::string_view sv) const {
-    return glob_match(elements, sv, [](const glob::element& e) {
-        return std::visit([](const auto& v) { return std::is_same_v<std::decay_t<decltype(v)>, glob::star>; }, e);
-    }, [](const glob::element& e, match_struct<std::string_view>& m) {
+    return glob_match(elements, sv, [](const glob::element& e, match_struct<std::string_view>& m) {
         return std::visit(match_visitor {m}, e);
     });
 }

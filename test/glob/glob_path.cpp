@@ -8,7 +8,7 @@ namespace fs = std::filesystem;
 
 TEST_CASE("glob_path: matches", "[glob_path]") {
     
-    glob_path gp = { "a", glob::star{}, "c.txt" };
+    glob_path gp = { "a", globstar{}, "c.txt" };
     REQUIRE( gp.matches(fs::path("a") / "b" / "c.txt") );
     REQUIRE_FALSE( gp.matches(fs::path("a") / "b" / "d.txt") );
     REQUIRE( gp.matches(fs::path("a") / "b" / "e" / "x" / "c.txt") );

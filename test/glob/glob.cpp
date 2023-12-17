@@ -1,26 +1,26 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/benchmark/catch_benchmark.hpp>
 
-#include "glob/glob.hpp"
-
-
-
 #include <iostream>
+
+#include "glob/glob.hpp"
 
 using namespace lf;
 
 
+TEST_CASE("glob: not matches", "[glob]") {
+    REQUIRE_FALSE( glob { 
+        globstar {}, 
+        "abc"
+    }.matches("xaaabcaabcx") );
+}
+
 TEST_CASE("glob: matches", "[glob]") {
 
     REQUIRE( glob { 
-        glob::star {}, 
+        globstar {}, 
         "abc", 
         glob::any {} 
-    }.matches("xaaabcaabcx") );
-
-    REQUIRE_FALSE( glob { 
-        glob::star {}, 
-        "abc"
     }.matches("xaaabcaabcx") );
 
     glob range_glob = {
@@ -35,7 +35,7 @@ TEST_CASE("glob: matches", "[glob]") {
     REQUIRE_FALSE(range_glob.matches("0Z"));
 
     glob ext_glob = {
-        glob::star {},
+        globstar {},
         ".txt"
     };
 
@@ -47,15 +47,24 @@ TEST_CASE("glob: matches", "[glob]") {
 
 }
 
+TEST_CASE("range", "[glob]") {
+    glob g = { globstar{}, "b", glob::any{}, glob::range{{U'A', U'Z'}} };
+    auto sr = std::ranges::subrange(g.elements);
+    std::cout << "size: " << sr.size() << std::endl;
+    sr.advance(1);
+    const glob::element& el = *sr.begin();
+    REQUIRE(std::holds_alternative<std::string>(el));
+
+}
 
 TEST_CASE("glob: match performance", "[glob]") {
 
-    for (size_t iter = 0; iter < 20; iter++) {
+    for (size_t iter = 0; iter < 40; iter++) {
 
         glob g;
         for (size_t i = 0; i < iter; i++) {
             g.elements.push_back("a");
-            g.elements.push_back(glob::star{});
+            g.elements.push_back(globstar{});
         }
         g.elements.push_back("b");
 
