@@ -16,13 +16,10 @@ class glob_path {
         match_struct<Sequence>& m;
 
         bool operator()(const globstar&) {
-            if (m.last) {
-                m.cur = m.end;
-            } else if (m.cur != m.end) {
-                ++m.cur;
-            } else {
+            if (m.cur == m.end) {
                 return false;
             }
+            ++m.cur;
             return true;
         }
 

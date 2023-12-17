@@ -1,7 +1,6 @@
 #pragma once
 
 #include <concepts>
-#include <cstddef>
 #include <ranges>
 #include <variant>
 #include <algorithm>
@@ -14,8 +13,12 @@ template <std::ranges::range Sequence>
 struct match_struct {
     std::ranges::const_iterator_t<const Sequence>& cur;
     const std::ranges::const_sentinel_t<const Sequence>& end;
-    const bool last;
 };
+
+template <typename T>
+bool is_globstar(const T& v) {
+    return std::holds_alternative<globstar>(v);
+}
 
 template <
     std::ranges::range Elements,
@@ -31,9 +34,10 @@ bool glob_match(
     const MatchFn& try_match
 ) {
 
+    using elem = std::ranges::range_value_t<const Elements>;
     using elem_iter = std::ranges::const_iterator_t<const Elements>;
     using seq_iter = std::ranges::const_iterator_t<const Sequence>;
-    
+
     elem_iter e_cur = elements.begin();
     const elem_iter e_end = elements.end();
 
@@ -42,28 +46,21 @@ bool glob_match(
 
     while (e_cur != e_end) {
 
-        const auto e_ns_begin = std::find_if_not(e_cur, e_end, [](const auto& el) { 
-            return std::holds_alternative<globstar>(el); 
-        });
+        const auto e_ns_begin = std::find_if_not(e_cur, e_end, &is_globstar<elem>);
+        const auto e_ns_end = std::find_if(e_ns_begin, e_end, &is_globstar<elem>);
 
-        const auto e_ns_end = std::find_if(e_ns_begin, e_end, [](const auto& el) { 
-            return std::holds_alternative<globstar>(el); 
-        });
+        const bool has_star = e_ns_begin != e_cur;
+        const bool last_chunk = e_ns_end == e_end;
+        if (has_star && last_chunk && e_ns_begin == e_ns_end) {
+            s_cur = s_end;
+            return true;
+        }
 
-        const bool has_star = e_ns_begin != e_cur;        
+        match_struct<Sequence> m = { s_cur, s_end };
         while (true) {
-
             const auto s_restore_cur = s_cur;
 
-            bool ns_match = true;
-            for (auto e_ns_cur = e_ns_begin; e_ns_cur != e_ns_end; ++e_ns_cur) {
-                match_struct<Sequence> m = { s_cur, s_end, e_ns_cur + 1 == e_end };
-                if (!try_match(*e_ns_cur, m)) {
-                    ns_match = false;
-                    break;
-                }
-            }
-
+            bool ns_match = std::all_of(e_ns_begin, e_ns_end, [&m, &try_match](const auto& e) { return try_match(e, m); });
             if (!has_star) {
                 if (!ns_match) {
                     return false;
@@ -71,15 +68,12 @@ bool glob_match(
                 break;
             }
             
-            bool last_chunk = e_ns_end == e_end;
             if (ns_match && (!last_chunk || s_cur == s_end)) {
                 break;
             }
 
             s_cur = s_restore_cur;
-
-            match_struct<Sequence> star_match = { s_cur, s_end, e_ns_begin == e_ns_end };
-            if (!try_match(*e_cur, star_match)) {
+            if (!try_match(*e_cur, m)) {
                 return false;
             }
 

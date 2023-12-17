@@ -10,6 +10,10 @@ struct match_visitor {
 
     match_struct<Sequence>& m;
 
+    bool operator()(const globstar&) {
+        return operator()(glob::any{});
+    }
+
     bool operator()(const glob::any&) {
         if (m.cur == m.end) {
             return false;
@@ -37,16 +41,6 @@ struct match_visitor {
         return true;
     }
 
-    bool operator()(const globstar&) {
-        if (m.last) {
-            m.cur = m.end;
-        } else if (m.cur != m.end) {
-            utf8::unchecked::next(m.cur);
-        } else {
-            return false;
-        }
-        return true;
-    }
 };
 
 glob::range::range(const std::initializer_list<std::pair<const utf8::utfchar32_t, utf8::utfchar32_t>>& map_init): 
