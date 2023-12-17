@@ -59,8 +59,7 @@ bool glob_match(
         match_struct<Sequence> m = { s_cur, s_end };
         while (true) {
             const seq_iter s_restore_cur = s_cur;
-
-            bool ns_match = std::all_of(e_ns_begin, e_ns_end, [&m, &try_match](const auto& e) { 
+            const bool ns_match = std::all_of(e_ns_begin, e_ns_end, [&m, &try_match](const auto& e) { 
                 return m.cur != m.end && try_match(e, m);
             });
 
