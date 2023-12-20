@@ -70,11 +70,8 @@ bool glob_match(
                 break;
             }
             
-            if (ns_match) {
-                if (!last_chunk || s_cur == s_end) {
-                    break;
-                }
-                continue;
+            if (ns_match && (!last_chunk || s_cur == s_end)) {
+                break;
             }
 
             s_cur = s_restore_cur;

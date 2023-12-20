@@ -15,6 +15,13 @@ TEST_CASE("glob: not matches", "[glob]") {
     }.matches("xaaabcaabcx") );
 }
 
+TEST_CASE("glob: match last sequence", "[glob]") {
+    REQUIRE( glob { 
+        globstar {}, 
+        "aa", 
+    }.matches("xxxxaaa") );
+}
+
 TEST_CASE("glob: matches", "[glob]") {
 
     REQUIRE( glob { 
