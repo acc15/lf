@@ -159,6 +159,8 @@ add_executable(lf_test
 
     test/glob/glob.cpp
     test/glob/glob_path.cpp
+
+    test/sync/glob_sync.cpp
 )
 target_include_directories(lf_test PRIVATE test)
 target_link_libraries(lf_test PRIVATE lf_core Catch2::Catch2)

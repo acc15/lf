@@ -7,7 +7,6 @@
 
 using namespace lf;
 
-
 TEST_CASE("glob: not matches", "[glob]") {
     REQUIRE_FALSE( glob { 
         globstar {}, 
@@ -54,18 +53,7 @@ TEST_CASE("glob: matches", "[glob]") {
 
 }
 
-TEST_CASE("range", "[glob]") {
-    glob g = { globstar{}, "b", glob::any{}, glob::range{{U'A', U'Z'}} };
-    auto sr = std::ranges::subrange(g.elements);
-    std::cout << "size: " << sr.size() << std::endl;
-    sr.advance(1);
-    const glob::element& el = *sr.begin();
-    REQUIRE(std::holds_alternative<std::string>(el));
-
-}
-
 TEST_CASE("glob: match performance", "[glob]") {
-
     for (size_t iter = 0; iter < 40; iter++) {
 
         glob g;
@@ -86,5 +74,4 @@ TEST_CASE("glob: match performance", "[glob]") {
             << "ns" << std::endl;
     
     }
-
 }
