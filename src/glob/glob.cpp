@@ -10,8 +10,9 @@ struct match_visitor {
 
     match_struct<Sequence>& m;
 
-    bool operator()(const globstar&) {
-        return operator()(glob::any{});
+    bool operator()(const glob::star&) {
+        utf8::unchecked::next(m.cur);
+        return true;
     }
 
     bool operator()(const glob::any&) {
@@ -34,18 +35,28 @@ struct match_visitor {
 
 };
 
+glob::range::range(): map(), inverse(false) {}
+glob::range::range(const range& cp): map(cp.map), inverse(cp.inverse) {}
+glob::range::range(range&& mv): map(std::move(mv.map)), inverse(mv.inverse) {}
+
 glob::range::range(const std::initializer_list<std::pair<const utf8::utfchar32_t, utf8::utfchar32_t>>& map_init): 
     map(map_init), 
     inverse(false) {
 }
 
-glob::glob(const std::initializer_list<element>& v): elements(v) {
-}
+glob::glob(const std::initializer_list<element>& v): elements(v) {}
+glob::glob(const element_vector& v): elements(v) {}
+glob::glob(element_vector&& v): elements(v) {}
 
 bool glob::matches(std::string_view sv) const {
     return glob_match(elements, sv, [](const glob::element& e, match_struct<std::string_view>& m) {
         return std::visit(match_visitor {m}, e);
     });
+}
+
+glob glob::parse(std::string_view str) {
+    auto it = str.begin();
+    return glob::parse(it, str.end());
 }
 
 }

@@ -9,14 +9,14 @@ using namespace lf;
 
 TEST_CASE("glob: not matches", "[glob]") {
     REQUIRE_FALSE( glob { 
-        globstar {}, 
+        glob::star {}, 
         "abc"
     }.matches("xaaabcaabcx") );
 }
 
 TEST_CASE("glob: match last sequence", "[glob]") {
     REQUIRE( glob { 
-        globstar {}, 
+        glob::star {}, 
         "aa", 
     }.matches("xxxxaaa") );
 }
@@ -24,7 +24,7 @@ TEST_CASE("glob: match last sequence", "[glob]") {
 TEST_CASE("glob: matches", "[glob]") {
 
     REQUIRE( glob { 
-        globstar {}, 
+        glob::star {}, 
         "abc", 
         glob::any {} 
     }.matches("xaaabcaabcx") );
@@ -41,7 +41,7 @@ TEST_CASE("glob: matches", "[glob]") {
     REQUIRE_FALSE(range_glob.matches("0Z"));
 
     glob ext_glob = {
-        globstar {},
+        glob::star {},
         ".txt"
     };
 
@@ -59,7 +59,7 @@ TEST_CASE("glob: match performance", "[glob]") {
         glob g;
         for (size_t i = 0; i < iter; i++) {
             g.elements.push_back("a");
-            g.elements.push_back(globstar{});
+            g.elements.push_back(glob::star());
         }
         g.elements.push_back("b");
 
@@ -74,4 +74,11 @@ TEST_CASE("glob: match performance", "[glob]") {
             << "ns" << std::endl;
     
     }
+}
+
+TEST_CASE("glob: parse", "[glob]") {
+
+
+    glob g = glob::parse("a*b?c[ab]d[!]e[!ab]");
+
 }

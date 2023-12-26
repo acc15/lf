@@ -2,8 +2,9 @@
 
 #include <concepts>
 #include <ranges>
-#include <variant>
 #include <algorithm>
+
+#include "glob/glob.hpp"
 
 namespace lf {
 
@@ -14,11 +15,6 @@ struct match_struct {
     std::ranges::const_iterator_t<const Sequence>& cur;
     const std::ranges::const_sentinel_t<const Sequence>& end;
 };
-
-template <typename T>
-bool is_globstar(const T& v) {
-    return std::holds_alternative<globstar>(v);
-}
 
 template <
     std::ranges::range Elements,
@@ -46,8 +42,8 @@ bool glob_match(
 
     while (e_cur != e_end) {
 
-        const elem_iter e_ns_begin = std::find_if_not(e_cur, e_end, &is_globstar<elem>);
-        const elem_iter e_ns_end = std::find_if(e_ns_begin, e_end, &is_globstar<elem>);
+        const elem_iter e_ns_begin = std::find_if_not(e_cur, e_end, &glob::is_star<elem>);
+        const elem_iter e_ns_end = std::find_if(e_ns_begin, e_end, &glob::is_star<elem>);
 
         const bool has_star = e_ns_begin != e_cur;
         const bool last_chunk = e_ns_end == e_end;

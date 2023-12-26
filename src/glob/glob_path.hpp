@@ -4,8 +4,8 @@
 #include <string>
 #include <filesystem>
 
-#include "glob/match.hpp"
 #include "glob/glob.hpp"
+#include "glob/match.hpp"
 
 namespace lf {
 
@@ -15,7 +15,7 @@ class glob_path {
     struct match_visitor {
         match_struct<Sequence>& m;
 
-        bool operator()(const globstar&) {
+        bool operator()(const glob::star&) {
             ++m.cur;
             return true;
         }
@@ -40,7 +40,7 @@ class glob_path {
 
 public:
 
-    using element = std::variant<globstar, std::string, glob>;
+    using element = std::variant<glob::star, std::string, glob>;
     using element_vector = std::vector<element>;
 
     element_vector elements;
@@ -50,7 +50,7 @@ public:
     template<std::ranges::range PathLike>
     bool matches(const PathLike& path) {
         return glob_match(elements, path, [](const glob_path::element& e, match_struct<PathLike>& m) {
-            return std::visit(match_visitor {m}, e);
+            return std::visit(match_visitor<PathLike> {m}, e);
         });
     }
 
