@@ -77,8 +77,7 @@ TEST_CASE("glob: match performance", "[glob]") {
 }
 
 TEST_CASE("glob: parse", "[glob]") {
+    glob g = glob::parse("a*b?c[ab]d[!]e[!ab]x[a-zA-Z]");
 
-
-    glob g = glob::parse("a*b?c[ab]d[!]e[!ab]");
 
 }

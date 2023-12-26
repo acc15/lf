@@ -47,7 +47,9 @@ range_matcher::range_map::iterator range_matcher::make_min_iter(
 
 void range_matcher::add_minmax(const codepoint& min, const codepoint& max) {
     const auto min_next = ranges.upper_bound(min);
-    const auto min_iter = make_min_iter(min_next, min, max);
+    const auto min_iter = min_next != ranges.begin() && std::prev(min_next)->second + 1 >= min
+        ? std::prev(min_next)
+        : ranges.insert(min_next, { min, max });
 
     const auto max_next = ranges.upper_bound(max);
     if (max_next != ranges.end() && max + 1 == max_next->first) {
