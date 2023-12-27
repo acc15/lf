@@ -111,6 +111,7 @@ add_library(lf_core
     src/glob/matcher/star_matcher.cpp
     src/glob/glob.cpp
     src/glob/glob_path.cpp
+    src/glob/parse.cpp
 
 )
 target_link_libraries(lf_core utf8::cpp)
