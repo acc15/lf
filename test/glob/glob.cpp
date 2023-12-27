@@ -58,6 +58,15 @@ TEST_CASE("glob: match range", "[glob][match]") {
     REQUIRE_FALSE(range_glob.matches("0Z"));
 }
 
+TEST_CASE("glob: match utf8", "[glob][match]") {
+    glob glob = { glob::range{ {{U'а', U'я'}} } };
+    REQUIRE( glob.matches("а") );
+    REQUIRE( glob.matches("б") );
+    REQUIRE( glob.matches("в") );
+    REQUIRE( glob.matches("я") );
+    REQUIRE( !glob.matches("А") );
+}
+
 TEST_CASE("glob: match extension", "[glob][match]") {
     glob ext_glob = { glob::star(), ".txt" };
     REQUIRE(ext_glob.matches("a.txt"));
@@ -139,4 +148,14 @@ TEST_CASE("glob: parse range single dash", "[glob][parse]") {
 
 TEST_CASE("glob: parse multiple consecutive stars", "[glob][parse]") {
     test_parse("*****", { glob::star() });
+}
+
+TEST_CASE("glob: stringify", "[glob][stringify]") {
+    REQUIRE( glob { 
+        glob::star(), 
+        glob::any(), 
+        glob::range { {{U'А', U'Я'}, {U'а', U'я'}, {U'a', U'a'}} },
+        glob::range { {{U'a', U'c'}}, true },
+        "abc*[]?", 
+    }.stringify() == "*?[aА-Яа-я][!a-c]abc[*][[][]][?]" );
 }

@@ -3,6 +3,7 @@
 #include "glob/glob.hpp"
 #include "glob/match.hpp"
 #include "glob/parse.hpp"
+#include "glob/stringify.hpp"
 
 namespace lf {
 
@@ -44,6 +45,10 @@ bool glob::matches(std::string_view sv) const {
     return glob_match(elements, sv, [](const glob::element& e, match_struct<std::string_view>& m) {
         return std::visit(match_visitor {m}, e);
     });
+}
+
+std::string glob::stringify() const {
+    return glob_stringify(elements);
 }
 
 glob glob::parse(std::string_view str) {

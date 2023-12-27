@@ -104,14 +104,10 @@ add_library(lf_core
     src/cmd/impl/info_cmd.cpp 
 
     # glob
-    src/glob/matcher/glob_matcher.cpp
-    src/glob/matcher/any_matcher.cpp
-    src/glob/matcher/range_matcher.cpp
-    src/glob/matcher/string_matcher.cpp
-    src/glob/matcher/star_matcher.cpp
     src/glob/glob.cpp
     src/glob/glob_path.cpp
     src/glob/parse.cpp
+    src/glob/stringify.cpp
 
 )
 target_link_libraries(lf_core utf8::cpp)

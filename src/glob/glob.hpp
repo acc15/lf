@@ -34,6 +34,7 @@ namespace lf {
         glob(const std::initializer_list<element>& v);
 
         bool matches(std::string_view sv) const;
+        std::string stringify() const;
         static glob parse(std::string_view str);
 
     };

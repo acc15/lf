@@ -15,10 +15,10 @@ static bool non_stop_parse(Iter, Sentinel) {
 }
 
 template <std::input_iterator Iter, std::sentinel_for<Iter> Sentinel, std::invocable<Iter, Sentinel> StopFunction = bool(*)(Iter,Sentinel)>
-static glob glob_parse(Iter& it, Sentinel end, StopFunction fn = non_stop_parse) {
+static glob glob_parse(Iter& it, Sentinel end, StopFunction stop = non_stop_parse) {
     glob::element_vector els;
     while (it != end) {
-        if (fn(it, end)) {
+        if (stop(it, end)) {
             break;
         }
 
@@ -64,7 +64,6 @@ void glob_parse_range(Iter& it, Sentinel end, glob::element_vector& els) {
 
     bool in_char_range = false;
     while (it != end) {
-
         const auto ch = utf8::unchecked::next(it);
         if (ch == U']') {
             break;
@@ -74,19 +73,19 @@ void glob_parse_range(Iter& it, Sentinel end, glob::element_vector& els) {
             glob_add_minmax(range.map, last_char.value(), ch);
             last_char = std::nullopt;
             in_char_range = false;
-        } else if (ch == U'-') {
-            if (last_char.has_value()) {
-                in_char_range = true;
-            } else {
-                last_char = ch;
-            }
-        } else {
-            if (last_char.has_value()) {
-                glob_add_minmax(range.map, last_char.value(), last_char.value());
-            }
-            last_char = ch;
+            continue;
         }
 
+        if (ch == U'-' && last_char.has_value()) {
+            in_char_range = true;
+            continue;
+        }
+
+        if (last_char.has_value()) {
+            glob_add_minmax(range.map, last_char.value(), last_char.value());
+        }
+        
+        last_char = ch;
     }
 
     if (last_char.has_value()) {
