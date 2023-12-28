@@ -7,7 +7,6 @@
 namespace lf {
 
 std::string& glob_make_string_ref(glob::element_vector& els);
-void glob_add_minmax(glob::range::map_type& ranges, utf8::utfchar32_t min, utf8::utfchar32_t max);
 
 template <std::input_iterator Iter, std::sentinel_for<Iter> Sentinel>
 static bool non_stop_parse(Iter, Sentinel) {
@@ -15,7 +14,7 @@ static bool non_stop_parse(Iter, Sentinel) {
 }
 
 template <std::input_iterator Iter, std::sentinel_for<Iter> Sentinel, std::invocable<Iter, Sentinel> StopFunction = bool(*)(Iter,Sentinel)>
-static glob glob_parse(Iter& it, Sentinel end, StopFunction stop = non_stop_parse) {
+static glob::element_vector glob_parse(Iter& it, Sentinel end, StopFunction stop = non_stop_parse) {
     glob::element_vector els;
     while (it != end) {
         if (stop(it, end)) {
@@ -44,7 +43,7 @@ static glob glob_parse(Iter& it, Sentinel end, StopFunction stop = non_stop_pars
             break;
         }
     }
-    return glob(std::move(els));
+    return els;
 }
 
 template <std::input_iterator Iter, std::sentinel_for<Iter> Sentinel>
@@ -70,7 +69,7 @@ void glob_parse_range(Iter& it, Sentinel end, glob::element_vector& els) {
         }
         
         if (in_char_range) {
-            glob_add_minmax(range.map, last_char.value(), ch);
+            range.add(last_char.value(), ch);
             last_char = std::nullopt;
             in_char_range = false;
             continue;
@@ -82,18 +81,18 @@ void glob_parse_range(Iter& it, Sentinel end, glob::element_vector& els) {
         }
 
         if (last_char.has_value()) {
-            glob_add_minmax(range.map, last_char.value(), last_char.value());
+            range.add(last_char.value());
         }
         
         last_char = ch;
     }
 
     if (last_char.has_value()) {
-        glob_add_minmax(range.map, last_char.value(), last_char.value());
+        range.add(last_char.value());
     }
 
     if (in_char_range) {
-        glob_add_minmax(range.map, U'-', U'-');
+        range.add(U'-');
     }
 
     if (range.map.empty()) {

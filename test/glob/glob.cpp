@@ -76,7 +76,7 @@ TEST_CASE("glob: match extension", "[glob][match]") {
     REQUIRE_FALSE(ext_glob.matches("Hello.zip"));
 }
 
-TEST_CASE("glob: match performance", "[glob]") {
+TEST_CASE("glob: match performance", "[glob][match][!benchmark]") {
     for (size_t iter = 0; iter < 40; iter++) {
 
         glob g;
