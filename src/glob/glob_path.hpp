@@ -51,6 +51,8 @@ public:
 
     bool matches(const fs_path& path);
 
+    static glob_path::element parse_path_element(std::string_view v);
+
     // void stringify(std::string& result) const;
     // std::string stringify() const;
 

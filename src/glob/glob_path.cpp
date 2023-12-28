@@ -10,5 +10,28 @@ bool glob_path::matches(const fs_path& path) {
     return matches(path | std::views::transform([](const fs_path& p) { return p.string(); }));
 }
 
+glob_path::element glob_path::parse_path_element(std::string_view v) {
+    if (v.empty()) {
+        return static_cast<std::string>(v);
+    }
+    if (v == "**") {
+        return glob::star {};
+    }
+    auto g = glob::parse(v);
+    if (g.elements.empty()) {
+        return static_cast<std::string>(v);
+    }
+    if (g.elements.size() > 1) {
+        return g;
+    }
+    
+    auto& first = g.elements.front();
+    if (std::holds_alternative<std::string>(first)) {
+        return std::get<std::string>(first);
+    }
+    return g;
+}
+
+
 }
 
